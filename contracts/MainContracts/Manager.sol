@@ -10,16 +10,11 @@ Transparent Proxies:
     - 0 : Itself (Certificate Pool Manager)
     - 1 : Public Pool
     - 2 : Treasury
-    - 3 : Certis Token
-    - 4 : Private Pool Factory
-    - 5 : Provider Factory
-    - 6 : Price Converter
-    - 7 : Proposition Settings
-    - 8 : ENS
+    - 3 : Originals Token
+    - 4 : Proposition Settings
 
 Beacons:
-    - 0 : Private Pool
-    - 1 : Provider
+    - 0 : NFT
 
  NewProposals :
     - Amount of New Transaparent proxies = m

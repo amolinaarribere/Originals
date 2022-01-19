@@ -10,9 +10,9 @@ library Library{
 
     // DATA /////////////////////////////////////////
     // enum
-    enum Prices{NewProvider, NewPool, NewCertificate, NewProviderContract}
-    enum TransparentProxies{CertificatePoolManager, PublicPool, Treasury, Certis, PrivatePoolFactory, ProviderFactory, PriceConverter, PropSettings, ENS}
-    enum Beacons{PrivatePool, Provider}
+    enum Prices{NewIssuer, TransferFee}
+    enum TransparentProxies{CertificatePoolManager, PublicPool, Treasury, Originals, PropSettings}
+    enum Beacons{NFT}
 
     // Structures
     // Certificate Manager
@@ -22,13 +22,6 @@ library Library{
         bytes[] TransparentData;
         string PrivatePoolContractName;
         string PrivatePoolContractVersion;
-    }
-
-    // Pending Certificates
-    struct _pendingCertificatesStruct{
-        address pool;
-        address holder;
-        bytes32 certificate;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
