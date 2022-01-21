@@ -74,7 +74,20 @@ library ItemsLibrary{
         address owner;
         string name;
         string symbol;
-        address nftContract; 
+        Library.PaymentPlans paymentPlan;
+    }
+
+    struct _pendingIssuerStruct{
+        _issuerStruct issuer;
+        address[] _Validations;
+        address[] _Rejections;
+    }
+
+    struct _offerStruct{
+        uint256 offer;
+        address sender;
+        address bidder;
+        uint256 deadline; 
     }
     
     struct _itemIdentity{

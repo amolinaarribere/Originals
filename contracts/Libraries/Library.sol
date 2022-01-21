@@ -10,6 +10,7 @@ library Library{
 
     // DATA /////////////////////////////////////////
     // enum
+    enum PaymentPlans{Minting, TransferFee}
     enum Prices{NewIssuer, TransferFee}
     enum TransparentProxies{CertificatePoolManager, PublicPool, Treasury, Originals, PropSettings}
     enum Beacons{NFT}
