@@ -111,7 +111,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
     }
 
     modifier isFromTokenContract(address addr){
-        Library.ItIsSomeone(addr, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Certis)]);
+        Library.ItIsSomeone(addr, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Originals)]);
         _;
     }
 
@@ -123,11 +123,11 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
     }
 
     function totalSupply() internal view returns(uint256){
-        return IERC20Upgradeable(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Certis)]).totalSupply();
+        return IERC20Upgradeable(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Originals)]).totalSupply();
     }
 
     function GetTokensBalance(address add) internal view returns(uint256){
-        return IERC20Upgradeable(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Certis)]).balanceOf(add);
+        return IERC20Upgradeable(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Originals)]).balanceOf(add);
     }
 
     function GetVotingTokens(address addr, uint id) internal view returns(uint256){
@@ -154,7 +154,6 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
         super.ManagedBaseContract_init(managerContractAddress);
         _chairperson = chairperson;
         _nextPropID = 0; 
-        setContractConfig(contractName, contractVersion);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////

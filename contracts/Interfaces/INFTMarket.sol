@@ -10,7 +10,6 @@ pragma solidity 0.8.7;
    import "../Libraries/ItemsLibrary.sol";
 
  interface INFTMarket  {
-    using ItemsLibrary for *;
 
     function changeOwner(address newOwner) external;
     function changePaymentPlan(Library.PaymentPlans newPaymentPlan) external;

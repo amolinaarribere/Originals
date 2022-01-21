@@ -9,7 +9,6 @@ pragma solidity 0.8.7;
   import "../Libraries/ItemsLibrary.sol";
 
  interface IPool  {
-     using ItemsLibrary for *;
 
     function requestIssuer(address owner, string memory name, string memory symbol, Library.PaymentPlans paymentPlan) external payable returns (uint);
     function validateIssuer(uint id) external;

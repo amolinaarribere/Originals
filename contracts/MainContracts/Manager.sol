@@ -12,6 +12,7 @@ Transparent Proxies:
     - 2 : Treasury
     - 3 : Originals Token
     - 4 : Proposition Settings
+    - 5 : NFT Factory
 
 Beacons:
     - 0 : NFT
@@ -112,8 +113,6 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         for(uint i=0; i < initialContracts.BeaconAddresses.length; i++){
             addBeacon(initialContracts.BeaconAddresses[i]);
         }
-        IFactory(address(_TransparentProxies[uint256(Library.TransparentProxies.PrivatePoolFactory)])).updateContractName(initialContracts.PrivatePoolContractName);
-        IFactory(address(_TransparentProxies[uint256(Library.TransparentProxies.PrivatePoolFactory)])).updateContractVersion(initialContracts.PrivatePoolContractVersion);
     }
 
     function UpdateAll() internal override
@@ -163,16 +162,9 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
 
         pointer = pointer + _TransparentProxies.length + NewTransparentProxies;
         
-
-        if(0 < _ProposedNewValues[pointer].length)
-            IFactory(address(_TransparentProxies[uint256(Library.TransparentProxies.PrivatePoolFactory)])).updateContractName(string(_ProposedNewValues[pointer]));
-
-        if(0 < _ProposedNewValues[pointer + 1].length)
-            IFactory(address(_TransparentProxies[uint256(Library.TransparentProxies.PrivatePoolFactory)])).updateContractVersion(string(_ProposedNewValues[pointer + 1]));
-
         // We finally upgrade this contract if required
-        upgradeTransparentProxy(_TransparentProxies[uint256(Library.TransparentProxies.CertificatePoolManager)], 
-                uint256(Library.TransparentProxies.CertificatePoolManager), 
+        upgradeTransparentProxy(_TransparentProxies[uint256(Library.TransparentProxies.Manager)], 
+                uint256(Library.TransparentProxies.Manager), 
                 _ProposedNewValues[_NewPropositionsRedimesionFields], 
                 _ProposedNewValues[_NewPropositionsRedimesionFields + TransaprentProxyDataSkip]);
 
