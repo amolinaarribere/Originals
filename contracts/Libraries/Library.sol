@@ -12,7 +12,7 @@ library Library{
     // enum
     enum PaymentPlans{Minting, TransferFee}
     enum Prices{NewIssuer, TransferFee}
-    enum TransparentProxies{Manager, PublicPool, Treasury, Originals, PropSettings, NFTFactory}
+    enum TransparentProxies{Manager, PublicPool, Treasury, Originals, PropSettings, NFTFactory, AdminPiggyBank}
     enum Beacons{NFT}
 
     // Structures

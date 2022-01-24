@@ -15,6 +15,17 @@ pragma solidity 0.8.7;
 abstract contract MultiSigContract is IMultiSigContract, Initializable{
     using AddressLibrary for *;
 
+    // EVENTS /////////////////////////////////////////
+    event _VoteForOwner(address owner, address voter, bool vote);
+    event _AddOwnerValidation(address owner);
+    event _RemoveOwnerValidation(address owner);
+    event _AddOwnerRejection(address owner);
+    event _RemoveOwnerRejection(address owner);
+
+    event _VoteForMinOwner(uint256 minOwner, address voter, bool vote);
+    event _MinOwnerValidation(uint256 minOwner);
+    event _MinOwnerRejection(uint256 minOwner);
+
     // DATA /////////////////////////////////////////
     // Owners
     struct _ownerStruct{
@@ -149,7 +160,11 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
         OwnerPending(owner, true)
         HasNotAlreadyVoted(msg.sender, owner, false)
     {
+
+        emit _VoteForOwner(owner, msg.sender, vote);
+
         _Owners._owner[owner]._Voters.push(msg.sender);
+        
         if(vote){
             _Owners._owner[owner]._validations++;
 
@@ -160,6 +175,7 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
                     _Owners._activatedOwners.push(owner);
                     _Owners._owner[owner]._activated = true;
                     _Owners._owner[owner]._id = _Owners._activatedOwners.length - 1; 
+                    emit _AddOwnerValidation(owner);
                 }
                 else{
                     uint pos = _Owners._owner[owner]._id;
@@ -167,6 +183,7 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
                     if(_Owners._activatedOwners.length > pos)  _Owners._owner[_Owners._activatedOwners[pos]]._id = pos;
                     delete(_Owners._owner[owner]._activated);
                     delete(_Owners._owner[owner]._id); 
+                    emit _RemoveOwnerValidation(owner);
                 }
 
                 deletingPendingOwner(owner, pendingList);
@@ -177,7 +194,13 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
 
             if(_Owners._owner[owner]._rejections >= _minOwners){
                 address[] storage pendingList = _Owners._pendingOwnersRemove;
-                if(isOwnerPendingToAdded(owner)) pendingList = _Owners._pendingOwnersAdd;
+                if(isOwnerPendingToAdded(owner)){
+                    pendingList = _Owners._pendingOwnersAdd;
+                    emit _AddOwnerRejection(owner);
+                } 
+                else{
+                    emit _RemoveOwnerRejection(owner);
+                }
                 
                 deletingPendingOwner(owner, pendingList);
             }
@@ -212,12 +235,12 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
         return _Owners._owner[addr]._activated;
     }
 
-    function isOwnerPendingToAdded(address addr) public view returns(bool)
+    function isOwnerPendingToAdded(address addr) internal view returns(bool)
     {
         return (addr == _Owners._pendingOwnersAdd[_Owners._owner[addr]._pendingId]);
     }
 
-    function isOwnerPendingToRemoved(address addr) public view returns(bool)
+    function isOwnerPendingToRemoved(address addr) internal view returns(bool)
     {
         return (addr == _Owners._pendingOwnersRemove[_Owners._owner[addr]._pendingId]);
     }

@@ -41,7 +41,7 @@ library ItemsLibrary{
     using Library for *;
 
     // EVENTS /////////////////////////////////////////
-    event _AddItemValidation(string ItemType,  bytes32 indexed Item,  string Info);
+    /*event _AddItemValidation(string ItemType,  bytes32 indexed Item,  string Info);
     event _RemoveItemValidation(string ItemType,  bytes32 indexed Item,  string Info);
     event _AddItemRejection(string ItemType,  bytes32 indexed Item,  string Info);
     event _RemoveItemRejection( string ItemType,  bytes32 indexed Item,  string Info);
@@ -67,20 +67,22 @@ library ItemsLibrary{
 
     function HasNotAlreadyVoted(address addr, bytes32 item, _ItemsStruct storage itemStruct) public view{
         require(false == hasVoted(addr, item, itemStruct), "EC5-");
-    }
+    }*/
     
     // DATA /////////////////////////////////////////
     struct _issuerStruct{
-        address owner;
-        string name;
-        string symbol;
-        Library.PaymentPlans paymentPlan;
+        address _owner;
+        string _name;
+        string _symbol;
+        Library.PaymentPlans _paymentPlan;
     }
 
     struct _pendingIssuerStruct{
-        _issuerStruct issuer;
-        address[] _Validations;
-        address[] _Rejections;
+        _issuerStruct _issuer;
+        uint _pendingId;
+        uint _validations;
+        uint _rejections;
+        address[] _voters;
     }
 
     struct _offerStruct{
@@ -89,7 +91,8 @@ library ItemsLibrary{
         address bidder;
         uint256 deadline; 
     }
-    
+
+  /*  
     struct _itemIdentity{
         string _Info;
         bool _activated;
@@ -113,7 +116,7 @@ library ItemsLibrary{
         uint256 _minSignatures;
         string ItemTypeLabel; // Certificate, owner, provider, pool
         uint[] ids; // Ids that will be returned to callback when item activation/deletion has been validated/rejected 
-    }
+    }*/
 
     
     // AUX FUNCTIONALITY /////////////////////////////////////////
@@ -122,7 +125,7 @@ library ItemsLibrary{
         return true;
     }
 
-    function ReturnManipulateStructContent(_manipulateItemStruct memory manipulateItemstruct) public pure returns(bytes32, uint, string memory, uint[] memory)
+    /*function ReturnManipulateStructContent(_manipulateItemStruct memory manipulateItemstruct) public pure returns(bytes32, uint, string memory, uint[] memory)
     {
         return(manipulateItemstruct.item,
          manipulateItemstruct._minSignatures,
@@ -315,6 +318,6 @@ library ItemsLibrary{
     {
         return (AddressLibrary.FindAddress(add, itemStruct._items[item]._Validations) ||
                 AddressLibrary.FindAddress(add, itemStruct._items[item]._Rejections));
-    }
+    }*/
 
 }
