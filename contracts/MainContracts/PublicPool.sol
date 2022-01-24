@@ -53,6 +53,11 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
       _;
   }
 
+  modifier validFees(uint256 fee, uint256 decimals){
+      Library.validFees(fee, decimals);
+      _;
+  }
+
   // CONSTRUCTOR /////////////////////////////////////////
   function PublicPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
       super.MultiSigContract_init(owners, minOwners); 
@@ -62,8 +67,9 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
   }
 
   // FUNCTIONALITY /////////////////////////////////////////
-  function requestIssuer(address owner, string memory name, string memory symbol, Library.PaymentPlans paymentPlan) external override payable
+  function requestIssuer(address owner, string memory name, string memory symbol, uint256 feeAmount, uint256 feeDecimals, Library.PaymentPlans paymentPlan) external override payable
     validOwners(owner)
+    validFees(feeAmount, feeDecimals)
   returns (uint256)
   {
     ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:msg.value}(Library.Prices.NewIssuer);
@@ -71,6 +77,8 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     _pendingIssuers[nextIssuerId]._issuer._owner = owner;
     _pendingIssuers[nextIssuerId]._issuer._name = name;
     _pendingIssuers[nextIssuerId]._issuer._symbol = symbol;
+    _pendingIssuers[nextIssuerId]._issuer._feeAmount = feeAmount;
+    _pendingIssuers[nextIssuerId]._issuer._feeDecimals = feeDecimals;
     _pendingIssuers[nextIssuerId]._issuer._paymentPlan = paymentPlan;
     _pendingIssuers[nextIssuerId]._pendingId = _listOfPendingIssuers.length;
     _listOfPendingIssuers.push(nextIssuerId);
@@ -104,7 +112,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
         if(_pendingIssuers[id]._validations >= _minOwners){
             _listOfIssuers.push(id);
-            _issuers[id] = GenerateNewNFTMarket(_pendingIssuers[id]._issuer._owner, _pendingIssuers[id]._issuer._name, _pendingIssuers[id]._issuer._symbol, _pendingIssuers[id]._issuer._paymentPlan);
+            _issuers[id] = GenerateNewNFTMarket(_pendingIssuers[id]._issuer._owner, _pendingIssuers[id]._issuer._name, _pendingIssuers[id]._issuer._symbol, _pendingIssuers[id]._issuer._feeAmount, _pendingIssuers[id]._issuer._feeDecimals, _pendingIssuers[id]._issuer._paymentPlan);
             deletingPendingIssuer(id);
             emit _IssuerValidation(id, _issuers[id]);
         }
@@ -131,10 +139,11 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     delete(_pendingIssuers[id]._voters);
   }
 
-  function GenerateNewNFTMarket(address owner, string memory name, string memory symbol, Library.PaymentPlans paymentPlan) internal returns(address)
+  function GenerateNewNFTMarket(address owner, string memory name, string memory symbol, uint256 feeAmount, uint256 feeDecimals, Library.PaymentPlans paymentPlan) internal returns(address)
   {
     address beaconAddress = _managerContract.retrieveBeacons()[uint256(Library.Beacons.NFT)];
-    bytes memory data = abi.encodeWithSignature("NFTMarket_init(address,address,string,string,uint8)", address(_managerContract), owner, name, symbol, uint8(paymentPlan));
+    (,,,,,,uint256 OffersLifeTime) = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
+    bytes memory data = abi.encodeWithSignature("NFTMarket_init(address,address,string,string,uint256,uint256,uint256,uint8)", address(_managerContract), owner, name, symbol, OffersLifeTime, feeAmount, feeDecimals, uint8(paymentPlan));
 
     BeaconProxy beaconProxy = new BeaconProxy(beaconAddress, data);
 

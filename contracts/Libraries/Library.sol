@@ -11,7 +11,7 @@ library Library{
     // DATA /////////////////////////////////////////
     // enum
     enum PaymentPlans{Minting, TransferFee}
-    enum Prices{NewIssuer, TransferFee}
+    enum Prices{NewIssuer, MintingFee, TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals}
     enum TransparentProxies{Manager, PublicPool, Treasury, Originals, PropSettings, NFTFactory, AdminPiggyBank}
     enum Beacons{NFT}
 
@@ -26,6 +26,10 @@ library Library{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
+    function validFees(uint256 fee, uint256 decimals){
+      require(fee <= 100 * 10**decimals, "fees cannot be larger than 100 percent");
+    }
+
     function IdCorrect(uint Id, uint length) public pure{
         require(length > Id, "EC1-");
     }
