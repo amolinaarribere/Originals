@@ -240,19 +240,26 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
     }
 
     function validateMinOwners() external override
-        isAnOwner(msg.sender, true)
-        NewMinOwnerInProgress(true)
-        HasNotAlreadyVoted(msg.sender, address(0), true)
     {
         voteNewMinOwners(true);
     }
     
     function rejectMinOwners() external override
+    {
+        voteNewMinOwners(false);
+    }
+
+    function voteNewMinOwners(bool vote) internal 
         isAnOwner(msg.sender, true)
         NewMinOwnerInProgress(true)
         HasNotAlreadyVoted(msg.sender, address(0), true)
     {
-        voteNewMinOwners(false);
+         if(vote) _newMinOwnersVotesFor += 1;
+        else _newMinOwnersVotesAgainst += 1;
+
+        _newMinOwnersVoters.push(msg.sender);
+
+        checkNewMinOwners();         
     }
 
     function deleteNewMinOwners() internal 
@@ -261,16 +268,6 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
         _newMinOwnersVotesFor = 0;
         _newMinOwnersVotesAgainst = 0;
         delete(_newMinOwnersVoters);
-    }
-
-    function voteNewMinOwners(bool vote) internal 
-    {
-        if(vote) _newMinOwnersVotesFor += 1;
-        else _newMinOwnersVotesAgainst += 1;
-
-        _newMinOwnersVoters.push(msg.sender);
-
-        checkNewMinOwners();        
     }
 
     function checkNewMinOwners() internal
