@@ -13,10 +13,12 @@ Before every token transfer we contact the token gouvernance Base contracts so t
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "../Interfaces/IPool.sol";
+import "../Interfaces/ITreasury.sol";
 import "../Base/ManagedBaseContract.sol";
 import "../Base/MultiSigContract.sol";
 import "../Libraries/ItemsLibrary.sol";
 import "../Libraries/UintLibrary.sol";
+import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 
 
@@ -25,11 +27,11 @@ import "../Libraries/UintLibrary.sol";
   using UintLibrary for *;
 
   // EVENTS /////////////////////////////////////////
-  event _NewIssuerRequest(address indexed owner, string name, string symbol);
+  event _NewIssuerRequest(uint256 indexed id, address owner, string name, string symbol);
 
-  event _VoteForIssuer(uint256 id, address voter, bool vote);
-  event _IssuerValidation(uint256 id);
-  event _IssuerRejection(uint256 id);
+  event _VoteForIssuer(uint256 indexed id, address voter, bool vote);
+  event _IssuerValidation(uint256 indexed id, address NFTMarket);
+  event _IssuerRejection(uint256 indexed id);
 
   // DATA /////////////////////////////////////////
   mapping(uint256 => address) _issuers;
@@ -62,17 +64,20 @@ import "../Libraries/UintLibrary.sol";
   // FUNCTIONALITY /////////////////////////////////////////
   function requestIssuer(address owner, string memory name, string memory symbol, Library.PaymentPlans paymentPlan) external override payable
     validOwners(owner)
-  returns (uint)
+  returns (uint256)
   {
+    ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:msg.value}(Library.Prices.NewIssuer);
+
     _pendingIssuers[nextIssuerId]._issuer._owner = owner;
     _pendingIssuers[nextIssuerId]._issuer._name = name;
     _pendingIssuers[nextIssuerId]._issuer._symbol = symbol;
     _pendingIssuers[nextIssuerId]._issuer._paymentPlan = paymentPlan;
     _pendingIssuers[nextIssuerId]._pendingId = _listOfPendingIssuers.length;
-    
     _listOfPendingIssuers.push(nextIssuerId);
-    nextIssuerId++;
 
+    emit _NewIssuerRequest(nextIssuerId, owner, name, symbol);
+
+    nextIssuerId++;
     return(nextIssuerId - 1);
   }
 
@@ -101,6 +106,7 @@ import "../Libraries/UintLibrary.sol";
             _listOfIssuers.push(id);
             _issuers[id] = GenerateNewNFTMarket(_pendingIssuers[id]._issuer._owner, _pendingIssuers[id]._issuer._name, _pendingIssuers[id]._issuer._symbol, _pendingIssuers[id]._issuer._paymentPlan);
             deletingPendingIssuer(id);
+            emit _IssuerValidation(id, _issuers[id]);
         }
     }
     else{
@@ -108,6 +114,7 @@ import "../Libraries/UintLibrary.sol";
 
         if(_pendingIssuers[id]._rejections >= _minOwners){
             deletingPendingIssuer(id);
+            emit _IssuerRejection(id);
         }
     }
   }
@@ -126,7 +133,12 @@ import "../Libraries/UintLibrary.sol";
 
   function GenerateNewNFTMarket(address owner, string memory name, string memory symbol, Library.PaymentPlans paymentPlan) internal returns(address)
   {
-    return address(0);
+    address beaconAddress = _managerContract.retrieveBeacons()[uint256(Library.Beacons.NFT)];
+    bytes memory data = abi.encodeWithSignature("NFTMarket_init(address,address,string,string,uint8)", address(_managerContract), owner, name, symbol, uint8(paymentPlan));
+
+    BeaconProxy beaconProxy = new BeaconProxy(beaconAddress, data);
+
+    return address(beaconProxy);
   }
 
   function retrieveIssuers() external override view returns (uint[] memory)

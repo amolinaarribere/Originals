@@ -10,13 +10,13 @@ pragma solidity 0.8.7;
 
  interface IPool  {
 
-    function requestIssuer(address owner, string memory name, string memory symbol, Library.PaymentPlans paymentPlan) external payable returns (uint);
-    function validateIssuer(uint id) external;
-    function rejectIssuer(uint id) external;
+    function requestIssuer(address owner, string memory name, string memory symbol, Library.PaymentPlans paymentPlan) external payable returns (uint256);
+    function validateIssuer(uint256 id) external;
+    function rejectIssuer(uint256 id) external;
 
-    function retrieveIssuers() external view returns (uint[] memory);
-    function retrieveNFTMarketForIssuer(uint id) external view returns (address);
-    function retrievePendingIssuers() external view returns (uint[] memory);
-    function retrievePendingIssuer(uint id) external view returns (ItemsLibrary._pendingIssuerStruct memory);
+    function retrieveIssuers() external view returns (uint256[] memory);
+    function retrieveNFTMarketForIssuer(uint256 id) external view returns (address);
+    function retrievePendingIssuers() external view returns (uint256[] memory);
+    function retrievePendingIssuer(uint256 id) external view returns (ItemsLibrary._pendingIssuerStruct memory);
 
 }
