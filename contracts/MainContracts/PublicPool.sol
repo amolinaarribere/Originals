@@ -29,7 +29,7 @@ import "../Base/MultiSigContract.sol";
 
   // CONSTRUCTOR /////////////////////////////////////////
   function PublicPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
-      super.MultiSigCertPool_init(owners, minOwners, contractName, contractVersion); 
+      super.MultiSigContract_init(owners, minOwners); 
       super.ManagedBaseContract_init(managerContractAddress); 
   }
 

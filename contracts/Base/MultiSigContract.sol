@@ -8,7 +8,6 @@ pragma solidity 0.8.7;
  */
 
  import "../Interfaces/IMultiSigContract.sol";
- import "../Base/EntitiesBaseContract.sol";
  import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  import "../Libraries/AddressLibrary.sol";
 
@@ -22,8 +21,9 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
         bool _activated;
         uint _id;
         uint _pendingId;
-        address[] _Validations;
-        address[] _Rejections;
+        uint _validations;
+        uint _rejections;
+        address[] _Voters;
     }
 
     struct _ownersStruct{
@@ -60,24 +60,6 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
     function OwnerPendingFunc(address addr, bool YesOrNo) internal view{
         require(YesOrNo == (isOwnerPendingToAdded(addr) || isOwnerPendingToRemoved(addr)), "EC9-");
     }
-
-   /* modifier OwnerPendingToAdded(address addr, bool YesOrNo){
-        OwnerPendingToAddedFunc(addr, YesOrNo);
-        _;
-    }
-
-    function OwnerPendingToAddedFunc(address addr, bool YesOrNo) internal view{
-        require(YesOrNo == isOwnerPendingToAdded(addr), "EC9-");
-    }
-
-    modifier OwnerPendingToRemoved(address addr, bool YesOrNo){
-        OwnerPendingToRemovedFunc(addr, YesOrNo);
-        _;
-    }
-
-    function OwnerPendingToRemovedFunc(address addr, bool YesOrNo) internal view{
-        require(YesOrNo == isOwnerPendingToRemoved(addr), "EC9-");
-    }*/
     
     modifier minRequired(uint min, uint number){
          minRequiredFunc(min, number);
@@ -94,14 +76,12 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
     }
 
     function HasNotAlreadyVotedFunc(address voter, address owner, bool minOwner) internal view {
+        address[] storage listOfVoters = _Owners._owner[owner]._Voters;
         if(minOwner){
-            require(false == AddressLibrary.FindAddress(voter, _newMinOwnersVoters), "EC5-");
+            listOfVoters = _newMinOwnersVoters;
         }
-        else{
-            require (false == (AddressLibrary.FindAddress(voter, _Owners._owner[owner]._Validations) ||
-                            AddressLibrary.FindAddress(voter, _Owners._owner[owner]._Rejections))
-                    );
-        }
+
+        require(false == AddressLibrary.FindAddress(voter, listOfVoters), "EC5-");
     }
     
     modifier NewMinOwnerInProgress(bool YesOrNo){
@@ -128,28 +108,27 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
 
     // FUNCTIONALITY OWNER /////////////////////////////////////////
     function addOwner(address owner) external override 
-        isAnOwner(msg.sender, true)
         isAnOwner(owner, false)
-        OwnerPending(owner, false)
     {
-        _Owners._pendingOwnersAdd.push(owner);
-        uint pos = _Owners._pendingOwnersAdd.length - 1;
-        _Owners._owner[owner]._pendingId = pos;
-
-        vote(msg.sender, owner, true);
+        updateOwner(owner,  _Owners._pendingOwnersAdd);
     }
     
     function removeOwner(address owner) external override
-        isAnOwner(msg.sender, true)
         isAnOwner(owner, true)
-        OwnerPending(owner, false)
         minRequired(_minOwners, _Owners._activatedOwners.length - 1)
     {
-        _Owners._pendingOwnersRemove.push(owner);
-        uint pos = _Owners._pendingOwnersRemove.length - 1;
+        updateOwner(owner,  _Owners._pendingOwnersRemove);
+    }
+
+    function updateOwner(address owner, address[] storage pendingList) internal
+        isAnOwner(msg.sender, true)
+        OwnerPending(owner, false)
+    {
+        pendingList.push(owner);
+        uint pos = pendingList.length - 1;
         _Owners._owner[owner]._pendingId = pos;
 
-        vote(msg.sender, owner, true);
+        VoteForOwner(owner, true);
     }
 
     function validateOwner(address owner) external override
@@ -157,12 +136,12 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
         if(true == isOwnerPendingToRemoved(owner)){
             require(_minOwners <= _Owners._activatedOwners.length - 1, "EC19-");
         }
-        Vote(owner, true);
+        VoteForOwner(owner, true);
     }
 
     function rejectOwner(address owner) external override
     {
-        Vote(owner, false);
+        VoteForOwner(owner, false);
     }
 
     function VoteForOwner(address owner, bool vote) internal
@@ -170,35 +149,55 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
         OwnerPending(owner, true)
         HasNotAlreadyVoted(msg.sender, owner, false)
     {
+        _Owners._owner[owner]._Voters.push(msg.sender);
         if(vote){
-            _Owners._owner[owner]._Validations.push(msg.sender);
-            if(_Owners._owner[owner]._Validations.length >= _minOwners){
+            _Owners._owner[owner]._validations++;
+
+            if(_Owners._owner[owner]._validations >= _minOwners){
+                address[] storage pendingList = _Owners._pendingOwnersRemove;
                 if(isOwnerPendingToAdded(owner)){
-                    AddressLibrary.AddressArrayRemoveResize(_Owners._owner[owner]._pendingId, _Owners._pendingOwnersAdd);
-
-
-                    ............
+                    pendingList = _Owners._pendingOwnersAdd;
+                    _Owners._activatedOwners.push(owner);
+                    _Owners._owner[owner]._activated = true;
+                    _Owners._owner[owner]._id = _Owners._activatedOwners.length - 1; 
                 }
                 else{
-
+                    uint pos = _Owners._owner[owner]._id;
+                    AddressLibrary.AddressArrayRemoveResize( pos, _Owners._activatedOwners);
+                    if(_Owners._activatedOwners.length > pos)  _Owners._owner[_Owners._activatedOwners[pos]]._id = pos;
+                    delete(_Owners._owner[owner]._activated);
+                    delete(_Owners._owner[owner]._id); 
                 }
+
+                deletingPendingOwner(owner, pendingList);
             }
         }
         else{
-            _Owners._owner[owner]._Rejections.push(msg.sender);
-            if(_Owners._owner[owner]._Rejections.length >= _minOwners){
-                if(isOwnerPendingToAdded(owner)){
+            _Owners._owner[owner]._rejections++;
 
-                }
-                else{
-                    
-                }
+            if(_Owners._owner[owner]._rejections >= _minOwners){
+                address[] storage pendingList = _Owners._pendingOwnersRemove;
+                if(isOwnerPendingToAdded(owner)) pendingList = _Owners._pendingOwnersAdd;
+                
+                deletingPendingOwner(owner, pendingList);
             }
         }
+
+    }
+
+    function deletingPendingOwner(address owner, address[] storage pendingList) internal
+    {
+        uint pos = _Owners._owner[owner]._pendingId;
+        AddressLibrary.AddressArrayRemoveResize(pos, pendingList);
+        if(pendingList.length > pos)  _Owners._owner[pendingList[pos]]._pendingId = pos;
+        delete(_Owners._owner[owner]._pendingId);
+        delete(_Owners._owner[owner]._validations);
+        delete(_Owners._owner[owner]._rejections);
+        delete(_Owners._owner[owner]._Voters);
     }
     
 
-    function retrieveAllOwners() external override view returns (address[] memory)){
+    function retrieveAllOwners() external override view returns (address[] memory){
         return(_Owners._activatedOwners);
     }
 
@@ -210,7 +209,7 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
     function isOwner(address addr) internal 
     view returns (bool)
     {
-        return _Owners.owner[addr]._activated;
+        return _Owners._owner[addr]._activated;
     }
 
     function isOwnerPendingToAdded(address addr) public view returns(bool)
@@ -231,9 +230,9 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
 
     // New min Owners proposal
     function changeMinOwners(uint newMinOwners) external override
-        isAnOwner(msg.sender)
+        isAnOwner(msg.sender, true)
         NewMinOwnerInProgress(false)
-        minRequired(newMinOwners, _Entities[_ownerId]._activatedItems.length)
+        minRequired(newMinOwners, _Owners._activatedOwners.length)
         minRequired(1, newMinOwners)
     {
         _newMinOwners = newMinOwners;
@@ -241,17 +240,17 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
     }
 
     function validateMinOwners() external override
-        isAnOwner(msg.sender)
+        isAnOwner(msg.sender, true)
         NewMinOwnerInProgress(true)
-        HasNotAlreadyVotedMinOwner(msg.sender)
+        HasNotAlreadyVoted(msg.sender, address(0), true)
     {
         voteNewMinOwners(true);
     }
     
     function rejectMinOwners() external override
-        isAnOwner(msg.sender)
+        isAnOwner(msg.sender, true)
         NewMinOwnerInProgress(true)
-        HasNotAlreadyVotedMinOwner(msg.sender)
+        HasNotAlreadyVoted(msg.sender, address(0), true)
     {
         voteNewMinOwners(false);
     }
