@@ -37,8 +37,6 @@ import "../Interfaces/INFTMarket.sol";
   mapping(uint256 => ItemsLibrary._offerStruct) private _tokenOffer;
 
   mapping(address => ItemsLibrary._BalanceStruct) private _balanceOfAccount;
-  mapping(address => uint256) private _balanceOfAccountLocked;
-
 
 
   // MODIFIERS /////////////////////////////////////////
@@ -53,8 +51,8 @@ import "../Interfaces/INFTMarket.sol";
   }
 
   modifier OfferInProgress(uint256 tokenId, bool YesOrNo){
-      if(YesOrNo) require(now <= _tokenOffer[tokenId].deadline, "There is no offer in progress");
-      else require(now > _tokenOffer[tokenId].deadline, "There is an offer in progress");
+      if(YesOrNo) require(block.timestamp <= _tokenOffer[tokenId]._deadline, "There is no offer in progress");
+      else require(block.timestamp > _tokenOffer[tokenId]._deadline, "There is an offer in progress");
       _;
   }
 
@@ -111,14 +109,16 @@ import "../Interfaces/INFTMarket.sol";
       _ownerTransferFeeDecimals = newDecimals;
   }
 
-
-
-  function mintToken(uint256 tokenId, address receiver, uint256 price) external override
+  function mintToken(uint256 tokenId, address receiver, uint256 price) external payable override
     isTheOwner(msg.sender)
   {
       if(_paymentPlan == Library.PaymentPlans.Minting)
       {
-        ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:msg.value}(Library.Prices.MintingFee);
+        uint[] memory Prices = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
+        uint256 MintingFee = Prices[uint256(Library.Prices.MintingFee)];
+        uint256 AdminMintingFee = Prices[uint256(Library.Prices.AdminMintingFee)];
+        require(msg.value >= MintingFee + AdminMintingFee, "Minting Fees not enough");
+        ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:msg.value - AdminMintingFee}();
       }
       _safeMint(receiver, tokenId);
       _tokenInfo[tokenId]._price = price;
@@ -128,12 +128,32 @@ import "../Interfaces/INFTMarket.sol";
   function setTokenPrice(uint256 tokenId, uint256 price) external override
     isTokenOwnerOrApproved(tokenId)
   {
-      _tokenInfo._price = price;
+      _tokenInfo[tokenId]._price = price;
   }
 
   function acceptOffer(uint256 tokenId) external override
     isTokenOwnerOrApproved(tokenId)
     OfferInProgress(tokenId, true)
+  {
+    (uint256 OwnerTransferFeeAmount, uint256 TransferFeeAmount, uint256 AdminTransferFeeAmount, uint256 commonDecimals) = getFees(tokenId);
+
+
+    uint256 percentageForTokenOwner = (100 * 10**commonDecimals) - OwnerTransferFeeAmount - TransferFeeAmount - AdminTransferFeeAmount;
+    require(percentageForTokenOwner >= 0, "Fees exceed 100 percent");
+
+    address FormerOwner = ownerOf(tokenId);
+
+    _safeTransfer(FormerOwner, _tokenOffer[tokenId]._bidder, tokenId, "");
+    uint256 offer = _tokenOffer[tokenId]._offer;
+    removeOffer(tokenId);
+
+    Pay(address(0), offer, TransferFeeAmount, commonDecimals, false);
+    Pay(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], offer, AdminTransferFeeAmount, commonDecimals, true);
+    Pay(_owner, offer, OwnerTransferFeeAmount, commonDecimals, true);
+    Pay(FormerOwner, offer, percentageForTokenOwner, commonDecimals, false);
+  }
+
+  function getFees(uint256 tokenId) internal view returns(uint256, uint256, uint256, uint256)
   {
     uint256 OwnerTransferFeeAmount = _ownerTransferFeeAmount;
     uint256 OwnerTransferFeeDecimals = _ownerTransferFeeDecimals;
@@ -143,29 +163,20 @@ import "../Interfaces/INFTMarket.sol";
     uint256 AdminTransferFeeDecimals = 0;
 
     if(Library.PaymentPlans.TransferFee == _tokenInfo[tokenId]._paymentPlan){
-        (,, TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals,) = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
+        uint[] memory Prices = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
+        TransferFeeAmount = Prices[uint256(Library.Prices.TransferFeeAmount)];
+        TransferFeeDecimals = Prices[uint256(Library.Prices.TransferFeeDecimals)];
+        AdminTransferFeeAmount = Prices[uint256(Library.Prices.AdminTransferFeeAmount)];
+        AdminTransferFeeDecimals = Prices[uint256(Library.Prices.AdminTransferFeeDecimals)];
     }
 
-    uint256 commonDecimals = getLargest([OwnerTransferFeeDecimals, TransferFeeDecimals, AdminTransferFeeDecimals]); 
+    uint256[3] memory Decimals = [OwnerTransferFeeDecimals, TransferFeeDecimals, AdminTransferFeeDecimals];
+    uint256 commonDecimals = getLargest(Decimals); 
     OwnerTransferFeeAmount = OwnerTransferFeeAmount * 10**(commonDecimals - OwnerTransferFeeDecimals);
     TransferFeeAmount = TransferFeeAmount * 10**(commonDecimals - TransferFeeDecimals);
     AdminTransferFeeAmount = AdminTransferFeeAmount * 10**(commonDecimals - AdminTransferFeeDecimals);
-    uint256 percentageForTokenOwner = (100 * 10**commonDecimals) - OwnerTransferFeeAmount - TransferFeeAmount - AdminTransferFeeAmount;
 
-    require(percentageForTokenOwner >= 0, "Fees exceed 100 percent");
-
-    _balanceOfAccountLocked[_tokenOffer[tokenId]._sender] -= _tokenOffer[tokenId]._offer;
-
-    _safeTransfer(_owners[tokenId], bidder, tokenId, "");
-    address sender = _tokenOffer[tokenId]._sender;
-    uint256 offer = _tokenOffer[tokenId]._offer;
-    removeOffer(tokenId);
-
-    Pay(address(0), offer, TransferFeeAmount, commonDecimals);
-    Pay( _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], offer, AdminTransferFeeAmount, commonDecimals);
-    Pay(_owner, offer, OwnerTransferFeeAmount, commonDecimals);
-    Pay(_owners[tokenId], offer, percentageForTokenOwner, commonDecimals);
-   
+    return(OwnerTransferFeeAmount, TransferFeeAmount, AdminTransferFeeAmount, commonDecimals);
   }
     
   function rejectOffer(uint256 tokenId) external override
@@ -189,31 +200,29 @@ import "../Interfaces/INFTMarket.sol";
       _tokenOffer[tokenId]._offer = msg.value;
       _tokenOffer[tokenId]._sender = msg.sender;
       _tokenOffer[tokenId]._bidder = bidder;
-      _tokenOffer[tokenId]._deadline = now + _offersLifeTime;
-      _balanceOfAccountLocked[msg.sender] += _offer;
+      _tokenOffer[tokenId]._deadline = block.timestamp + _offersLifeTime;
   }
     
-  function withdrawOffers(uint256 tokenId) external override
+  function withdrawOffer(uint256 tokenId) external override
     OfferInProgress(tokenId, false)
   {
     require(msg.sender == _tokenOffer[tokenId]._sender, "Only the original sender can withdraw the bid");
     assignToRejectedSender(_tokenOffer[tokenId]._sender, _tokenOffer[tokenId]._offer);
     removeOffer(tokenId);
-    internalWithdraw(msg.sender);
+    internalWithdraw(msg.sender, true);
   }
 
   function withdraw() external override
   {
-    internalWithdraw(msg.sender);
+    internalWithdraw(msg.sender, true);
   }
 
   function assignToRejectedSender(address sender, uint256 offer) internal
   {
-      _balanceOfAccountLocked[sender] -= _offer;
       ItemsLibrary.addBalance(_balanceOfAccount[sender], offer, 1);
   }
 
-  function Pay(address to, uint256 amount, uint256 percentage, uint256 decimals) internal
+  function Pay(address to, uint256 amount, uint256 percentage, uint256 decimals, bool AssignOrSend) internal
   {
       uint256 numerator = amount * percentage;
       uint256 denominator = 100 * 10**decimals;
@@ -224,28 +233,31 @@ import "../Interfaces/INFTMarket.sol";
       ItemsLibrary.addBalance(_balanceOfAccount[to], quotient, 1);
       ItemsLibrary.addBalance(_balanceOfAccount[to], remainder, denominator);
 
-      if(to == address(0)){
-
-      }
-      else{
-        internalWithdraw(to);
+      if(false == AssignOrSend)
+      {
+          if(address(0) != to) internalWithdraw(to, true);
+          else {
+            uint amountToTransfer = ItemsLibrary.checkFullBalance(_balanceOfAccount[to]);
+            ItemsLibrary.InternalWithdraw(_balanceOfAccount[to], amountToTransfer, to, false);
+            ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:amountToTransfer}();
+          }
       }
   }
 
-  function internalWithdraw(address addr) internal
+  function internalWithdraw(address addr, bool send) internal
   {
     uint256 amount = ItemsLibrary.checkFullBalance(_balanceOfAccount[addr]);
-    ItemsLibrary.InternalWithdraw(_balanceOfAccount[addr], amount, addr);
+    ItemsLibrary.InternalWithdraw(_balanceOfAccount[addr], amount, addr, send);
   }
 
-  function retrieveIssuer() external override view returns (ItemsLibrary._issuerStruct memory)
+  function retrieveIssuer() external override view returns (ItemsLibrary._issuerStruct memory, uint256)
   {
-    return(ItemsLibrary._issuerStruct(_owner, _name, _symbol, _paymentPlan), _offersLifeTime);
+    return(ItemsLibrary._issuerStruct(_owner, name(), symbol(), _ownerTransferFeeAmount, _ownerTransferFeeDecimals, _paymentPlan), _offersLifeTime);
   }
 
   function retrieveToken(uint256 tokenId) external override view returns (ItemsLibrary._tokenStruct memory, address)
   {
-    return(_tokenInfo[tokenId], _owners[tokenId]);
+    return(_tokenInfo[tokenId], ownerOf(tokenId));
   }
 
   function retrieveOffer(uint256 tokenId) external override view returns (ItemsLibrary._offerStruct memory)
@@ -253,7 +265,7 @@ import "../Interfaces/INFTMarket.sol";
       return(_tokenOffer[tokenId]);
   }
 
-  function getLargest(uint256[] nums) internal returns(uint256)
+  function getLargest(uint256[3] memory nums) internal pure returns(uint256)
   {
     uint256 largest = 0;
 

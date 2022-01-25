@@ -10,7 +10,7 @@ pragma solidity 0.8.7;
 
  interface IPool  {
 
-    function requestIssuer(address owner, string memory name, string memory symbol, Library.PaymentPlans paymentPlan) external payable returns (uint256);
+    function requestIssuer(address owner, string memory name, string memory symbol, uint256 feeAmount, uint256 feeDecimals, Library.PaymentPlans paymentPlan) external payable returns (uint256);
     function validateIssuer(uint256 id) external;
     function rejectIssuer(uint256 id) external;
 

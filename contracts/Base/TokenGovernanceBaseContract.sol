@@ -150,7 +150,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
     }
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function TokenGovernanceContract_init(address chairperson, address managerContractAddress, string memory contractName, string memory contractVersion) internal initializer {
+    function TokenGovernanceContract_init(address chairperson, address managerContractAddress) internal initializer {
         super.ManagedBaseContract_init(managerContractAddress);
         _chairperson = chairperson;
         _nextPropID = 0; 

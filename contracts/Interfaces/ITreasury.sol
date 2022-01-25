@@ -11,14 +11,13 @@ pragma solidity 0.8.7;
 
  interface ITreasury  {
 
-    function pay(Library.Prices price) external payable;    
-    function getRefund(address addr, uint numberOfOwners) external;
-    function withdraw(uint amount) external;
+    function pay() external payable;    
+    function withdraw(uint256 amount) external;
     function withdrawAll() external;
 
-    function retrieveLastAssigned(address addr) external view returns(uint);
-    function retrieveFullBalance(address addr) external view returns(uint);
-    function retrieveSettings() external view returns(uint, uint, uint, uint, uint, uint, uint);
-    function retrieveAggregatedAmount() external view returns(uint);
+    function retrieveLastAssigned(address addr) external view returns(uint256);
+    function retrieveFullBalance(address addr) external view returns(uint256);
+    function retrieveSettings() external view returns(uint256[] memory);
+    function retrieveAggregatedAmount() external view returns(uint256);
 
 }

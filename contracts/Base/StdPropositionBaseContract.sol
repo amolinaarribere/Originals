@@ -16,9 +16,9 @@ abstract contract StdPropositionBaseContract is IStdPropositionBaseContract, Tok
     bytes[] internal _ProposedNewValues;
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function StdPropositionBaseContract_init(address chairPerson, address managerContractAddress, string memory contractName, string memory contractVersion) public initializer 
+    function StdPropositionBaseContract_init(address chairPerson, address managerContractAddress) public initializer 
     {
-        super.TokenGovernanceContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
+        super.TokenGovernanceContract_init(chairPerson, managerContractAddress);
     }
 
     // GOVERNANCE /////////////////////////////////////////

@@ -43,7 +43,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
   uint256 nextIssuerId;
 
   // MODIFIERS /////////////////////////////////////////
-  modifier validOwners(address owner){
+  modifier validOwner(address owner){
       require(address(0) != owner, "NFT Market owner cannot be address 0");
       _;
   }
@@ -68,11 +68,14 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
   // FUNCTIONALITY /////////////////////////////////////////
   function requestIssuer(address owner, string memory name, string memory symbol, uint256 feeAmount, uint256 feeDecimals, Library.PaymentPlans paymentPlan) external override payable
-    validOwners(owner)
+    validOwner(owner)
     validFees(feeAmount, feeDecimals)
   returns (uint256)
   {
-    ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:msg.value}(Library.Prices.NewIssuer);
+
+    uint256 NewIssuerFee = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings()[uint256(Library.Prices.NewIssuerFee)];
+    require(msg.value >= NewIssuerFee, "New Issuer Fees not enough");
+    ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:msg.value}();
 
     _pendingIssuers[nextIssuerId]._issuer._owner = owner;
     _pendingIssuers[nextIssuerId]._issuer._name = name;
@@ -142,7 +145,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
   function GenerateNewNFTMarket(address owner, string memory name, string memory symbol, uint256 feeAmount, uint256 feeDecimals, Library.PaymentPlans paymentPlan) internal returns(address)
   {
     address beaconAddress = _managerContract.retrieveBeacons()[uint256(Library.Beacons.NFT)];
-    (,,,,,,uint256 OffersLifeTime) = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
+    uint256 OffersLifeTime = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings()[uint256(Library.Prices.OffersLifeTime)];
     bytes memory data = abi.encodeWithSignature("NFTMarket_init(address,address,string,string,uint256,uint256,uint256,uint8)", address(_managerContract), owner, name, symbol, OffersLifeTime, feeAmount, feeDecimals, uint8(paymentPlan));
 
     BeaconProxy beaconProxy = new BeaconProxy(beaconAddress, data);

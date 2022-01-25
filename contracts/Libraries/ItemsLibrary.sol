@@ -52,7 +52,7 @@ library ItemsLibrary{
     }
 
     // TREASURY ///////////////////////////
-    function InternalWithdraw(_BalanceStruct storage balance, uint amount, address to) public 
+    function InternalWithdraw(_BalanceStruct storage balance, uint amount, address to, bool transfer) public 
     {
         require(checkFullBalance(balance) >= amount, "Cannot withdraw that amount");
 
@@ -66,8 +66,10 @@ library ItemsLibrary{
 
         addBalance(balance, remainder, commonDividend);
 
-        (bool success, bytes memory data) = to.call{value: amount}("");
-        require(success, string(abi.encodePacked("Error transfering funds to address : ", data)));
+        if(transfer){
+            (bool success, bytes memory data) = to.call{value: amount}("");
+            require(success, string(abi.encodePacked("Error transfering funds to address : ", data)));
+        }
     }
 
     function addBalance(_BalanceStruct storage balance, uint amount, uint factor) public
@@ -75,7 +77,7 @@ library ItemsLibrary{
         if(amount > 0){
             if(0 == balance._balance[factor])
             {
-                _balances[addr]._factors.push(factor);
+                balance._factors.push(factor);
             }
             balance._balance[factor] += amount;
         }

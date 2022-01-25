@@ -86,9 +86,9 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
     }
 
     // INITIALIZATION /////////////////////////////////////////
-    function CertificatesPoolManager_init(address chairPerson, string memory contractName, string memory contractVersion) public initializer
+    function CertificatesPoolManager_init(address chairPerson) public initializer
     {
-        super.StdPropositionBaseContract_init(chairPerson, address(this), contractName, contractVersion);
+        super.StdPropositionBaseContract_init(chairPerson, address(this));
         _Admin = new ProxyAdmin();
     }
 

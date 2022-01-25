@@ -29,9 +29,9 @@ contract PropositionSettings is IPropositionSettings, StdPropositionBaseContract
     }
     
     // CONSTRUCTOR /////////////////////////////////////////
-    function PropositionSettings_init(address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint256 PropositionThreshold, uint256 minToPropose, string memory contractName, string memory contractVersion) public initializer 
+    function PropositionSettings_init(address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint256 PropositionThreshold, uint256 minToPropose) public initializer 
     {
-        super.StdPropositionBaseContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
+        super.StdPropositionBaseContract_init(chairPerson, managerContractAddress);
         areSettingsOKFunc(PropositionThreshold, minToPropose);
         InternalupdateSettings(PropositionLifeTime, PropositionThreshold, minToPropose);
     }
