@@ -41,7 +41,6 @@ Beacons:
  */
 
 import "../Interfaces/IManager.sol";
-import "../Interfaces/IFactory.sol";
 import "../Base/StdPropositionBaseContract.sol";
 import "../Libraries/AddressLibrary.sol";
 import "../Libraries/Library.sol";

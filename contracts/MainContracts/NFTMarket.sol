@@ -170,8 +170,7 @@ import "../Interfaces/INFTMarket.sol";
         AdminTransferFeeDecimals = Prices[uint256(Library.Prices.AdminTransferFeeDecimals)];
     }
 
-    uint256[3] memory Decimals = [OwnerTransferFeeDecimals, TransferFeeDecimals, AdminTransferFeeDecimals];
-    uint256 commonDecimals = getLargest(Decimals); 
+    uint256 commonDecimals = getLargest([OwnerTransferFeeDecimals, TransferFeeDecimals, AdminTransferFeeDecimals]); 
     OwnerTransferFeeAmount = OwnerTransferFeeAmount * 10**(commonDecimals - OwnerTransferFeeDecimals);
     TransferFeeAmount = TransferFeeAmount * 10**(commonDecimals - TransferFeeDecimals);
     AdminTransferFeeAmount = AdminTransferFeeAmount * 10**(commonDecimals - AdminTransferFeeDecimals);

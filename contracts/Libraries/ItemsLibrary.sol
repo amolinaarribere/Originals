@@ -51,7 +51,7 @@ library ItemsLibrary{
         return true;
     }
 
-    // TREASURY ///////////////////////////
+    // TREASURY & NFTMarket///////////////////////////
     function InternalWithdraw(_BalanceStruct storage balance, uint amount, address to, bool transfer) public 
     {
         require(checkFullBalance(balance) >= amount, "Cannot withdraw that amount");
