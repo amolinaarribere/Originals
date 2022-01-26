@@ -8,7 +8,7 @@ const init = require("../test_libraries/InitializeContracts.js");
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
 contract("Testing Admin Piggy Bank",function(accounts){
-    var certPoolManager;
+    var manager;
     var adminPiggyBankProxy;
 
     // used addresses
@@ -19,7 +19,7 @@ contract("Testing Admin Piggy Bank",function(accounts){
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
-        certPoolManager = contracts[0];
+        manager = contracts[0];
         adminPiggyBankProxy = new web3.eth.Contract(AdminPiggyBankAbi, contracts[1][4]);
     });
 

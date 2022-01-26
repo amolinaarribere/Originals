@@ -182,11 +182,11 @@ const AdminPiggyBankProxyInitializerMethod = {
 
 
 async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1){
-  let Manager = await Manager.new({from: chairPerson, gas: Gas});
+  let manager = await Manager.new({from: chairPerson, gas: Gas});
   let ManagerProxyData = getProxyData(ManagerProxyInitializerMethod, [chairPerson]);
 
   // New
-  let TransparentUpgradeableProxyIns = await TransparentUpgradeableProxy.new(Manager.address, chairPerson, ManagerProxyData, {from: chairPerson, gas: Gas});
+  let TransparentUpgradeableProxyIns = await TransparentUpgradeableProxy.new(manager.address, chairPerson, ManagerProxyData, {from: chairPerson, gas: Gas});
   let ManagerProxyAddress = TransparentUpgradeableProxyIns.address;
 
   var ManagerProxy = new web3.eth.Contract(ManagerAbi, ManagerProxyAddress);
@@ -205,7 +205,7 @@ async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1)
 
   let proxies = await retrieveProxies(ManagerProxy, user_1);
   
-  return [ManagerProxy._address, proxies, implementations, ProxyAdmin, Manager.address];
+  return [ManagerProxy._address, proxies, implementations, ProxyAdmin, manager.address];
 }
 
 async function deployImplementations(user_1){
@@ -221,8 +221,8 @@ async function deployImplementations(user_1){
     return [publicPool.address, treasury.address, originalsToken.address, propositionSettings.address, adminPiggyBank.address, nFTMarket.address, manager.address];
 }
 
-async function retrieveProxies(Manager, user_1){
-  let TransparentProxies = await Manager.methods.retrieveTransparentProxies().call({from: user_1});
+async function retrieveProxies(manager, user_1){
+  let TransparentProxies = await manager.methods.retrieveTransparentProxies().call({from: user_1});
 
   let i = 1;
   let publicPoolProxy = TransparentProxies[i];
@@ -242,11 +242,11 @@ function getProxyData(method, parameters){
   return web3.eth.abi.encodeFunctionCall(method, parameters);
 }
 
-function returnProxyInitData(PublicOwners, minOwners, Manager, chairPerson, mockChainLinkFeedRegistry){
-  let PublicPoolProxyData = getProxyData(PublicPoolProxyInitializerMethod, [PublicOwners, minOwners, Manager]);
-  let TreasuryProxyData = getProxyData(TreasuryProxyInitializerMethod, [Prices, Manager, chairPerson]);
-  let OriginalsProxyData = getProxyData(OriginalsTokenProxyInitializerMethod, ["Originals Token for Test", "ORI", TotalTokenSupply, Manager, 0, chairPerson]);
-  let PropositionSettingsProxyData = getProxyData(PropositionSettingsProxyInitializerMethod, [Manager, chairPerson, PropositionLifeTime, PropositionThreshold, minToPropose]);
+function returnProxyInitData(PublicOwners, minOwners, manager, chairPerson){
+  let PublicPoolProxyData = getProxyData(PublicPoolProxyInitializerMethod, [PublicOwners, minOwners, manager]);
+  let TreasuryProxyData = getProxyData(TreasuryProxyInitializerMethod, [Prices, manager, chairPerson]);
+  let OriginalsProxyData = getProxyData(OriginalsTokenProxyInitializerMethod, ["Originals Token for Test", "ORI", TotalTokenSupply, manager, 0, chairPerson]);
+  let PropositionSettingsProxyData = getProxyData(PropositionSettingsProxyInitializerMethod, [manager, chairPerson, PropositionLifeTime, PropositionThreshold, minToPropose]);
   let AdminPiggyBankProxyData = getProxyData(AdminPiggyBankProxyInitializerMethod, [PublicOwners, minOwners]);
 
   return [PublicPoolProxyData, TreasuryProxyData, OriginalsProxyData, PropositionSettingsProxyData, AdminPiggyBankProxyData];
