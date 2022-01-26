@@ -12,7 +12,7 @@ Transparent Proxies:
     - 2 : Treasury
     - 3 : Originals Token
     - 4 : Proposition Settings
-    - 5 : NFT Factory
+    - 5 : Admin Piggy Bank
 
 Beacons:
     - 0 : NFT
@@ -51,7 +51,7 @@ import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.so
 import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
 
-contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
+contract Manager is IManager, StdPropositionBaseContract{
     using AddressLibrary for *;
     using Library for *;
     using UintLibrary for *;
@@ -85,7 +85,7 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
     }
 
     // INITIALIZATION /////////////////////////////////////////
-    function CertificatesPoolManager_init(address chairPerson) public initializer
+    function Manager_init(address chairPerson) public initializer
     {
         super.StdPropositionBaseContract_init(chairPerson, address(this));
         _Admin = new ProxyAdmin();

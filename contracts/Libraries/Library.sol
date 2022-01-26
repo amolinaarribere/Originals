@@ -12,7 +12,7 @@ library Library{
     // enum
     enum PaymentPlans{Minting, TransferFee}
     enum Prices{NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee, TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals, OffersLifeTime}
-    enum TransparentProxies{Manager, PublicPool, Treasury, Originals, PropSettings, NFTFactory, AdminPiggyBank}
+    enum TransparentProxies{Manager, PublicPool, Treasury, Originals, PropSettings, AdminPiggyBank}
     enum Beacons{NFT}
 
     // Structures
@@ -21,8 +21,6 @@ library Library{
         address[] TransparentAddresses;
         address[] BeaconAddresses;
         bytes[] TransparentData;
-        string PrivatePoolContractName;
-        string PrivatePoolContractVersion;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
