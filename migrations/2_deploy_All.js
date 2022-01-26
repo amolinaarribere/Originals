@@ -418,5 +418,6 @@ module.exports = async function(deployer, network, accounts){
   console.log("NFT Market Beacon Address : " + Beacons[j]);
   console.log("NFT Market Implementation Address : " + BeaconsImpl[j++]);
 
+  console.log(" ----------------------------------------------- ");
 
 }

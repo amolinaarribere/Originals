@@ -12,8 +12,6 @@ const NoPropositionActivated = new RegExp("EC25-");
 const PropositionAlreadyInProgress = new RegExp("EC24-");
 const CanNotVote = new RegExp("EC23-");
 
-const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
-const PrivatePoolFactoryAbi = PrivatePoolFactory.abi;
 const emptyBytes = "0x";
 const address_0 = "0x0000000000000000000000000000000000000000";
 const zeroBytes = "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -33,7 +31,7 @@ async function checkProposition(contractAddress, Values, user_1){
         expect(Values[i]).to.equal(propositionResult[i]);
     }
 }
-
+/*
 async function returnContractManagerSettings(contractAddress, user_1){
     let TransparentProxies = await contractAddress.methods.retrieveTransparentProxies().call({from: user_1});
     let TransparentImpl = await contractAddress.methods.retrieveTransparentProxiesImpl().call({from: user_1});
@@ -81,46 +79,16 @@ async function returnContractManagerSettings(contractAddress, user_1){
         emptyBytes, 
         emptyBytes, 
         emptyBytes, 
-        emptyBytes, 
-        _PrivatePoolFactoryConfiguration[1],
-        _PrivatePoolFactoryConfiguration[2]]
-}
+        emptyBytes]
+}*/
 
 // checks
-
-async function checkPriceConverter(contractAddress, addressBytes, user_1){
-    let _registryAddress =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    expect(aux.Bytes32ToAddress(addressBytes[0])).to.equal(_registryAddress);
-}
 
 async function checkPropositionSettings(contractAddress, propBytes, user_1){
     let _propSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
     for(let i=0; i < 3; i++){
         expect(aux.Bytes32ToInt(propBytes[i])).to.equal(parseInt(_propSettings[i]));
     }
-}
-
-async function checkENS(contractAddress, ENSBytes, user_1){
-    let _ENS =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-
-    if(address_0 != aux.Bytes32ToAddress(ENSBytes[0])) expect(aux.Bytes32ToAddress(ENSBytes[0])).to.equal(_ENS[0]);
-    else expect(aux.Bytes32ToAddress(ENSBytes[0])).to.not.equal(_ENS[0]);
-
-    if(address_0 != aux.Bytes32ToAddress(ENSBytes[1])) expect(aux.Bytes32ToAddress(ENSBytes[1])).to.equal(_ENS[1]);
-    else expect(aux.Bytes32ToAddress(ENSBytes[1])).to.not.equal(_ENS[1]);
-
-    if(emptyBytes != ENSBytes[2]) expect(ENSBytes[2]).to.equal(_ENS[2]);
-    else expect(ENSBytes[2]).to.not.equal(_ENS[2]);
-
-    if(emptyBytes != ENSBytes[3]) expect(ENSBytes[3]).to.equal(_ENS[3]);
-    else expect(ENSBytes[3]).to.not.equal(_ENS[3]);
-
-    if(emptyBytes != ENSBytes[4]) expect(aux.BytesToString(ENSBytes[4])).to.equal(_ENS[4]);
-    else expect(aux.BytesToString(ENSBytes[4])).to.not.equal(_ENS[4]);
-
-    if(emptyBytes != ENSBytes[5]) expect(aux.BytesToString(ENSBytes[5])).to.equal(_ENS[5]);
-    else expect(aux.BytesToString(ENSBytes[5])).to.not.equal(_ENS[5]);
-
 }
 
 async function checkPrice(contractAddress, PricesBytes, user_1){
@@ -189,46 +157,6 @@ async function Config_Proposition_Correct(contractAddress, certisTokenProxy, tok
     let InitValue = [aux.IntToBytes32(_propositionSettings[0]), aux.IntToBytes32(_propositionSettings[1]), aux.IntToBytes32(_propositionSettings[2])];
     await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPropositionSettings, true);
    
-};
-
-async function Config_PriceConverter_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
-    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
-    // act
-    try{
-        await contractAddress.methods.sendProposition([aux.AddressToBytes32(address_0)]).send({from: chairPerson, gas: Gas}, function(error, result){});
-        expect.fail();
-    }
-    // assert
-    catch(error){
-        expect(error.message).to.match(WrongConfig);
-    }
-};
-
-async function Config_PriceConverter_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
-    let _registryAddress =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    let InitValue = [aux.AddressToBytes32(_registryAddress)];
-    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPriceConverter, true);
-};
-
-async function Config_ENS_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
-    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
-    // act
-    try{
-        await contractAddress.methods.sendProposition([aux.AddressToBytes32(address_0), aux.AddressToBytes32(address_0), emptyBytes, emptyBytes, emptyBytes, emptyBytes]).send({from: chairPerson, gas: Gas}, function(error, result){});
-        expect.fail();
-    }
-    // assert
-    catch(error){
-        expect(error.message).to.match(WrongConfig);
-    }
-};
-
-async function Config_ENS_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
-    let _ENSSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    let InitValue = [aux.AddressToBytes32(_ENSSettings[0]), aux.AddressToBytes32(_ENSSettings[1]), _ENSSettings[2], _ENSSettings[3], aux.StringToBytes(_ENSSettings[4]),  aux.StringToBytes(_ENSSettings[5])];
-    for(let i=0; i < NewValues.length; i++){
-        await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues[i], InitValue, checkENS, ((0==i)?true:false));
-    }
 };
 
 async function Config_Treasury_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
@@ -484,10 +412,6 @@ async function Check_Votes_Reassignment(contractAddress, certisTokenProxy, chair
 
 exports.Config_Proposition_Wrong = Config_Proposition_Wrong;
 exports.Config_Proposition_Correct = Config_Proposition_Correct;
-exports.Config_PriceConverter_Wrong = Config_PriceConverter_Wrong;
-exports.Config_PriceConverter_Correct = Config_PriceConverter_Correct;
-exports.Config_ENS_Wrong = Config_ENS_Wrong;
-exports.Config_ENS_Correct = Config_ENS_Correct;
 exports.Config_Treasury_Wrong = Config_Treasury_Wrong;
 exports.Config_Treasury_Correct = Config_Treasury_Correct;
 exports.Config_ContractsManager_Wrong = Config_ContractsManager_Wrong;

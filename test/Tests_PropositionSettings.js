@@ -1,8 +1,8 @@
 // Chai library for testing
 // ERROR tests = First we test the error message then we test the action was not carried out
 
-const CertisToken = artifacts.require("CertisToken");
-const CertisTokenAbi = CertisToken.abi;
+const OriginalsToken = artifacts.require("OriginalsToken");
+const OriginalsTokenAbi = OriginalsToken.abi;
 const PropositionSettings = artifacts.require("PropositionSettings");
 const PropositionSettingsAbi = PropositionSettings.abi;
 
@@ -21,8 +21,8 @@ const minToPropose = constants.minToPropose;
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
 contract("Testing Proposition Settings",function(accounts){
-    var certPoolManager;
-    var certisTokenProxy;
+    var manager;
+    var originalsTokenProxy;
     var propositionSettingsProxy;
 
     // used addresses
@@ -37,27 +37,27 @@ contract("Testing Proposition Settings",function(accounts){
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
-        certPoolManager = contracts[0];
-        certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][2]);
-        propositionSettingsProxy = new web3.eth.Contract(PropositionSettingsAbi, contracts[1][6]);
+        manager = contracts[0];
+        originalsTokenProxy = new web3.eth.Contract(OriginalsTokenAbi, contracts[1][2]);
+        propositionSettingsProxy = new web3.eth.Contract(PropositionSettingsAbi, contracts[1][3]);
     });
 
 
     // ****** Testing Settings Configuration ***************************************************************** //
     it("Retrieve Proposals Details",async function(){
-        await proposition.Check_Proposition_Details(propositionSettingsProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
+        await proposition.Check_Proposition_Details(propositionSettingsProxy, originalsTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
 
     it("Vote/Propose/Cancel Settings WRONG",async function(){
-        await proposition.Config_Proposition_Wrong(propositionSettingsProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
+        await proposition.Config_Proposition_Wrong(propositionSettingsProxy, originalsTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
     });
 
     it("Vote/Propose/Cancel Settings CORRECT",async function(){
-        await proposition.Config_Proposition_Correct(propositionSettingsProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
+        await proposition.Config_Proposition_Correct(propositionSettingsProxy, originalsTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
     });
 
     it("Votes Reassignment Settings",async function(){
-        await proposition.Check_Votes_Reassignment(propositionSettingsProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
+        await proposition.Check_Votes_Reassignment(propositionSettingsProxy, originalsTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
 
 });
