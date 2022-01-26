@@ -28,7 +28,7 @@ library ItemsLibrary{
     // TREASURY & NFTMarket///////////////////////////
     function InternalWithdraw(_BalanceStruct storage balance, uint amount, address to, bool transfer) public 
     {
-        require(checkFullBalance(balance) >= amount, "Cannot withdraw that amount");
+        require(checkFullBalance(balance) >= amount, "EC20-");
 
         uint[] memory f = returnFactors(balance);
         (uint total, uint commonDividend) = sumUpTotal(balance);

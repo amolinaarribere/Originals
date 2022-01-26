@@ -38,11 +38,11 @@ contract Treasury is ITreasury, StdPropositionBaseContract{
 
     // DATA /////////////////////////////////////////
     // prices parameters usd
-    uint[] private _Prices;
+    uint256[] private _Prices;
 
     // last amount at which dividends where assigned for each token owner
-    uint private _AggregatedDividendAmount;
-    mapping(address => uint) private _lastAssigned;
+    uint256 private _AggregatedDividendAmount;
+    mapping(address => uint256) private _lastAssigned;
 
     // dividends per token owner
     mapping(address => ItemsLibrary._BalanceStruct) private _balances;

@@ -14,6 +14,7 @@ const PropositionLifeTime = 604800;
 const PropositionThreshold = 500;
 const minToPropose = 50;
 const Gas = 6721975;
+const GasPrice = 10;
 
 exports.NewIssuerFee = NewIssuerFee;
 exports.AdminNewIssuerFee = AdminNewIssuerFee;
@@ -29,4 +30,5 @@ exports.PropositionLifeTime = PropositionLifeTime;
 exports.PropositionThreshold = PropositionThreshold;
 exports.minToPropose = minToPropose;
 exports.Gas = Gas;
+exports.GasPrice = GasPrice;
 

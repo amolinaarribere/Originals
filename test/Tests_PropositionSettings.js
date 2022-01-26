@@ -31,9 +31,9 @@ contract("Testing Proposition Settings",function(accounts){
     const minOwners = 2;
     const user_1 = accounts[4];
     const tokenOwner = [accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
-    var PropositionValues = [aux.IntToBytes32(PropositionLifeTime), 
-        aux.IntToBytes32(PropositionThreshold), 
-        aux.IntToBytes32(minToPropose)];
+    var PropositionValues = [aux.IntToBytes32(PropositionLifeTime - 1), 
+        aux.IntToBytes32(PropositionThreshold - 2), 
+        aux.IntToBytes32(minToPropose - 1)];
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
