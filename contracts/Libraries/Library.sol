@@ -11,7 +11,7 @@ library Library{
     // DATA /////////////////////////////////////////
     // enum
     enum PaymentPlans{Minting, TransferFee}
-    enum Prices{NewIssuerFee, MintingFee, AdminMintingFee, TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals, OffersLifeTime}
+    enum Prices{NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee, TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals, OffersLifeTime}
     enum TransparentProxies{Manager, PublicPool, Treasury, Originals, PropSettings, NFTFactory, AdminPiggyBank}
     enum Beacons{NFT}
 

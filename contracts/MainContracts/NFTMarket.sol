@@ -33,8 +33,8 @@ import "../Interfaces/INFTMarket.sol";
   uint256 _ownerTransferFeeAmount;
   uint256 _ownerTransferFeeDecimals;
 
-  mapping(uint256 => ItemsLibrary._tokenStruct) private _tokenInfo;
-  mapping(uint256 => ItemsLibrary._offerStruct) private _tokenOffer;
+  mapping(uint256 => _tokenStruct) private _tokenInfo;
+  mapping(uint256 => _offerStruct) private _tokenOffer;
 
   mapping(address => ItemsLibrary._BalanceStruct) private _balanceOfAccount;
 
@@ -118,7 +118,9 @@ import "../Interfaces/INFTMarket.sol";
         uint256 MintingFee = Prices[uint256(Library.Prices.MintingFee)];
         uint256 AdminMintingFee = Prices[uint256(Library.Prices.AdminMintingFee)];
         require(msg.value >= MintingFee + AdminMintingFee, "Minting Fees not enough");
-        ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:msg.value - AdminMintingFee}();
+
+        ItemsLibrary.TransferEtherTo(MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
+        ItemsLibrary.TransferEtherTo(msg.value - MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)]);
       }
       _safeMint(receiver, tokenId);
       _tokenInfo[tokenId]._price = price;
@@ -147,10 +149,10 @@ import "../Interfaces/INFTMarket.sol";
     uint256 offer = _tokenOffer[tokenId]._offer;
     removeOffer(tokenId);
 
-    Pay(address(0), offer, TransferFeeAmount, commonDecimals, false);
-    Pay(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], offer, AdminTransferFeeAmount, commonDecimals, true);
+    Pay(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], offer, TransferFeeAmount, commonDecimals, false);
+    Pay(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], offer, AdminTransferFeeAmount, commonDecimals, false);
     Pay(_owner, offer, OwnerTransferFeeAmount, commonDecimals, true);
-    Pay(FormerOwner, offer, percentageForTokenOwner, commonDecimals, false);
+    Pay(FormerOwner, offer, percentageForTokenOwner, commonDecimals, true);
   }
 
   function getFees(uint256 tokenId) internal view returns(uint256, uint256, uint256, uint256)
@@ -234,12 +236,7 @@ import "../Interfaces/INFTMarket.sol";
 
       if(false == AssignOrSend)
       {
-          if(address(0) != to) internalWithdraw(to, true);
-          else {
-            uint amountToTransfer = ItemsLibrary.checkFullBalance(_balanceOfAccount[to]);
-            ItemsLibrary.InternalWithdraw(_balanceOfAccount[to], amountToTransfer, to, false);
-            ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:amountToTransfer}();
-          }
+        internalWithdraw(to, true);
       }
   }
 
@@ -254,12 +251,12 @@ import "../Interfaces/INFTMarket.sol";
     return(ItemsLibrary._issuerStruct(_owner, name(), symbol(), _ownerTransferFeeAmount, _ownerTransferFeeDecimals, _paymentPlan), _offersLifeTime);
   }
 
-  function retrieveToken(uint256 tokenId) external override view returns (ItemsLibrary._tokenStruct memory, address)
+  function retrieveToken(uint256 tokenId) external override view returns (_tokenStruct memory, address)
   {
     return(_tokenInfo[tokenId], ownerOf(tokenId));
   }
 
-  function retrieveOffer(uint256 tokenId) external override view returns (ItemsLibrary._offerStruct memory)
+  function retrieveOffer(uint256 tokenId) external override view returns (_offerStruct memory)
   {
       return(_tokenOffer[tokenId]);
   }

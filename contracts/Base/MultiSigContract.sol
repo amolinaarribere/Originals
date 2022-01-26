@@ -81,17 +81,12 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
         require(min <= number, "EC19-");
     }
 
-    modifier HasNotAlreadyVoted(address voter, address owner, bool minOwner){
-        HasNotAlreadyVotedFunc(voter, owner, minOwner);
+    modifier HasNotAlreadyVoted(address voter, address[] memory listOfVoters){
+        HasNotAlreadyVotedFunc(voter, listOfVoters);
        _;
     }
 
-    function HasNotAlreadyVotedFunc(address voter, address owner, bool minOwner) internal view {
-        address[] storage listOfVoters = _Owners._owner[owner]._Voters;
-        if(minOwner){
-            listOfVoters = _newMinOwnersVoters;
-        }
-
+    function HasNotAlreadyVotedFunc(address voter, address[] memory listOfVoters) internal pure {
         require(false == AddressLibrary.FindAddress(voter, listOfVoters), "EC5-");
     }
     
@@ -158,7 +153,7 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
     function VoteForOwner(address owner, bool vote) internal
         isAnOwner(msg.sender, true)
         OwnerPending(owner, true)
-        HasNotAlreadyVoted(msg.sender, owner, false)
+        HasNotAlreadyVoted(msg.sender, _Owners._owner[owner]._Voters)        
     {
 
         emit _VoteForOwner(owner, msg.sender, vote);
@@ -275,7 +270,7 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
     function voteNewMinOwners(bool vote) internal 
         isAnOwner(msg.sender, true)
         NewMinOwnerInProgress(true)
-        HasNotAlreadyVoted(msg.sender, address(0), true)
+        HasNotAlreadyVoted(msg.sender, _newMinOwnersVoters)
     {
          if(vote) _newMinOwnersVotesFor += 1;
         else _newMinOwnersVotesAgainst += 1;
@@ -295,16 +290,21 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
 
     function checkNewMinOwners() internal
     {
-        if(ItemsLibrary.CheckValidations(_newMinOwnersVotesFor, _minOwners))
+        if(CheckValidations(_newMinOwnersVotesFor, _minOwners))
         {
             _minOwners = _newMinOwners;
             deleteNewMinOwners();
         }
-        else if(ItemsLibrary.CheckValidations(_newMinOwnersVotesAgainst, _minOwners))
+        else if(CheckValidations(_newMinOwnersVotesAgainst, _minOwners))
         {
             deleteNewMinOwners();
         }
 
+    }
+
+    function CheckValidations(uint256 signatures, uint256 minSignatures) internal pure returns(bool){
+        if(signatures < minSignatures) return false;
+        return true;
     }
 
     function retrievePendingMinOwners() external override view returns (uint)

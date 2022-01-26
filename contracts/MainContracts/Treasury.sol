@@ -83,8 +83,7 @@ contract Treasury is ITreasury, StdPropositionBaseContract{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function pay() external 
-    override payable
+    receive() external payable
     {
         _AggregatedDividendAmount += msg.value;
 

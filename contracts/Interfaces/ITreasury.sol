@@ -11,7 +11,6 @@ pragma solidity 0.8.7;
 
  interface ITreasury  {
 
-    function pay() external payable;    
     function withdraw(uint256 amount) external;
     function withdrawAll() external;
 

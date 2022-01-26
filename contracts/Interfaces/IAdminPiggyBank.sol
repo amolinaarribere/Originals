@@ -8,10 +8,17 @@ pragma solidity 0.8.7;
  */
 
 interface IAdminPiggyBank {
+    struct _TransferStruct{
+        address _to;
+        uint256 _amount;
+        uint _validations;
+        uint _rejections;
+        address[] _voters;
+    }
 
     function transfer(address receiver, uint amount) external;
     function approve() external;
     function reject() external;
 
-    function retrieveTransferInfo() external returns(address receiver, uint amount);
+    function retrieveTransferInfo() external view returns(_TransferStruct memory);
 }

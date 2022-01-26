@@ -19,36 +19,10 @@ library ItemsLibrary{
         Library.PaymentPlans _paymentPlan;
     }
 
-    struct _pendingIssuerStruct{
-        _issuerStruct _issuer;
-        uint _pendingId;
-        uint _validations;
-        uint _rejections;
-        address[] _voters;
-    }
-
-    struct _offerStruct{
-        uint256 _offer;
-        address _sender;
-        address _bidder;
-        uint256 _deadline; 
-    }
-
-    struct _tokenStruct{
-        Library.PaymentPlans _paymentPlan;
-        uint256 _price;
-    }
-
-    // dividends per token owner
+    // balance per token owner
     struct _BalanceStruct{
         mapping(uint => uint) _balance;
         uint[] _factors;
-    }
-    
-    // AUX FUNCTIONALITY /////////////////////////////////////////
-    function CheckValidations(uint256 signatures, uint256 minSignatures) public pure returns(bool){
-        if(signatures < minSignatures) return false;
-        return true;
     }
 
     // TREASURY & NFTMarket///////////////////////////
@@ -67,9 +41,14 @@ library ItemsLibrary{
         addBalance(balance, remainder, commonDividend);
 
         if(transfer){
-            (bool success, bytes memory data) = to.call{value: amount}("");
-            require(success, string(abi.encodePacked("Error transfering funds to address : ", data)));
+            TransferEtherTo(amount, to);
         }
+    }
+
+    function TransferEtherTo(uint amount, address to) public
+    {
+        (bool success, bytes memory data) = to.call{value: amount}("");
+        require(success, string(abi.encodePacked("Error transfering funds to address : ", data)));
     }
 
     function addBalance(_BalanceStruct storage balance, uint amount, uint factor) public
@@ -115,7 +94,6 @@ library ItemsLibrary{
 
         return (total, CommonDividend);
     }
-
 
     function returnFactors(_BalanceStruct storage balance) public view returns(uint[] memory)
     {

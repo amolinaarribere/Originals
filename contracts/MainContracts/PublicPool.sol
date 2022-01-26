@@ -37,7 +37,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
   mapping(uint256 => address) _issuers;
   uint256[] _listOfIssuers;
 
-  mapping(uint256 => ItemsLibrary._pendingIssuerStruct) _pendingIssuers;
+  mapping(uint256 => _pendingIssuerStruct) _pendingIssuers;
   uint256[] _listOfPendingIssuers;
 
   uint256 nextIssuerId;
@@ -73,9 +73,13 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
   returns (uint256)
   {
 
-    uint256 NewIssuerFee = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings()[uint256(Library.Prices.NewIssuerFee)];
-    require(msg.value >= NewIssuerFee, "New Issuer Fees not enough");
-    ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:msg.value}();
+    uint[] memory Prices = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
+    uint256 NewIssuerFee = Prices[uint256(Library.Prices.NewIssuerFee)];
+    uint256 AdminNewIssuerFee = Prices[uint256(Library.Prices.AdminNewIssuerFee)];
+    require(msg.value >= NewIssuerFee + AdminNewIssuerFee, "New Issuer Fees not enough");
+
+    ItemsLibrary.TransferEtherTo(NewIssuerFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
+    ItemsLibrary.TransferEtherTo(msg.value - NewIssuerFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)]);
 
     _pendingIssuers[nextIssuerId]._issuer._owner = owner;
     _pendingIssuers[nextIssuerId]._issuer._name = name;
@@ -168,7 +172,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     return _listOfPendingIssuers;
   }
 
-  function retrievePendingIssuer(uint id) external override view returns (ItemsLibrary._pendingIssuerStruct memory)
+  function retrievePendingIssuer(uint id) external override view returns (_pendingIssuerStruct memory)
   {
     return _pendingIssuers[id];
   }

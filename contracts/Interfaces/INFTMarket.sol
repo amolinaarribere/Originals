@@ -10,6 +10,17 @@ pragma solidity 0.8.7;
    import "../Libraries/ItemsLibrary.sol";
 
  interface INFTMarket  {
+    struct _offerStruct{
+        uint256 _offer;
+        address _sender;
+        address _bidder;
+        uint256 _deadline; 
+    }
+
+    struct _tokenStruct{
+        Library.PaymentPlans _paymentPlan;
+        uint256 _price;
+    }
 
     function changeOwner(address newOwner) external;
     function changePaymentPlan(Library.PaymentPlans newPaymentPlan) external;
@@ -29,7 +40,7 @@ pragma solidity 0.8.7;
     function withdraw() external;
 
     function retrieveIssuer() external view returns (ItemsLibrary._issuerStruct memory, uint256);
-    function retrieveToken(uint256 tokenId) external view returns (ItemsLibrary._tokenStruct memory, address);
-    function retrieveOffer(uint256 tokenId) external view returns (ItemsLibrary._offerStruct memory);
+    function retrieveToken(uint256 tokenId) external view returns (_tokenStruct memory, address);
+    function retrieveOffer(uint256 tokenId) external view returns (_offerStruct memory);
 
 }
