@@ -270,7 +270,7 @@ import "../Interfaces/INFTMarket.sol";
       factors);
   }
 
-  function CalculatePercents(uint256 amount, uint256 percentage, uint256 decimals) internal returns(uint256, uint256, uint256)
+  function CalculatePercents(uint256 amount, uint256 percentage, uint256 decimals) internal pure returns(uint256, uint256, uint256)
   {
       uint256 numerator = amount * percentage;
       uint256 denominator = 100 * 10**decimals;

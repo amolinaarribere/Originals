@@ -68,22 +68,8 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
       _;
   }
 
-  function isNFTMarketFunc(uint256 MarketId, address MarketAddress) internal{
+  function isNFTMarketFunc(uint256 MarketId, address MarketAddress) internal view{
     require(MarketAddress == _issuers[MarketId], "The Market Id and Address do not correspond");
-  }
-
-  modifier checkTotal(uint256 NFTMarketId, uint256 tokenID, uint256[] calldata amounts, uint256[] calldata factors){
-      checkTotalFunc(NFTMarketId, tokenID, amounts, factors);
-      _;
-  }
-
-  function checkTotalFunc(uint256 NFTMarketId, uint256 tokenID, uint256[] calldata amounts, uint256[] calldata factors) internal{
-      require(amounts.length == factors.length, "Provided array do not have the same length");
-      for(uint i=0; i < amounts.length; i++){
-        ItemsLibrary.addBalance(_creditOfAccount[address(0)], amounts[0], factors[0]);
-      }
-      require(_unassignedCreditForMarket[NFTMarketId][tokenID] == ItemsLibrary.checkFullBalance(_creditOfAccount[address(0)]), "Provided array do not have the same length");
-      ItemsLibrary.InternalWithdraw(_creditOfAccount[address(0)], _unassignedCreditForMarket[NFTMarketId][tokenID], address(0), false);
   }
 
   modifier isTokenUnassignedCreditEmpty(uint256 NFTMarketId, uint256 tokenID){
@@ -91,7 +77,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     _;
   }
 
-  function isTokenUnassignedCreditEmptyFunc(uint256 NFTMarketId, uint256 tokenID) internal{
+  function isTokenUnassignedCreditEmptyFunc(uint256 NFTMarketId, uint256 tokenID) internal view{
     require(0 == _unassignedCreditForMarket[NFTMarketId][tokenID], "Unassigned credit for this token is not empty");
   }
 
@@ -219,7 +205,6 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     ItemsLibrary.addBalance(_creditOfAccount[addr], msg.value, 1);
   }
 
-
   function transferUnassignedCredit(uint256 NFTMarketId, uint256 tokenID) external override payable
     isNFTMarket(NFTMarketId, msg.sender)
     isTokenUnassignedCreditEmpty(NFTMarketId, tokenID)
@@ -229,7 +214,6 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
   function addCredit(uint256 NFTMarketId, uint256 tokenID, address[] calldata addrs, uint256[] calldata amounts, uint256[] calldata factors) external override
     isNFTMarket(NFTMarketId, msg.sender)
-    checkTotal(NFTMarketId, tokenID, amounts, factors)
   {
     require(addrs.length == factors.length, "Provided array do not have the same length");
     for(uint i=0; i < addrs.length; i++){
@@ -256,17 +240,11 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[msg.sender]);
     internalWithdraw(msg.sender, amount);
   }
-
-  function withdrawFor(uint256 NFTMarketId, address addr, uint amount) external override
-    isNFTMarket(NFTMarketId, msg.sender)
-  {
-    internalWithdraw(addr, amount);
-  }
   
   function withdrawAllFor(uint256 NFTMarketId, address addr) external override
     isNFTMarket(NFTMarketId, msg.sender)
   {
-    uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[msg.sender]);
+    uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[addr]);
     internalWithdraw(addr, amount);
   }
 
