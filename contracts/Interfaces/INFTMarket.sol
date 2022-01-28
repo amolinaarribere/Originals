@@ -34,10 +34,8 @@ pragma solidity 0.8.7;
     function rejectOffer(uint256 tokenId) external;
 
 
-
-    function submitOffer(uint256 tokenId, address bidder) external payable;
+    function submitOffer(uint256 tokenId, address bidder, uint256 offer, bool FromCredit) external payable;
     function withdrawOffer(uint256 tokenId) external;
-    function withdraw() external;
 
     function retrieveIssuer() external view returns (ItemsLibrary._issuerStruct memory, uint256);
     function retrieveToken(uint256 tokenId) external view returns (_tokenStruct memory, address);
