@@ -81,6 +81,21 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     require(0 == _unassignedCreditForMarket[NFTMarketId][tokenID], "Unassigned credit for this token is not empty");
   }
 
+  modifier checkTotal(uint256 total, uint256[] memory amounts, uint256[] memory factors){
+    checkTotalFunc(total, amounts, factors);
+    _;
+  }
+
+  function checkTotalFunc(uint256 total, uint256[] memory amounts, uint256[] memory factors) internal pure{
+    require(amounts.length == factors.length, "Provided arrays do not have the same length");
+    uint256 CommonDividend = UintLibrary.ProductOfFactors(factors);
+    uint256 calculatedTotal = 0;
+    for(uint256 i=0; i < factors.length; i++){
+        calculatedTotal += amounts[i] * CommonDividend / factors[i];
+    }
+    require(total == calculatedTotal, "the total amount is not equal to the calculated one");
+  }
+
   // CONSTRUCTOR /////////////////////////////////////////
   function PublicPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
       super.MultiSigContract_init(owners, minOwners); 
@@ -214,8 +229,9 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
   function addCredit(uint256 NFTMarketId, uint256 tokenID, address[] calldata addrs, uint256[] calldata amounts, uint256[] calldata factors) external override
     isNFTMarket(NFTMarketId, msg.sender)
+    checkTotal(_unassignedCreditForMarket[NFTMarketId][tokenID], amounts, factors)
   {
-    require(addrs.length == factors.length, "Provided array do not have the same length");
+    require(addrs.length == factors.length, "Provided arrays do not have the same length");
     for(uint i=0; i < addrs.length; i++){
       ItemsLibrary.addBalance(_creditOfAccount[addrs[i]], amounts[i], factors[i]);
     }
