@@ -58,7 +58,7 @@ contract AdminPiggyBank is Initializable, MultiSigContract, IAdminPiggyBank {
         emit _Pay(msg.sender, msg.value);
     }
 
-    function transfer(address receiver, uint amount) external override
+    function transfer(address receiver, uint256 amount) external override
         isReceiverOK(receiver)
         isAmountOK(amount)
         transferInProgress(false)

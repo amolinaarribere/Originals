@@ -16,7 +16,7 @@ interface IAdminPiggyBank {
         address[] _voters;
     }
 
-    function transfer(address receiver, uint amount) external;
+    function transfer(address receiver, uint256 amount) external;
     function approve() external;
     function reject() external;
 
