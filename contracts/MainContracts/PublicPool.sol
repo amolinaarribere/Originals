@@ -40,8 +40,6 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
   mapping(uint256 => _pendingIssuerStruct) private _pendingIssuers;
   uint256[] private _listOfPendingIssuers;
 
-  uint256 private nextIssuerId;
-
   mapping(address => ItemsLibrary._BalanceStruct) private _creditOfAccount;
   mapping(uint256 => mapping(uint256 => uint256)) private _unassignedCreditForMarket;
 
@@ -100,15 +98,12 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
   function PublicPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
       super.MultiSigContract_init(owners, minOwners); 
       super.ManagedBaseContract_init(managerContractAddress); 
-
-      nextIssuerId = 0;
   }
 
   // FUNCTIONALITY /////////////////////////////////////////
   function requestIssuer(address owner, string memory name, string memory symbol, uint256 feeAmount, uint256 feeDecimals, Library.PaymentPlans paymentPlan) external override payable
     validOwner(owner)
     validFees(feeAmount, feeDecimals)
-  returns (uint256)
   {
 
     uint[] memory Prices = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
@@ -119,19 +114,18 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     ItemsLibrary.TransferEtherTo(NewIssuerFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
     ItemsLibrary.TransferEtherTo(msg.value - NewIssuerFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)]);
 
-    _pendingIssuers[nextIssuerId]._issuer._owner = owner;
-    _pendingIssuers[nextIssuerId]._issuer._name = name;
-    _pendingIssuers[nextIssuerId]._issuer._symbol = symbol;
-    _pendingIssuers[nextIssuerId]._issuer._feeAmount = feeAmount;
-    _pendingIssuers[nextIssuerId]._issuer._feeDecimals = feeDecimals;
-    _pendingIssuers[nextIssuerId]._issuer._paymentPlan = paymentPlan;
-    _pendingIssuers[nextIssuerId]._pendingId = _listOfPendingIssuers.length;
-    _listOfPendingIssuers.push(nextIssuerId);
+    uint256 IssuerID = uint256(keccak256(bytes(name)));
 
-    emit _NewIssuerRequest(nextIssuerId, owner, name, symbol);
+    _pendingIssuers[IssuerID]._issuer._owner = owner;
+    _pendingIssuers[IssuerID]._issuer._name = name;
+    _pendingIssuers[IssuerID]._issuer._symbol = symbol;
+    _pendingIssuers[IssuerID]._issuer._feeAmount = feeAmount;
+    _pendingIssuers[IssuerID]._issuer._feeDecimals = feeDecimals;
+    _pendingIssuers[IssuerID]._issuer._paymentPlan = paymentPlan;
+    _pendingIssuers[IssuerID]._pendingId = _listOfPendingIssuers.length;
+    _listOfPendingIssuers.push(IssuerID);
 
-    nextIssuerId++;
-    return(nextIssuerId - 1);
+    emit _NewIssuerRequest(IssuerID, owner, name, symbol);
   }
 
   function validateIssuer(uint256 id) external override
