@@ -69,7 +69,7 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
     }
 
     function OwnerPendingFunc(address addr, bool YesOrNo) internal view{
-        require(YesOrNo == (isOwnerPendingToAdded(addr) || isOwnerPendingToRemoved(addr)), "EC9-");
+        require(YesOrNo == (isOwnerPendingToAdded(addr) || isOwnerPendingToRemoved(addr)), "EC10-");
     }
     
     modifier minRequired(uint min, uint number){
@@ -232,11 +232,13 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
 
     function isOwnerPendingToAdded(address addr) internal view returns(bool)
     {
+        if(_Owners._owner[addr]._pendingId >= _Owners._pendingOwnersAdd.length) return false;
         return (addr == _Owners._pendingOwnersAdd[_Owners._owner[addr]._pendingId]);
     }
 
     function isOwnerPendingToRemoved(address addr) internal view returns(bool)
     {
+        if(_Owners._owner[addr]._pendingId >= _Owners._pendingOwnersRemove.length) return false;
         return (addr == _Owners._pendingOwnersRemove[_Owners._owner[addr]._pendingId]);
     }
 
