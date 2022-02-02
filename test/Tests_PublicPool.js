@@ -25,14 +25,6 @@ contract("Testing Public Pool",function(accounts){
     const minOwners = 2;
     const user_1 = accounts[4];
     const extra_owner = accounts[5];
-    const address_0 = "0x0000000000000000000000000000000000000000";
-    const MustBeOwner = new RegExp("EC9-");
-
-    const CannotTransferToAddress0 = new RegExp("We cannot transfer to address 0");
-    const CannotTransferMoreThan = new RegExp("We cannot transfer more than the current balance");
-    const TransferInProgress = new RegExp("Transfer in progress");
-
-
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
