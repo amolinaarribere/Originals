@@ -34,6 +34,7 @@ contract("Testing Public Pool",function(accounts){
     const issuer_1_fee = 10;
     const issuer_1_decimals = 0;
     const issuer_1_paymentplans = 0;
+    const issuer_2 = accounts[6];
 
     var NewIssuerAmount = NewIssuerFee.plus(AdminNewIssuerFee);
 
@@ -44,6 +45,7 @@ contract("Testing Public Pool",function(accounts){
     const AddressNOK = new RegExp("NFT Market owner cannot be address 0");
     const NotEnoughFees = new RegExp("New Issuer Fees not enough");
     const TooMuch = new RegExp("EC20-");
+    const IssuerIDTaken = new RegExp("This Issuer Name has already been taken");
 
 
 
@@ -125,6 +127,16 @@ contract("Testing Public Pool",function(accounts){
         catch(error){
             expect(error.message).to.match(NotEnoughFees);
         }
+        // act
+        try{
+            await publicpoolProxy.methods.requestIssuer(issuer_1, issuer_1_name, issuer_1_symbol, 10, 0, 0).send({from: user_1, gas: Gas, value: NewIssuerAmount}, function(error, result){});
+            await publicpoolProxy.methods.requestIssuer(issuer_2, issuer_1_name, "", 10, 0, 0).send({from: user_1, gas: Gas, value: NewIssuerAmount}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(IssuerIDTaken);
+        }
     });
 
     it("Add Issuer CORRECT",async function(){
@@ -169,6 +181,15 @@ contract("Testing Public Pool",function(accounts){
         expect(Issuers.length).to.equal(1);
         let IssuersAddress = await publicpoolProxy.methods.retrieveNFTMarketForIssuer(issuerId).call();
         expect(IssuersAddress).to.equal(NFTMarketAddress);
+
+        try{
+            await publicpoolProxy.methods.requestIssuer(issuer_2, issuer_1_name, "", 10, 0, 0).send({from: user_1, gas: Gas, value: NewIssuerAmount}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(IssuerIDTaken);
+        }
     });
 
     // ****** TESTING Credit ***************************************************************** //

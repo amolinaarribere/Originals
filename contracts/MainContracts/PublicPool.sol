@@ -114,7 +114,8 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     ItemsLibrary.TransferEtherTo(NewIssuerFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
     ItemsLibrary.TransferEtherTo(msg.value - NewIssuerFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)]);
 
-    uint256 IssuerID = uint256(keccak256(bytes(name)));
+    uint256 IssuerID = getIssuerIdFromName(name);
+    require(address(0) == _pendingIssuers[IssuerID]._issuer._owner && address(0) == _issuers[IssuerID], "This Issuer Name has already been taken");
 
     _pendingIssuers[IssuerID]._issuer._owner = owner;
     _pendingIssuers[IssuerID]._issuer._name = name;
@@ -126,6 +127,11 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     _listOfPendingIssuers.push(IssuerID);
 
     emit _NewIssuerRequest(IssuerID, owner, name, symbol);
+  }
+
+  function getIssuerIdFromName(string memory name) internal pure returns(uint256)
+  {
+    return uint256(keccak256(bytes(name)));
   }
 
   function validateIssuer(uint256 id) external override
