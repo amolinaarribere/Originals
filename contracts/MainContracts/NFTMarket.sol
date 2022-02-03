@@ -25,7 +25,18 @@ import "../Interfaces/INFTMarket.sol";
     using Library for *;
 
   // EVENTS /////////////////////////////////////////
-  
+  event _NewOwner(address indexed formerOwner, address newOwner);
+  event _NewPaymentPlan(Library.PaymentPlans formerPlan, Library.PaymentPlans newPlan);
+  event _NewOffersLifeTime(uint256 indexed formerLifeTime, uint256 newLifeTime);
+  event _NewOwnerFees(uint256 indexed formerAmount, uint256 indexed formerDecimals, uint256 newAmount, uint256 newDecimals);
+
+  event _MintToken(uint256 indexed tokenId, address receiver, uint256 price, Library.PaymentPlans plan, uint256 MintingFee, uint256 AdminMintingFee);
+  event _SetTokenPrice(uint256 indexed tokenId, uint256 indexed formerPrice, uint256 newPrice);
+  event _SubmitOffer(uint256 indexed tokenId, address indexed sender, address indexed bidder, uint256 offer, bool FromCredit);
+  event _AcceptOffer(uint256 indexed tokenId, address indexed formerOwner, address indexed newOwner, uint256 offer);
+  event _RejectOffer(uint256 indexed tokenId);
+  event _WithdrawOffer(uint256 indexed tokenId);
+
 
   // DATA /////////////////////////////////////////
   address _owner;
@@ -87,18 +98,21 @@ import "../Interfaces/INFTMarket.sol";
   function changeOwner(address newOwner) external override
     isTheOwner(msg.sender)
   {
+      emit _NewOwner(_owner, newOwner);
       _owner = newOwner;
   }
 
   function changePaymentPlan(Library.PaymentPlans newPaymentPlan) external override
     isTheOwner(msg.sender)
   {
+      emit _NewPaymentPlan(_paymentPlan, newPaymentPlan);
       _paymentPlan = newPaymentPlan;
   }
 
   function changeOffersLifeTime(uint256 newLifeTime) external override
     isTheOwner(msg.sender)
   {
+      emit _NewOffersLifeTime(_offersLifeTime, newLifeTime);
       _offersLifeTime = newLifeTime;
   }
 
@@ -106,6 +120,7 @@ import "../Interfaces/INFTMarket.sol";
     isTheOwner(msg.sender)
     validFees(newAmount, newDecimals)
   {
+      emit _NewOwnerFees(_ownerTransferFeeAmount, _ownerTransferFeeDecimals, newAmount, newDecimals);
       _ownerTransferFeeAmount = newAmount;
       _ownerTransferFeeDecimals = newDecimals;
   }
@@ -113,11 +128,14 @@ import "../Interfaces/INFTMarket.sol";
   function mintToken(uint256 tokenId, address receiver, uint256 price) external payable override
     isTheOwner(msg.sender)
   {
+      uint256 MintingFee = 0;
+      uint256 AdminMintingFee = 0;
+
       if(_paymentPlan == Library.PaymentPlans.Minting)
       {
         uint[] memory Prices = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
-        uint256 MintingFee = Prices[uint256(Library.Prices.MintingFee)];
-        uint256 AdminMintingFee = Prices[uint256(Library.Prices.AdminMintingFee)];
+        MintingFee = Prices[uint256(Library.Prices.MintingFee)];
+        AdminMintingFee = Prices[uint256(Library.Prices.AdminMintingFee)];
         require(msg.value >= MintingFee + AdminMintingFee, "Minting Fees not enough");
 
         ItemsLibrary.TransferEtherTo(MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
@@ -126,11 +144,14 @@ import "../Interfaces/INFTMarket.sol";
       _safeMint(receiver, tokenId);
       _tokenInfo[tokenId]._price = price;
       _tokenInfo[tokenId]._paymentPlan = _paymentPlan;
+
+      emit _MintToken(tokenId, receiver, price, _paymentPlan, MintingFee, AdminMintingFee);
   }
 
   function setTokenPrice(uint256 tokenId, uint256 price) external override
     isTokenOwnerOrApproved(tokenId)
   {
+      emit _SetTokenPrice(tokenId, _tokenInfo[tokenId]._price, price);
       _tokenInfo[tokenId]._price = price;
   }
 
@@ -138,6 +159,8 @@ import "../Interfaces/INFTMarket.sol";
     isTokenOwnerOrApproved(tokenId)
     OfferInProgress(tokenId, true)
   {
+    emit _AcceptOffer(tokenId, ownerOf(tokenId),  _tokenOffer[tokenId]._bidder,  _tokenOffer[tokenId]._offer);
+
     (uint256 OwnerTransferFeeAmount, uint256 TransferFeeAmount, uint256 AdminTransferFeeAmount, uint256 commonDecimals) = getFees(tokenId);
 
 
@@ -145,12 +168,11 @@ import "../Interfaces/INFTMarket.sol";
     require(percentageForTokenOwner >= 0, "Fees exceed 100 percent");
 
     _safeTransfer(ownerOf(tokenId), _tokenOffer[tokenId]._bidder, tokenId, "");
-    uint256 offer = _tokenOffer[tokenId]._offer;
 
     AllocatePercents(tokenId,
       [_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], _owner, ownerOf(tokenId)],
       [TransferFeeAmount, AdminTransferFeeAmount, OwnerTransferFeeAmount, percentageForTokenOwner],
-      offer,
+      _tokenOffer[tokenId]._offer,
       commonDecimals);
 
     removeOffer(tokenId);
@@ -192,6 +214,7 @@ import "../Interfaces/INFTMarket.sol";
   {
     assignToRejectedSender(tokenId);
     removeOffer(tokenId);
+    emit _RejectOffer(tokenId);
   }
 
   function removeOffer(uint256 tokenId) internal
@@ -220,7 +243,8 @@ import "../Interfaces/INFTMarket.sol";
     _tokenOffer[tokenId]._sender = msg.sender;
     _tokenOffer[tokenId]._bidder = bidder;
     _tokenOffer[tokenId]._deadline = block.timestamp + _offersLifeTime;
-      
+
+    emit _SubmitOffer(tokenId, msg.sender, bidder, offer, FromCredit);
   }
     
   function withdrawOffer(uint256 tokenId) external override
@@ -229,6 +253,7 @@ import "../Interfaces/INFTMarket.sol";
     require(msg.sender == _tokenOffer[tokenId]._sender, "Only the original sender can withdraw the bid");
     assignToRejectedSender(tokenId);
     removeOffer(tokenId);
+    emit _WithdrawOffer(tokenId);
   }
 
   function assignToRejectedSender(uint tokenId) internal

@@ -21,7 +21,6 @@ import "../Libraries/UintLibrary.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 
-
  contract PublicPool is  Initializable, MultiSigContract, ManagedBaseContract, IPool {
   using ItemsLibrary for *;
   using UintLibrary for *;
