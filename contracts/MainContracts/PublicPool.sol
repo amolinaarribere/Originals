@@ -28,10 +28,17 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
   // EVENTS /////////////////////////////////////////
   event _NewIssuerRequest(uint256 indexed id, address owner, string name, string symbol);
-
   event _VoteForIssuer(uint256 indexed id, address voter, bool vote);
   event _IssuerValidation(uint256 indexed id, address NFTMarket);
   event _IssuerRejection(uint256 indexed id);
+
+  event _CreditReceived(address indexed receiver, uint256 amount, address indexed sender);
+  event _CreditUnAssignedReceived(uint256 indexed NFTMarketId, uint256 indexed tokenID, uint256 amount);
+  event _CreditAssigned(uint256 indexed NFTMarketId, uint256 indexed tokenID, address indexed receiver, uint256 amount, uint256 factor);
+  event _CreditReused(uint256 indexed NFTMarketId, uint256 indexed tokenID, address indexed creditor, uint256 amount);
+  event _CreditWithdrawn(address indexed withdrawer, uint256 amount);
+  event _CreditWithdrawnFor(address indexed withdrawer, uint256 amount, address indexed sender);
+
 
   // DATA /////////////////////////////////////////
   mapping(uint256 => address) private _issuers;
@@ -215,16 +222,20 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     return _pendingIssuers[id];
   }
 
+  // Credit Functionality
+
   function sendCredit(address addr) external override payable
   {
     ItemsLibrary.addBalance(_creditOfAccount[addr], msg.value, 1);
+    emit _CreditReceived(addr, msg.value, msg.sender);
   }
 
   function transferUnassignedCredit(uint256 NFTMarketId, uint256 tokenID) external override payable
     isNFTMarket(NFTMarketId, msg.sender)
     isTokenUnassignedCreditEmpty(NFTMarketId, tokenID)
   {
-    _unassignedCreditForMarket[NFTMarketId][tokenID] += msg.value;
+    internalTransferUnassignedCredit(NFTMarketId, tokenID, msg.value);
+    emit _CreditUnAssignedReceived(NFTMarketId, tokenID, msg.value);
   }
 
   function addCredit(uint256 NFTMarketId, uint256 tokenID, address[] calldata addrs, uint256[] calldata amounts, uint256[] calldata factors) external override
@@ -234,6 +245,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     require(addrs.length == factors.length, "Provided arrays do not have the same length");
     for(uint i=0; i < addrs.length; i++){
       ItemsLibrary.addBalance(_creditOfAccount[addrs[i]], amounts[i], factors[i]);
+      emit _CreditAssigned(NFTMarketId, tokenID, addrs[i], amounts[i], factors[i]);
     }
     delete(_unassignedCreditForMarket[NFTMarketId][tokenID]);
   }
@@ -243,30 +255,38 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     isTokenUnassignedCreditEmpty(NFTMarketId, tokenID)
   {
     ItemsLibrary.InternalWithdraw(_creditOfAccount[addr], amount, address(0), false);
-    _unassignedCreditForMarket[NFTMarketId][tokenID] += amount;
+    internalTransferUnassignedCredit(NFTMarketId, tokenID, amount);
+    emit _CreditReused(NFTMarketId, tokenID, addr, amount);
   }
 
   function withdraw(uint amount) external override
   {
-    internalWithdraw(msg.sender, amount);
+    internalWithdraw(msg.sender, amount, address(0));
   }
   
   function withdrawAll() external override
   {
     uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[msg.sender]);
-    internalWithdraw(msg.sender, amount);
+    internalWithdraw(msg.sender, amount, address(0));
   }
   
   function withdrawAllFor(uint256 NFTMarketId, address addr) external override
     isNFTMarket(NFTMarketId, msg.sender)
   {
     uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[addr]);
-    internalWithdraw(addr, amount);
+    internalWithdraw(addr, amount, msg.sender);
   }
 
-  function internalWithdraw(address addr, uint amount) internal
+  function internalTransferUnassignedCredit(uint256 NFTMarketId, uint256 tokenID, uint256 amount) internal
+  {
+      _unassignedCreditForMarket[NFTMarketId][tokenID] = amount;
+  }
+
+  function internalWithdraw(address addr, uint amount, address sender) internal
   {
     ItemsLibrary.InternalWithdraw(_creditOfAccount[addr], amount, addr, true);
+    if(address(0) != sender) emit _CreditWithdrawnFor(addr, amount, sender);
+    else emit _CreditWithdrawn(addr, amount);
   }
 
   function retrieveCredit(address addr) external override view returns (uint256)

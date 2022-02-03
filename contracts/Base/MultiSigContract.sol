@@ -274,10 +274,12 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
         NewMinOwnerInProgress(true)
         HasNotAlreadyVoted(msg.sender, _newMinOwnersVoters)
     {
-         if(vote) _newMinOwnersVotesFor += 1;
+        if(vote) _newMinOwnersVotesFor += 1;
         else _newMinOwnersVotesAgainst += 1;
 
         _newMinOwnersVoters.push(msg.sender);
+
+        emit _VoteForMinOwner(_newMinOwners, msg.sender, vote);
 
         checkNewMinOwners();         
     }
@@ -295,10 +297,12 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
         if(CheckValidations(_newMinOwnersVotesFor, _minOwners))
         {
             _minOwners = _newMinOwners;
+            emit _MinOwnerValidation(_newMinOwners);
             deleteNewMinOwners();
         }
         else if(CheckValidations(_newMinOwnersVotesAgainst, _minOwners))
         {
+            emit _MinOwnerRejection(_newMinOwners);
             deleteNewMinOwners();
         }
 

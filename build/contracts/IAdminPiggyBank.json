@@ -74,7 +74,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"approve\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"reject\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveTransferInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_validations\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rejections\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_voters\",\"type\":\"address[]\"}],\"internalType\":\"struct IAdminPiggyBank._TransferStruct\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Store & retrieve value in a variable\",\"kind\":\"dev\",\"methods\":{},\"title\":\"Storage\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces/IAdminPiggyBank.sol\":\"IAdminPiggyBank\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"project:/contracts/Interfaces/IAdminPiggyBank.sol\":{\"keccak256\":\"0x7d87c92b4540c41b96e6fe1518f34fbf8201840c058ebbbaa42775650f09f912\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://3d93678aabb4f61d55b0f960c370032aacb9fd415a7dbd7a1ab18b4409dc013d\",\"dweb:/ipfs/QmdSJT1XQroSJo5PVvjSbjBsyBqW7fXRH8LunLhaSt1uju\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"approve\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"reject\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveTransferInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_validations\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rejections\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_voters\",\"type\":\"address[]\"}],\"internalType\":\"struct IAdminPiggyBank._TransferStruct\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Store & retrieve value in a variable\",\"kind\":\"dev\",\"methods\":{},\"title\":\"Storage\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces/IAdminPiggyBank.sol\":\"IAdminPiggyBank\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"project:/contracts/Interfaces/IAdminPiggyBank.sol\":{\"keccak256\":\"0xcc56685c35d3cdf4e996cefd387bcc4094496dd8a2d7692a10003913922ec8dc\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://3f86eab8912bc65f00efc3cd5827f25621aab946ba17bb093f85e0160bc8223e\",\"dweb:/ipfs/QmNrBmfvKyRWRexQmYpeGwpxMLre8dGjSRUUmvjKX8ru3z\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -82,21 +82,21 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\ninterface IAdminPiggyBank {\r\n    struct _TransferStruct{\r\n        address _to;\r\n        uint256 _amount;\r\n        uint _validations;\r\n        uint _rejections;\r\n        address[] _voters;\r\n    }\r\n\r\n    function transfer(address receiver, uint amount) external;\r\n    function approve() external;\r\n    function reject() external;\r\n\r\n    function retrieveTransferInfo() external view returns(_TransferStruct memory);\r\n}",
+  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\ninterface IAdminPiggyBank {\r\n    struct _TransferStruct{\r\n        address _to;\r\n        uint256 _amount;\r\n        uint _validations;\r\n        uint _rejections;\r\n        address[] _voters;\r\n    }\r\n\r\n    function transfer(address receiver, uint256 amount) external;\r\n    function approve() external;\r\n    function reject() external;\r\n\r\n    function retrieveTransferInfo() external view returns(_TransferStruct memory);\r\n}",
   "sourcePath": "C:\\Users\\d-aam\\GitHub\\Originals\\contracts\\Interfaces\\IAdminPiggyBank.sol",
   "ast": {
     "absolutePath": "project:/contracts/Interfaces/IAdminPiggyBank.sol",
     "exportedSymbols": {
       "IAdminPiggyBank": [
-        5851
+        5890
       ]
     },
-    "id": 5852,
+    "id": 5891,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 5818,
+        "id": 5857,
         "literals": [
           "solidity",
           "0.8",
@@ -111,15 +111,15 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 5819,
+          "id": 5858,
           "nodeType": "StructuredDocumentation",
           "src": "65:73:29",
           "text": " @title Storage\n @dev Store & retrieve value in a variable"
         },
         "fullyImplemented": false,
-        "id": 5851,
+        "id": 5890,
         "linearizedBaseContracts": [
-          5851
+          5890
         ],
         "name": "IAdminPiggyBank",
         "nameLocation": "152:15:29",
@@ -127,16 +127,16 @@
         "nodes": [
           {
             "canonicalName": "IAdminPiggyBank._TransferStruct",
-            "id": 5831,
+            "id": 5870,
             "members": [
               {
                 "constant": false,
-                "id": 5821,
+                "id": 5860,
                 "mutability": "mutable",
                 "name": "_to",
                 "nameLocation": "216:3:29",
                 "nodeType": "VariableDeclaration",
-                "scope": 5831,
+                "scope": 5870,
                 "src": "208:11:29",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -145,7 +145,7 @@
                   "typeString": "address"
                 },
                 "typeName": {
-                  "id": 5820,
+                  "id": 5859,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
                   "src": "208:7:29",
@@ -159,12 +159,12 @@
               },
               {
                 "constant": false,
-                "id": 5823,
+                "id": 5862,
                 "mutability": "mutable",
                 "name": "_amount",
                 "nameLocation": "238:7:29",
                 "nodeType": "VariableDeclaration",
-                "scope": 5831,
+                "scope": 5870,
                 "src": "230:15:29",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -173,7 +173,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 5822,
+                  "id": 5861,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "230:7:29",
@@ -186,12 +186,12 @@
               },
               {
                 "constant": false,
-                "id": 5825,
+                "id": 5864,
                 "mutability": "mutable",
                 "name": "_validations",
                 "nameLocation": "261:12:29",
                 "nodeType": "VariableDeclaration",
-                "scope": 5831,
+                "scope": 5870,
                 "src": "256:17:29",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -200,7 +200,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 5824,
+                  "id": 5863,
                   "name": "uint",
                   "nodeType": "ElementaryTypeName",
                   "src": "256:4:29",
@@ -213,12 +213,12 @@
               },
               {
                 "constant": false,
-                "id": 5827,
+                "id": 5866,
                 "mutability": "mutable",
                 "name": "_rejections",
                 "nameLocation": "289:11:29",
                 "nodeType": "VariableDeclaration",
-                "scope": 5831,
+                "scope": 5870,
                 "src": "284:16:29",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -227,7 +227,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 5826,
+                  "id": 5865,
                   "name": "uint",
                   "nodeType": "ElementaryTypeName",
                   "src": "284:4:29",
@@ -240,12 +240,12 @@
               },
               {
                 "constant": false,
-                "id": 5830,
+                "id": 5869,
                 "mutability": "mutable",
                 "name": "_voters",
                 "nameLocation": "321:7:29",
                 "nodeType": "VariableDeclaration",
-                "scope": 5831,
+                "scope": 5870,
                 "src": "311:17:29",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -255,7 +255,7 @@
                 },
                 "typeName": {
                   "baseType": {
-                    "id": 5828,
+                    "id": 5867,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "311:7:29",
@@ -265,7 +265,7 @@
                       "typeString": "address"
                     }
                   },
-                  "id": 5829,
+                  "id": 5868,
                   "nodeType": "ArrayTypeName",
                   "src": "311:9:29",
                   "typeDescriptions": {
@@ -279,13 +279,13 @@
             "name": "_TransferStruct",
             "nameLocation": "182:15:29",
             "nodeType": "StructDefinition",
-            "scope": 5851,
+            "scope": 5890,
             "src": "175:161:29",
             "visibility": "public"
           },
           {
             "functionSelector": "a9059cbb",
-            "id": 5838,
+            "id": 5877,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -293,17 +293,17 @@
             "nameLocation": "353:8:29",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5836,
+              "id": 5875,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5833,
+                  "id": 5872,
                   "mutability": "mutable",
                   "name": "receiver",
                   "nameLocation": "370:8:29",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5838,
+                  "scope": 5877,
                   "src": "362:16:29",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -312,7 +312,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 5832,
+                    "id": 5871,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "362:7:29",
@@ -326,13 +326,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 5835,
+                  "id": 5874,
                   "mutability": "mutable",
                   "name": "amount",
-                  "nameLocation": "385:6:29",
+                  "nameLocation": "388:6:29",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5838,
-                  "src": "380:11:29",
+                  "scope": 5877,
+                  "src": "380:14:29",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -340,10 +340,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5834,
-                    "name": "uint",
+                    "id": 5873,
+                    "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "380:4:29",
+                    "src": "380:7:29",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -352,157 +352,157 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "361:31:29"
+              "src": "361:34:29"
             },
             "returnParameters": {
-              "id": 5837,
+              "id": 5876,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "401:0:29"
+              "src": "404:0:29"
             },
-            "scope": 5851,
-            "src": "344:58:29",
+            "scope": 5890,
+            "src": "344:61:29",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "12424e3f",
-            "id": 5841,
+            "id": 5880,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "approve",
-            "nameLocation": "417:7:29",
+            "nameLocation": "420:7:29",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5839,
+              "id": 5878,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "424:2:29"
+              "src": "427:2:29"
             },
             "returnParameters": {
-              "id": 5840,
+              "id": 5879,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "435:0:29"
+              "src": "438:0:29"
             },
-            "scope": 5851,
-            "src": "408:28:29",
+            "scope": 5890,
+            "src": "411:28:29",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "4dc415de",
-            "id": 5844,
+            "id": 5883,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "reject",
-            "nameLocation": "451:6:29",
+            "nameLocation": "454:6:29",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5842,
+              "id": 5881,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "457:2:29"
+              "src": "460:2:29"
             },
             "returnParameters": {
-              "id": 5843,
+              "id": 5882,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "468:0:29"
+              "src": "471:0:29"
             },
-            "scope": 5851,
-            "src": "442:27:29",
+            "scope": 5890,
+            "src": "445:27:29",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "6151c343",
-            "id": 5850,
+            "id": 5889,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "retrieveTransferInfo",
-            "nameLocation": "486:20:29",
+            "nameLocation": "489:20:29",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5845,
+              "id": 5884,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "506:2:29"
+              "src": "509:2:29"
             },
             "returnParameters": {
-              "id": 5849,
+              "id": 5888,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5848,
+                  "id": 5887,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5850,
-                  "src": "531:22:29",
+                  "scope": 5889,
+                  "src": "534:22:29",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_struct$__TransferStruct_$5831_memory_ptr",
+                    "typeIdentifier": "t_struct$__TransferStruct_$5870_memory_ptr",
                     "typeString": "struct IAdminPiggyBank._TransferStruct"
                   },
                   "typeName": {
-                    "id": 5847,
+                    "id": 5886,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 5846,
+                      "id": 5885,
                       "name": "_TransferStruct",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5831,
-                      "src": "531:15:29"
+                      "referencedDeclaration": 5870,
+                      "src": "534:15:29"
                     },
-                    "referencedDeclaration": 5831,
-                    "src": "531:15:29",
+                    "referencedDeclaration": 5870,
+                    "src": "534:15:29",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$__TransferStruct_$5831_storage_ptr",
+                      "typeIdentifier": "t_struct$__TransferStruct_$5870_storage_ptr",
                       "typeString": "struct IAdminPiggyBank._TransferStruct"
                     }
                   },
                   "visibility": "internal"
                 }
               ],
-              "src": "530:24:29"
+              "src": "533:24:29"
             },
-            "scope": 5851,
-            "src": "477:78:29",
+            "scope": 5890,
+            "src": "480:78:29",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 5852,
-        "src": "142:416:29",
+        "scope": 5891,
+        "src": "142:419:29",
         "usedErrors": []
       }
     ],
-    "src": "39:519:29"
+    "src": "39:522:29"
   },
   "legacyAST": {
     "absolutePath": "project:/contracts/Interfaces/IAdminPiggyBank.sol",
     "exportedSymbols": {
       "IAdminPiggyBank": [
-        5851
+        5890
       ]
     },
-    "id": 5852,
+    "id": 5891,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 5818,
+        "id": 5857,
         "literals": [
           "solidity",
           "0.8",
@@ -517,15 +517,15 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 5819,
+          "id": 5858,
           "nodeType": "StructuredDocumentation",
           "src": "65:73:29",
           "text": " @title Storage\n @dev Store & retrieve value in a variable"
         },
         "fullyImplemented": false,
-        "id": 5851,
+        "id": 5890,
         "linearizedBaseContracts": [
-          5851
+          5890
         ],
         "name": "IAdminPiggyBank",
         "nameLocation": "152:15:29",
@@ -533,16 +533,16 @@
         "nodes": [
           {
             "canonicalName": "IAdminPiggyBank._TransferStruct",
-            "id": 5831,
+            "id": 5870,
             "members": [
               {
                 "constant": false,
-                "id": 5821,
+                "id": 5860,
                 "mutability": "mutable",
                 "name": "_to",
                 "nameLocation": "216:3:29",
                 "nodeType": "VariableDeclaration",
-                "scope": 5831,
+                "scope": 5870,
                 "src": "208:11:29",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -551,7 +551,7 @@
                   "typeString": "address"
                 },
                 "typeName": {
-                  "id": 5820,
+                  "id": 5859,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
                   "src": "208:7:29",
@@ -565,12 +565,12 @@
               },
               {
                 "constant": false,
-                "id": 5823,
+                "id": 5862,
                 "mutability": "mutable",
                 "name": "_amount",
                 "nameLocation": "238:7:29",
                 "nodeType": "VariableDeclaration",
-                "scope": 5831,
+                "scope": 5870,
                 "src": "230:15:29",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -579,7 +579,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 5822,
+                  "id": 5861,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "230:7:29",
@@ -592,12 +592,12 @@
               },
               {
                 "constant": false,
-                "id": 5825,
+                "id": 5864,
                 "mutability": "mutable",
                 "name": "_validations",
                 "nameLocation": "261:12:29",
                 "nodeType": "VariableDeclaration",
-                "scope": 5831,
+                "scope": 5870,
                 "src": "256:17:29",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -606,7 +606,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 5824,
+                  "id": 5863,
                   "name": "uint",
                   "nodeType": "ElementaryTypeName",
                   "src": "256:4:29",
@@ -619,12 +619,12 @@
               },
               {
                 "constant": false,
-                "id": 5827,
+                "id": 5866,
                 "mutability": "mutable",
                 "name": "_rejections",
                 "nameLocation": "289:11:29",
                 "nodeType": "VariableDeclaration",
-                "scope": 5831,
+                "scope": 5870,
                 "src": "284:16:29",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -633,7 +633,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 5826,
+                  "id": 5865,
                   "name": "uint",
                   "nodeType": "ElementaryTypeName",
                   "src": "284:4:29",
@@ -646,12 +646,12 @@
               },
               {
                 "constant": false,
-                "id": 5830,
+                "id": 5869,
                 "mutability": "mutable",
                 "name": "_voters",
                 "nameLocation": "321:7:29",
                 "nodeType": "VariableDeclaration",
-                "scope": 5831,
+                "scope": 5870,
                 "src": "311:17:29",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -661,7 +661,7 @@
                 },
                 "typeName": {
                   "baseType": {
-                    "id": 5828,
+                    "id": 5867,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "311:7:29",
@@ -671,7 +671,7 @@
                       "typeString": "address"
                     }
                   },
-                  "id": 5829,
+                  "id": 5868,
                   "nodeType": "ArrayTypeName",
                   "src": "311:9:29",
                   "typeDescriptions": {
@@ -685,13 +685,13 @@
             "name": "_TransferStruct",
             "nameLocation": "182:15:29",
             "nodeType": "StructDefinition",
-            "scope": 5851,
+            "scope": 5890,
             "src": "175:161:29",
             "visibility": "public"
           },
           {
             "functionSelector": "a9059cbb",
-            "id": 5838,
+            "id": 5877,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -699,17 +699,17 @@
             "nameLocation": "353:8:29",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5836,
+              "id": 5875,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5833,
+                  "id": 5872,
                   "mutability": "mutable",
                   "name": "receiver",
                   "nameLocation": "370:8:29",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5838,
+                  "scope": 5877,
                   "src": "362:16:29",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -718,7 +718,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 5832,
+                    "id": 5871,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "362:7:29",
@@ -732,13 +732,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 5835,
+                  "id": 5874,
                   "mutability": "mutable",
                   "name": "amount",
-                  "nameLocation": "385:6:29",
+                  "nameLocation": "388:6:29",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5838,
-                  "src": "380:11:29",
+                  "scope": 5877,
+                  "src": "380:14:29",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -746,10 +746,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5834,
-                    "name": "uint",
+                    "id": 5873,
+                    "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "380:4:29",
+                    "src": "380:7:29",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -758,143 +758,143 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "361:31:29"
+              "src": "361:34:29"
             },
             "returnParameters": {
-              "id": 5837,
+              "id": 5876,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "401:0:29"
+              "src": "404:0:29"
             },
-            "scope": 5851,
-            "src": "344:58:29",
+            "scope": 5890,
+            "src": "344:61:29",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "12424e3f",
-            "id": 5841,
+            "id": 5880,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "approve",
-            "nameLocation": "417:7:29",
+            "nameLocation": "420:7:29",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5839,
+              "id": 5878,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "424:2:29"
+              "src": "427:2:29"
             },
             "returnParameters": {
-              "id": 5840,
+              "id": 5879,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "435:0:29"
+              "src": "438:0:29"
             },
-            "scope": 5851,
-            "src": "408:28:29",
+            "scope": 5890,
+            "src": "411:28:29",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "4dc415de",
-            "id": 5844,
+            "id": 5883,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "reject",
-            "nameLocation": "451:6:29",
+            "nameLocation": "454:6:29",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5842,
+              "id": 5881,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "457:2:29"
+              "src": "460:2:29"
             },
             "returnParameters": {
-              "id": 5843,
+              "id": 5882,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "468:0:29"
+              "src": "471:0:29"
             },
-            "scope": 5851,
-            "src": "442:27:29",
+            "scope": 5890,
+            "src": "445:27:29",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "6151c343",
-            "id": 5850,
+            "id": 5889,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "retrieveTransferInfo",
-            "nameLocation": "486:20:29",
+            "nameLocation": "489:20:29",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5845,
+              "id": 5884,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "506:2:29"
+              "src": "509:2:29"
             },
             "returnParameters": {
-              "id": 5849,
+              "id": 5888,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5848,
+                  "id": 5887,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5850,
-                  "src": "531:22:29",
+                  "scope": 5889,
+                  "src": "534:22:29",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_struct$__TransferStruct_$5831_memory_ptr",
+                    "typeIdentifier": "t_struct$__TransferStruct_$5870_memory_ptr",
                     "typeString": "struct IAdminPiggyBank._TransferStruct"
                   },
                   "typeName": {
-                    "id": 5847,
+                    "id": 5886,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 5846,
+                      "id": 5885,
                       "name": "_TransferStruct",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 5831,
-                      "src": "531:15:29"
+                      "referencedDeclaration": 5870,
+                      "src": "534:15:29"
                     },
-                    "referencedDeclaration": 5831,
-                    "src": "531:15:29",
+                    "referencedDeclaration": 5870,
+                    "src": "534:15:29",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$__TransferStruct_$5831_storage_ptr",
+                      "typeIdentifier": "t_struct$__TransferStruct_$5870_storage_ptr",
                       "typeString": "struct IAdminPiggyBank._TransferStruct"
                     }
                   },
                   "visibility": "internal"
                 }
               ],
-              "src": "530:24:29"
+              "src": "533:24:29"
             },
-            "scope": 5851,
-            "src": "477:78:29",
+            "scope": 5890,
+            "src": "480:78:29",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 5852,
-        "src": "142:416:29",
+        "scope": 5891,
+        "src": "142:419:29",
         "usedErrors": []
       }
     ],
-    "src": "39:519:29"
+    "src": "39:522:29"
   },
   "compiler": {
     "name": "solc",
@@ -902,7 +902,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.3",
-  "updatedAt": "2022-02-01T14:10:06.043Z",
+  "updatedAt": "2022-02-03T07:33:27.096Z",
   "devdoc": {
     "details": "Store & retrieve value in a variable",
     "kind": "dev",
