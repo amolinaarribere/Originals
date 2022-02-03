@@ -163,9 +163,9 @@ import "../Interfaces/INFTMarket.sol";
 
     (uint256 OwnerTransferFeeAmount, uint256 TransferFeeAmount, uint256 AdminTransferFeeAmount, uint256 commonDecimals) = getFees(tokenId);
 
-
-    uint256 percentageForTokenOwner = (100 * 10**commonDecimals) - OwnerTransferFeeAmount - TransferFeeAmount - AdminTransferFeeAmount;
-    require(percentageForTokenOwner >= 0, "Fees exceed 100 percent");
+    uint256 TotalFees = OwnerTransferFeeAmount + TransferFeeAmount + AdminTransferFeeAmount;
+    require(10**(commonDecimals + 2) >= TotalFees, "Fees exceed 100 percent");
+    uint256 percentageForTokenOwner = 10**(commonDecimals + 2) - TotalFees;
 
     _safeTransfer(ownerOf(tokenId), _tokenOffer[tokenId]._bidder, tokenId, "");
 

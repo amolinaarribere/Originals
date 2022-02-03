@@ -65,11 +65,13 @@ contract("Testing Public Pool",function(accounts){
     const AddressNOK = new RegExp("NFT Market owner cannot be address 0");
     const NotEnoughFees = new RegExp("New Issuer Fees not enough");
     const NotEnoughCredit = new RegExp("EC20-");
+    const OfferNotInProgress = new RegExp("There is no offer in progress");
     const OfferInProgress = new RegExp("There is an offer in progress");
     const MintingFeesNotEnough = new RegExp("Minting Fees not enough");
     const OnlyOwnerOrApproved = new RegExp("Only owner or approved can change token price");
     const OfferPriceNotOK = new RegExp("The offer is below the minimum price");
     const NotEnoughFunds = new RegExp("Not enough value sent to match the offer");
+    const FeesExceedMax = new RegExp("Fees exceed 100 percent");
     const OnlySender = new RegExp("Only the original sender can withdraw the bid");
 
     const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
@@ -101,7 +103,7 @@ contract("Testing Public Pool",function(accounts){
 
 
     // ****** TESTING Changing Configs ***************************************************************** //
-
+/*
     it("Change Configuration WRONG",async function(){
         await GenerateMarkets(false);
         try{
@@ -356,20 +358,88 @@ contract("Testing Public Pool",function(accounts){
         expect(parseInt(offer._deadline)).to.equal(0);
         
     });
-
-    // ****** TESTING Vote Offer ***************************************************************** //
-    it("Vote Offer WRONG",async function(){
+*/
+    // ****** TESTING REply to Offer ***************************************************************** //
+    it("Reply Offer WRONG",async function(){
         await GenerateMarkets(false);
         let tokenId = 0;
+        let tokenId_2 = 1;
         let tokenPrice = 10;
 
         await Market_1.methods.mintToken(tokenId, user_1, tokenPrice).send({from: issuer_1, gas: Gas, value: mintingFee}, function(error, result){});
-        await Market_1.methods.submitOffer(tokenId, user_2, tokenPrice, false).send({from: user_2, gas: Gas, value : 2 * tokenPrice}, function(error, result){});
 
-        
+        try{
+            await Market_1.methods.acceptOffer(tokenId).send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(OfferNotInProgress);
+        }
+        try{
+            await Market_1.methods.rejectOffer(tokenId).send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(OfferNotInProgress);
+        }
+        try{
+            await Market_1.methods.submitOffer(tokenId, user_2, tokenPrice, false).send({from: user_2, gas: Gas, value : tokenPrice}, function(error, result){});
+            await Market_1.methods.acceptOffer(tokenId).send({from: issuer_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(OnlyOwnerOrApproved);
+        }
+        try{
+            await Market_1.methods.rejectOffer(tokenId).send({from: issuer_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(OnlyOwnerOrApproved);
+        }
+        try{
+            let Fees = 100 * (10 ** TransferFeeDecimals) - TransferFeeAmount;
+            await Market_1.methods.changeOwnerTransferFees(Fees, TransferFeeDecimals).send({from: issuer_1, gas: Gas}, function(error, result){});
+            await Market_1.methods.acceptOffer(tokenId).send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(FeesExceedMax);
+        }
+
+        let newLifeTime = 1;
+
+        try{
+            await Market_1.methods.mintToken(tokenId_2, user_1, tokenPrice).send({from: issuer_1, gas: Gas, value: mintingFee}, function(error, result){});
+            await Market_1.methods.changeOffersLifeTime(newLifeTime).send({from: issuer_1, gas: Gas}, function(error, result){});
+            await Market_1.methods.submitOffer(tokenId_2, user_2, tokenPrice, false).send({from: user_2, gas: Gas, value : tokenPrice}, function(error, result){});
+            await sleep(1000 * (newLifeTime + 2));
+            await Market_1.methods.acceptOffer(tokenId_2).send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(OfferNotInProgress);
+        }
+        try{
+            await Market_1.methods.submitOffer(tokenId_2, user_2, tokenPrice, false).send({from: user_2, gas: Gas, value : tokenPrice}, function(error, result){});
+            await sleep(1000 * (newLifeTime + 2));
+            await Market_1.methods.rejectOffer(tokenId_2).send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(OfferNotInProgress);
+        }
+
     });
 
-    it("Vote Offer CORRECT",async function(){
+    it("Reply Offer CORRECT",async function(){
        
     });
 
