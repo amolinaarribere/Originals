@@ -152,6 +152,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
   function voteForIssuer(uint id, bool vote) internal
     isAnOwner(msg.sender, true)
+    HasNotAlreadyVoted(msg.sender, _pendingIssuers[id]._voters)
     IssuerPending(id)
   {
     emit _VoteForIssuer(id, msg.sender, vote);

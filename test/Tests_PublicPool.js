@@ -45,7 +45,10 @@ contract("Testing Public Pool",function(accounts){
     const AddressNOK = new RegExp("NFT Market owner cannot be address 0");
     const NotEnoughFees = new RegExp("New Issuer Fees not enough");
     const TooMuch = new RegExp("EC20-");
+    const NotAnOwner = new RegExp("EC9-");
+    const OwnerAlreadyvoted = new RegExp("EC5-");
     const IssuerIDTaken = new RegExp("This Issuer Name has already been taken");
+    const NotPending = new RegExp("This issuer id is not pending");
 
 
 
@@ -192,6 +195,62 @@ contract("Testing Public Pool",function(accounts){
         }
     });
 
+    // ****** TESTING Voting On Issuers ***************************************************************** //
+    it("Voting Issuer WRONG",async function(){
+        let response = await publicpoolProxy.methods.requestIssuer(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans).send({from: user_1, gas: Gas, value: NewIssuerAmount}, function(error, result){});;
+        let issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
+        try{
+            await publicpoolProxy.methods.rejectIssuer(issuerId).send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NotAnOwner);
+        }
+        try{
+            await publicpoolProxy.methods.validateIssuer(issuerId).send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NotAnOwner);
+        }
+        try{
+            await publicpoolProxy.methods.rejectIssuer(issuerId.plus(1)).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NotPending);
+        }
+        try{
+            await publicpoolProxy.methods.validateIssuer(issuerId.plus(1)).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NotPending);
+        }
+        try{
+            await publicpoolProxy.methods.rejectIssuer(issuerId).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+            await publicpoolProxy.methods.rejectIssuer(issuerId).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(OwnerAlreadyvoted);
+        }
+        try{
+            await publicpoolProxy.methods.validateIssuer(issuerId).send({from: PublicOwners[1], gas: Gas}, function(error, result){});
+            await publicpoolProxy.methods.validateIssuer(issuerId).send({from: PublicOwners[1], gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(OwnerAlreadyvoted);
+        }
+       
+    });
     // ****** TESTING Credit ***************************************************************** //
     it("Withdraw Credit WRONG",async function(){
         try{
