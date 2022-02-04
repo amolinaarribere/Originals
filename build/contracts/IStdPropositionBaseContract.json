@@ -1,0 +1,414 @@
+{
+  "contractName": "IStdPropositionBaseContract",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes[]",
+          "name": "NewValues",
+          "type": "bytes[]"
+        }
+      ],
+      "name": "sendProposition",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "retrieveProposition",
+      "outputs": [
+        {
+          "internalType": "bytes[]",
+          "name": "",
+          "type": "bytes[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"retrieveProposition\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"\",\"type\":\"bytes[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes[]\",\"name\":\"NewValues\",\"type\":\"bytes[]\"}],\"name\":\"sendProposition\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Store & retrieve value in a variable\",\"kind\":\"dev\",\"methods\":{},\"title\":\"Storage\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces/IStdPropositionBaseContract.sol\":\"IStdPropositionBaseContract\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"project:/contracts/Interfaces/IStdPropositionBaseContract.sol\":{\"keccak256\":\"0x0c6fd216fde3720c0811142c8a76aac852f0b6139eff944db301233f0daaa850\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://5962ae7383468d8a49145bd30224c82ecd753affc14ae44e5bc5715b88071ed5\",\"dweb:/ipfs/Qmc8CR8hQAAJN6NP9bL5bUPutvBGJ6wRv83FxvJFnaMsQ2\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\n interface IStdPropositionBaseContract  {\r\n\r\n    function sendProposition(bytes[] memory NewValues) external;\r\n\r\n    function retrieveProposition() external view returns(bytes[] memory);\r\n\r\n}",
+  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Originals\\contracts\\Interfaces\\IStdPropositionBaseContract.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/Interfaces/IStdPropositionBaseContract.sol",
+    "exportedSymbols": {
+      "IStdPropositionBaseContract": [
+        6278
+      ]
+    },
+    "id": 6279,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 6264,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".7"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "39:22:35"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 6265,
+          "nodeType": "StructuredDocumentation",
+          "src": "65:73:35",
+          "text": " @title Storage\n @dev Store & retrieve value in a variable"
+        },
+        "fullyImplemented": false,
+        "id": 6278,
+        "linearizedBaseContracts": [
+          6278
+        ],
+        "name": "IStdPropositionBaseContract",
+        "nameLocation": "153:27:35",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "e15aa3a6",
+            "id": 6271,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sendProposition",
+            "nameLocation": "200:15:35",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6269,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6268,
+                  "mutability": "mutable",
+                  "name": "NewValues",
+                  "nameLocation": "231:9:35",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6271,
+                  "src": "216:24:35",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes_memory_ptr_$dyn_memory_ptr",
+                    "typeString": "bytes[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 6266,
+                      "name": "bytes",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "216:5:35",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes_storage_ptr",
+                        "typeString": "bytes"
+                      }
+                    },
+                    "id": 6267,
+                    "nodeType": "ArrayTypeName",
+                    "src": "216:7:35",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes_storage_$dyn_storage_ptr",
+                      "typeString": "bytes[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "215:26:35"
+            },
+            "returnParameters": {
+              "id": 6270,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "250:0:35"
+            },
+            "scope": 6278,
+            "src": "191:60:35",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "a93316f5",
+            "id": 6277,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "retrieveProposition",
+            "nameLocation": "268:19:35",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6272,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "287:2:35"
+            },
+            "returnParameters": {
+              "id": 6276,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6275,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6277,
+                  "src": "312:14:35",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes_memory_ptr_$dyn_memory_ptr",
+                    "typeString": "bytes[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 6273,
+                      "name": "bytes",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "312:5:35",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes_storage_ptr",
+                        "typeString": "bytes"
+                      }
+                    },
+                    "id": 6274,
+                    "nodeType": "ArrayTypeName",
+                    "src": "312:7:35",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes_storage_$dyn_storage_ptr",
+                      "typeString": "bytes[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "311:16:35"
+            },
+            "scope": 6278,
+            "src": "259:69:35",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 6279,
+        "src": "143:190:35",
+        "usedErrors": []
+      }
+    ],
+    "src": "39:294:35"
+  },
+  "legacyAST": {
+    "absolutePath": "project:/contracts/Interfaces/IStdPropositionBaseContract.sol",
+    "exportedSymbols": {
+      "IStdPropositionBaseContract": [
+        6278
+      ]
+    },
+    "id": 6279,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 6264,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".7"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "39:22:35"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 6265,
+          "nodeType": "StructuredDocumentation",
+          "src": "65:73:35",
+          "text": " @title Storage\n @dev Store & retrieve value in a variable"
+        },
+        "fullyImplemented": false,
+        "id": 6278,
+        "linearizedBaseContracts": [
+          6278
+        ],
+        "name": "IStdPropositionBaseContract",
+        "nameLocation": "153:27:35",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "e15aa3a6",
+            "id": 6271,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sendProposition",
+            "nameLocation": "200:15:35",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6269,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6268,
+                  "mutability": "mutable",
+                  "name": "NewValues",
+                  "nameLocation": "231:9:35",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6271,
+                  "src": "216:24:35",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes_memory_ptr_$dyn_memory_ptr",
+                    "typeString": "bytes[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 6266,
+                      "name": "bytes",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "216:5:35",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes_storage_ptr",
+                        "typeString": "bytes"
+                      }
+                    },
+                    "id": 6267,
+                    "nodeType": "ArrayTypeName",
+                    "src": "216:7:35",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes_storage_$dyn_storage_ptr",
+                      "typeString": "bytes[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "215:26:35"
+            },
+            "returnParameters": {
+              "id": 6270,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "250:0:35"
+            },
+            "scope": 6278,
+            "src": "191:60:35",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "a93316f5",
+            "id": 6277,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "retrieveProposition",
+            "nameLocation": "268:19:35",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6272,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "287:2:35"
+            },
+            "returnParameters": {
+              "id": 6276,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6275,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6277,
+                  "src": "312:14:35",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes_memory_ptr_$dyn_memory_ptr",
+                    "typeString": "bytes[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 6273,
+                      "name": "bytes",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "312:5:35",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes_storage_ptr",
+                        "typeString": "bytes"
+                      }
+                    },
+                    "id": 6274,
+                    "nodeType": "ArrayTypeName",
+                    "src": "312:7:35",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes_storage_$dyn_storage_ptr",
+                      "typeString": "bytes[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "311:16:35"
+            },
+            "scope": 6278,
+            "src": "259:69:35",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 6279,
+        "src": "143:190:35",
+        "usedErrors": []
+      }
+    ],
+    "src": "39:294:35"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.7+commit.e28d00a7.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.3",
+  "updatedAt": "2022-02-03T07:57:28.621Z",
+  "devdoc": {
+    "details": "Store & retrieve value in a variable",
+    "kind": "dev",
+    "methods": {},
+    "title": "Storage",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

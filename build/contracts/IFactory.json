@@ -1,0 +1,528 @@
+{
+  "contractName": "IFactory",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "internalType": "enum Library.PaymentPlans",
+          "name": "paymentPlan",
+          "type": "uint8"
+        }
+      ],
+      "name": "create",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"symbol\",\"type\":\"string\"},{\"internalType\":\"enum Library.PaymentPlans\",\"name\":\"paymentPlan\",\"type\":\"uint8\"}],\"name\":\"create\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces/IFactory.sol\":\"IFactory\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"project:/contracts/Interfaces/IFactory.sol\":{\"keccak256\":\"0xe42a48076ddf44af99dd58d9602b6ac8320720785843ed00d99dc7f86df3b45f\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://e4ecc57334f6087732a78a000e965086a4e14dbffa4940c7b223e3ac5d4e08cf\",\"dweb:/ipfs/QmbHY7LDBk9zg4kt8HM3hSeFMFnsUhg9tVE6My7RJiS8WT\"]},\"project:/contracts/Libraries/Library.sol\":{\"keccak256\":\"0xa4dbc6a52009dda986db41a07e5d1441d144d2b3abbcee3560caf35d0cbb8fb2\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://c07b790405af7057101cdbe52c1401de02db14dfba541dca3bb857a63e0c2200\",\"dweb:/ipfs/QmNvmGkyBb5RT78CBXUri7FXA7MfhNqSfjTouQjhjqWMJJ\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n  import \"../Libraries/Library.sol\";\r\n\r\n\r\ninterface IFactory {\r\n\r\n    function create(address owner, string memory name, string memory symbol, Library.PaymentPlans paymentPlan) external returns (address);\r\n    \r\n}",
+  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Originals\\contracts\\Interfaces\\IFactory.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/Interfaces/IFactory.sol",
+    "exportedSymbols": {
+      "IFactory": [
+        5864
+      ],
+      "Library": [
+        6958
+      ]
+    },
+    "id": 5865,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 5848,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".7"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "39:22:30"
+      },
+      {
+        "absolutePath": "project:/contracts/Libraries/Library.sol",
+        "file": "../Libraries/Library.sol",
+        "id": 5849,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 5865,
+        "sourceUnit": 6959,
+        "src": "142:34:30",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 5864,
+        "linearizedBaseContracts": [
+          5864
+        ],
+        "name": "IFactory",
+        "nameLocation": "192:8:30",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "ecbfd4b6",
+            "id": 5863,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "create",
+            "nameLocation": "219:6:30",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 5859,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5851,
+                  "mutability": "mutable",
+                  "name": "owner",
+                  "nameLocation": "234:5:30",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5863,
+                  "src": "226:13:30",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 5850,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "226:7:30",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5853,
+                  "mutability": "mutable",
+                  "name": "name",
+                  "nameLocation": "255:4:30",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5863,
+                  "src": "241:18:30",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 5852,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "241:6:30",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5855,
+                  "mutability": "mutable",
+                  "name": "symbol",
+                  "nameLocation": "275:6:30",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5863,
+                  "src": "261:20:30",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 5854,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "261:6:30",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5858,
+                  "mutability": "mutable",
+                  "name": "paymentPlan",
+                  "nameLocation": "304:11:30",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5863,
+                  "src": "283:32:30",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_PaymentPlans_$6743",
+                    "typeString": "enum Library.PaymentPlans"
+                  },
+                  "typeName": {
+                    "id": 5857,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 5856,
+                      "name": "Library.PaymentPlans",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 6743,
+                      "src": "283:20:30"
+                    },
+                    "referencedDeclaration": 6743,
+                    "src": "283:20:30",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_PaymentPlans_$6743",
+                      "typeString": "enum Library.PaymentPlans"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "225:91:30"
+            },
+            "returnParameters": {
+              "id": 5862,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5861,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5863,
+                  "src": "335:7:30",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 5860,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "335:7:30",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "334:9:30"
+            },
+            "scope": 5864,
+            "src": "210:134:30",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 5865,
+        "src": "182:171:30",
+        "usedErrors": []
+      }
+    ],
+    "src": "39:314:30"
+  },
+  "legacyAST": {
+    "absolutePath": "project:/contracts/Interfaces/IFactory.sol",
+    "exportedSymbols": {
+      "IFactory": [
+        5864
+      ],
+      "Library": [
+        6958
+      ]
+    },
+    "id": 5865,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 5848,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".7"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "39:22:30"
+      },
+      {
+        "absolutePath": "project:/contracts/Libraries/Library.sol",
+        "file": "../Libraries/Library.sol",
+        "id": 5849,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 5865,
+        "sourceUnit": 6959,
+        "src": "142:34:30",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 5864,
+        "linearizedBaseContracts": [
+          5864
+        ],
+        "name": "IFactory",
+        "nameLocation": "192:8:30",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "ecbfd4b6",
+            "id": 5863,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "create",
+            "nameLocation": "219:6:30",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 5859,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5851,
+                  "mutability": "mutable",
+                  "name": "owner",
+                  "nameLocation": "234:5:30",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5863,
+                  "src": "226:13:30",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 5850,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "226:7:30",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5853,
+                  "mutability": "mutable",
+                  "name": "name",
+                  "nameLocation": "255:4:30",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5863,
+                  "src": "241:18:30",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 5852,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "241:6:30",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5855,
+                  "mutability": "mutable",
+                  "name": "symbol",
+                  "nameLocation": "275:6:30",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5863,
+                  "src": "261:20:30",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 5854,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "261:6:30",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5858,
+                  "mutability": "mutable",
+                  "name": "paymentPlan",
+                  "nameLocation": "304:11:30",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5863,
+                  "src": "283:32:30",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_PaymentPlans_$6743",
+                    "typeString": "enum Library.PaymentPlans"
+                  },
+                  "typeName": {
+                    "id": 5857,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 5856,
+                      "name": "Library.PaymentPlans",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 6743,
+                      "src": "283:20:30"
+                    },
+                    "referencedDeclaration": 6743,
+                    "src": "283:20:30",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_PaymentPlans_$6743",
+                      "typeString": "enum Library.PaymentPlans"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "225:91:30"
+            },
+            "returnParameters": {
+              "id": 5862,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5861,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5863,
+                  "src": "335:7:30",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 5860,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "335:7:30",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "334:9:30"
+            },
+            "scope": 5864,
+            "src": "210:134:30",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 5865,
+        "src": "182:171:30",
+        "usedErrors": []
+      }
+    ],
+    "src": "39:314:30"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.7+commit.e28d00a7.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.3",
+  "updatedAt": "2022-01-25T13:35:48.454Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
