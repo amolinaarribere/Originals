@@ -91,21 +91,12 @@ async function checkContracts(contractAddress, ContractsBytes, user_1){
     expect(aux.Bytes32ToAddress(ContractsBytes[i])).to.equal(_Contracts[i++]);
     expect(aux.Bytes32ToAddress(ContractsBytes[i])).to.equal(_Contracts[i++]);
     expect(aux.Bytes32ToAddress(ContractsBytes[i])).to.equal(_Contracts[i++]);
-    expect(aux.Bytes32ToAddress(ContractsBytes[i])).to.equal(_Contracts[i++]);
-    expect(aux.Bytes32ToAddress(ContractsBytes[i])).to.equal(_Contracts[i++]);
-    expect(aux.Bytes32ToAddress(ContractsBytes[i])).to.equal(_Contracts[i++]);
-    expect(aux.Bytes32ToAddress(ContractsBytes[i])).to.equal(_Contracts[i++]);
     i++;
     i++;
     i++;
     i++;
     i++;
     i++;
-    i++;
-    i++;
-    i++;
-    expect(aux.BytesToString(ContractsBytes[i])).to.equal(_Contracts[i++]);
-    expect(aux.BytesToString(ContractsBytes[i])).to.equal(_Contracts[i++]);
 }
 
 // tests
@@ -171,21 +162,12 @@ async function Config_ContractsManager_Correct(contractAddress, originalsTokenPr
         aux.AddressToBytes32(result[i++]),
         aux.AddressToBytes32(result[i++]),
         aux.AddressToBytes32(result[i++]),
-        aux.AddressToBytes32(result[i++]),
-        aux.AddressToBytes32(result[i++]),
-        aux.AddressToBytes32(result[i++]),
-        aux.AddressToBytes32(result[i++]),
         result[i++],
         result[i++],
         result[i++],
         result[i++],
         result[i++],
-        result[i++],
-        result[i++],
-        result[i++],
-        result[i++],
-        aux.StringToBytes(result[i++]),
-        aux.StringToBytes(result[i++]),
+        result[i++]
     ];
     await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkContracts, true);
    
