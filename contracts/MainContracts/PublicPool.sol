@@ -97,7 +97,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     for(uint256 i=0; i < factors.length; i++){
         calculatedTotal += amounts[i] * CommonDividend / factors[i];
     }
-    require(total == calculatedTotal, "the total amount is not equal to the calculated one");
+    require((total * CommonDividend) == calculatedTotal, "the total amount is not equal to the calculated one");
   }
 
   // CONSTRUCTOR /////////////////////////////////////////

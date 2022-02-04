@@ -36,7 +36,7 @@ import "../Interfaces/INFTMarket.sol";
   event _AcceptOffer(uint256 indexed tokenId, address indexed formerOwner, address indexed newOwner, uint256 offer);
   event _RejectOffer(uint256 indexed tokenId);
   event _WithdrawOffer(uint256 indexed tokenId);
-
+  
 
   // DATA /////////////////////////////////////////
   address _owner;
@@ -48,8 +48,6 @@ import "../Interfaces/INFTMarket.sol";
 
   mapping(uint256 => _tokenStruct) private _tokenInfo;
   mapping(uint256 => _offerStruct) private _tokenOffer;
-
-  //mapping(address => ItemsLibrary._BalanceStruct) private _balanceOfAccount;
 
 
   // MODIFIERS /////////////////////////////////////////
@@ -164,7 +162,8 @@ import "../Interfaces/INFTMarket.sol";
     (uint256 OwnerTransferFeeAmount, uint256 TransferFeeAmount, uint256 AdminTransferFeeAmount, uint256 commonDecimals) = getFees(tokenId);
 
     uint256 TotalFees = OwnerTransferFeeAmount + TransferFeeAmount + AdminTransferFeeAmount;
-    require(10**(commonDecimals + 2) >= TotalFees, "Fees exceed 100 percent");
+    Library.validFees(TotalFees, commonDecimals);
+
     uint256 percentageForTokenOwner = 10**(commonDecimals + 2) - TotalFees;
 
     _safeTransfer(ownerOf(tokenId), _tokenOffer[tokenId]._bidder, tokenId, "");
