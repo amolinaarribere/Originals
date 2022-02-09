@@ -324,7 +324,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -337,7 +338,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -350,7 +352,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -373,7 +376,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -392,7 +396,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -416,7 +421,8 @@
     },
     {
       "stateMutability": "payable",
-      "type": "receive"
+      "type": "receive",
+      "payable": true
     },
     {
       "inputs": [
@@ -506,7 +512,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"_AddOwnerRejection\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"_AddOwnerValidation\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"minOwner\",\"type\":\"uint256\"}],\"name\":\"_MinOwnerRejection\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"minOwner\",\"type\":\"uint256\"}],\"name\":\"_MinOwnerValidation\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"payer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"_Pay\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"_RemoveOwnerRejection\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"_RemoveOwnerValidation\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"_TransferCreated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"_TransferRejected\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"_TransferValidated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"minOwner\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"vote\",\"type\":\"bool\"}],\"name\":\"_VoteForMinOwner\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"vote\",\"type\":\"bool\"}],\"name\":\"_VoteForOwner\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"vote\",\"type\":\"bool\"}],\"name\":\"_VoteForTransfer\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"owners\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"minOwners\",\"type\":\"uint256\"}],\"name\":\"AdminPiggyBank_init\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"owners\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"minOwners\",\"type\":\"uint256\"}],\"name\":\"MultiSigContract_init\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"addOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"approve\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"newMinOwners\",\"type\":\"uint256\"}],\"name\":\"changeMinOwners\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"reject\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rejectMinOwners\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"rejectOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"removeOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveAllOwners\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveMinOwners\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrievePendingMinOwners\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrievePendingMinOwnersStatus\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"addedORremove\",\"type\":\"bool\"}],\"name\":\"retrievePendingOwners\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveTransferInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_validations\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rejections\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_voters\",\"type\":\"address[]\"}],\"internalType\":\"struct IAdminPiggyBank._TransferStruct\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"validateMinOwners\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"validateOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/MainContracts/AdminPiggyBank.sol\":\"AdminPiggyBank\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\":{\"keccak256\":\"0x68861bcc80cacbd498efde75aab6c74a486cc48262660d326c8d7530d9752097\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5beb2713aca05976562500789329e8c41320d00bd68ea9247856ec73894c3e3f\",\"dweb:/ipfs/QmQKwkpofsZYAzMZs7uNL7Qq58zVBuhoZCGpD6bJdUwyqy\"]},\"@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol\":{\"keccak256\":\"0x3f0f878c796dfc7feba6d3c4e3e526c14c7deae8b7bfc71088e3f38fab0d77b3\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://69bf7d357ce97852f4fb71045919b1bb2c0ad0c820e3f06b9dd4451b2dc5a343\",\"dweb:/ipfs/QmWt96ZviufDu2qqS7Ln6UCJjfLyoFKbo6YKn54ao3o94z\"]},\"project:/contracts/Base/MultiSigContract.sol\":{\"keccak256\":\"0xb40edcf7257b482a795baae2268edfb1267e04f1a42d24a96310f68c1d627d41\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://d39b7fbfa9e8a058d2307a5bb79921870a9072218e28fd8e858da5f5f6e4d5c6\",\"dweb:/ipfs/QmSRTxjWGBpbJFsy2iNoaVxQ1TeJLXCFKL35JPCtvEzpuB\"]},\"project:/contracts/Interfaces/IAdminPiggyBank.sol\":{\"keccak256\":\"0xcc56685c35d3cdf4e996cefd387bcc4094496dd8a2d7692a10003913922ec8dc\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://3f86eab8912bc65f00efc3cd5827f25621aab946ba17bb093f85e0160bc8223e\",\"dweb:/ipfs/QmNrBmfvKyRWRexQmYpeGwpxMLre8dGjSRUUmvjKX8ru3z\"]},\"project:/contracts/Interfaces/IMultiSigContract.sol\":{\"keccak256\":\"0xb87ed156e11200f832fe62c284d7dbd777a9313bf4ded9416fc407c6ea9fa0e8\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://0d7f4df1ec5b8f12746aab041b01096f02afdef03abf5fb640c8b7bbf561510e\",\"dweb:/ipfs/QmYqn1fkDtx46xCmgqwEsafw4JqzqWfL6kb6MG3ufe599J\"]},\"project:/contracts/Libraries/AddressLibrary.sol\":{\"keccak256\":\"0x9b857d01af9584bd900e3cb3d3e6806911e1f44cb4c968064ecde6aaa053d020\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://bd2582fc1b0deedf784adc17c12d18574e191fac05ff677e535f47c0ac2dc5b9\",\"dweb:/ipfs/QmRy1tEoSVhDgVNqGBVVnVrDbhq6LPo2NnSFjhEM1txyTA\"]},\"project:/contracts/Libraries/ItemsLibrary.sol\":{\"keccak256\":\"0x5df32938d6f44298b5a8d4f0b776f6f372a8f2e994fa1eeda74fc1cd7659fcf9\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://ffd1891a2b78f41eab17ab22e7aedaa38d378ec7bf86ca19d0910595ee4b7b99\",\"dweb:/ipfs/QmesvWoKsrETsAJqGpMb9EsTeRUsr6b6hQ7hJw6GG2gQkx\"]},\"project:/contracts/Libraries/Library.sol\":{\"keccak256\":\"0x2a0e799b20b1f82081ceef74ac006728cd731663f1151532abdd54b5d2f4f622\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://6979c00e4ba4d1d8de5bcb63828d94f0187c2cb11c3442a33fdb77dd1392f5ad\",\"dweb:/ipfs/QmYSsNcLiMMT7suzrD4NpH3drLwbDjRwTk1MEFaThEGU3z\"]},\"project:/contracts/Libraries/UintLibrary.sol\":{\"keccak256\":\"0xffd64305f6fc87fcded03dc4ffbe5297d181ef280d84840f9829d5c4d78d9d30\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://14c35c27a17e04737e97415072a92d80f41ca95fc5d0244de2ab19f90f03d689\",\"dweb:/ipfs/QmVNZzmiVYpdmTzCnFLirNvg2LJw7wwZrf6tyYnyYE7Pj1\"]},\"project:/contracts/MainContracts/AdminPiggyBank.sol\":{\"keccak256\":\"0xa7d9d9adf8dd0b6e91b9ed9c2ce762deab7475d2aad07a2c11c9fc29406a3688\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://4d4bd10364e94c4c7e092a3d03576d923df93046988ac2d8a4bc0a172d68bdea\",\"dweb:/ipfs/QmXLCYLjK6DQ61FavTCdfv2jJdYHAMNPZeEchyrmaBdwnv\"]}},\"version\":1}",
@@ -16527,9 +16534,21 @@
     "name": "solc",
     "version": "0.8.7+commit.e28d00a7.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "5777": {
+      "events": {},
+      "links": {
+        "Library": "0x96440f953c9A6FcEfA7Ec9536B8A606cB6403318",
+        "AddressLibrary": "0x12462416836bcF2aD5dd29e4C06D98cC96D055e7",
+        "ItemsLibrary": "0x245b6688315A885f26aeE20de1d67300F79C7C86"
+      },
+      "address": "0x10DC35D73C2cab73cD490bBF1b06daDc7ADAf0Ad",
+      "transactionHash": "0x356e0b85d7015515459d57505e48e1e8c592960eedde01892bcb276be6d3be6f"
+    }
+  },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2022-02-03T07:57:28.648Z",
+  "updatedAt": "2022-02-07T15:18:49.162Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {},
