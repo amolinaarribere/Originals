@@ -13,6 +13,7 @@ Transparent Proxies:
     - 3 : Originals Token
     - 4 : Proposition Settings
     - 5 : Admin Piggy Bank
+    - 6 : Payments
 
 Beacons:
     - 0 : NFT
