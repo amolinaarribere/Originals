@@ -14,6 +14,8 @@ library Library{
     enum Prices{NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee, TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals, OffersLifeTime}
     enum TransparentProxies{Manager, PublicPool, Treasury, Originals, PropSettings, AdminPiggyBank, Payments}
     enum Beacons{NFT}
+    enum PublicPoolPaymentTypes{SendCredit, TransferUnassignedCredit}
+
 
     // Structures
     // Certificate Manager
@@ -45,6 +47,10 @@ library Library{
 
     function Bytes32ArrayToString(bytes32[] memory element) public pure returns(string memory){
         return string(abi.encodePacked(element));
+    }
+
+    function Bytes32ArrayToBytes(bytes32[] memory element) public pure returns(bytes memory){
+        return abi.encodePacked(element);
     }
 
     function BytestoBytes32(bytes memory _b) public pure returns(bytes32[] memory){

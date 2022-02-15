@@ -4,6 +4,9 @@ pragma solidity 0.8.7;
 
 import "./Library.sol";
 import "./UintLibrary.sol";
+import "../Interfaces/IPayments.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 
 library ItemsLibrary{
     using UintLibrary for *;
@@ -26,7 +29,7 @@ library ItemsLibrary{
     }
 
     // TREASURY & NFTMarket///////////////////////////
-    function InternalWithdraw(_BalanceStruct storage balance, uint amount, address to, bool transfer) public 
+    function InternalWithdraw(_BalanceStruct storage balance, uint amount, address to, bool transfer, address PaymentContractAddress) public 
     {
         require(checkFullBalance(balance) >= amount, "EC20-");
 
@@ -41,14 +44,17 @@ library ItemsLibrary{
         addBalance(balance, remainder, commonDividend);
 
         if(transfer){
-            TransferEtherTo(amount, to);
+            TransferTo(amount, to, PaymentContractAddress);
         }
     }
 
-    function TransferEtherTo(uint amount, address to) public
+    function TransferTo(uint amount, address to, address PaymentContractAddress) public
     {
-        (bool success, bytes memory data) = to.call{value: amount}("");
-        require(success, string(abi.encodePacked("Error transfering funds to address : ", data)));
+        bool success = IERC20(IPayments(PaymentContractAddress).retrieveSettings()).transfer(to, amount);
+        require(success, "Error transfering funds to address");
+
+       /* (bool success, bytes memory data) = to.call{value: amount}("");
+        require(success, string(abi.encodePacked("Error transfering funds to address : ", data)));*/
     }
 
     function addBalance(_BalanceStruct storage balance, uint amount, uint factor) public

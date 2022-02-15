@@ -6,10 +6,8 @@ pragma solidity 0.8.7;
  Address data type common functionality
  */
 
- import "./Library.sol";
 
 library AddressLibrary{
-    using Library for *;
 
     // AUX FUNCTIONALITY /////////////////////////////////////////
     function FindAddress(address add, address[] memory list) public pure returns (bool){

@@ -1,31 +1,31 @@
 {
-  "contractName": "ITokenEventSubscriber",
+  "contractName": "ICreditor",
   "abi": [
     {
       "inputs": [
         {
           "internalType": "address",
-          "name": "from",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
+          "name": "sender",
           "type": "address"
         },
         {
           "internalType": "uint256",
           "name": "amount",
           "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
         }
       ],
-      "name": "onTokenBalanceChanged",
+      "name": "CreditReceived",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"onTokenBalanceChanged\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Store & retrieve value in a variable\",\"kind\":\"dev\",\"methods\":{},\"title\":\"Storage\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces/ITokenEventSubscriber.sol\":\"ITokenEventSubscriber\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"project:/contracts/Interfaces/ITokenEventSubscriber.sol\":{\"keccak256\":\"0x6c718607f2b201205a858a75b834b6cf235cbd185efd3f42de88562bc2e901e6\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://8365d985d04ae80b038298b577f010a5da7fdc9505d536b48ef13ae8cf0b3927\",\"dweb:/ipfs/QmWkwSKehq8FjcSGWRmDZRq1PwhEN3UawKDohkGRVJD9vU\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"CreditReceived\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Store & retrieve value in a variable\",\"kind\":\"dev\",\"methods\":{},\"title\":\"Storage\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces/ICreditor.sol\":\"ICreditor\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"project:/contracts/Interfaces/ICreditor.sol\":{\"keccak256\":\"0xe464388741c620b8d842f19c9ac8ccebf22351f8c94a2e9a76b2e91f7c193588\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://ef552f5b31f6fb41b61c4fb7f9eafc68c90e4c3f6edb6516fc7921340127ad38\",\"dweb:/ipfs/QmdptDw3LEc3bJmmvGqV2z5TRW1orSvafXExvffQ3NYYer\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -33,28 +33,28 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\n interface ITokenEventSubscriber {\r\n    function onTokenBalanceChanged(address from, address to, uint256 amount) external;\r\n }",
-  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Originals\\contracts\\Interfaces\\ITokenEventSubscriber.sol",
+  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\n\r\n\r\ninterface ICreditor{\r\n    function CreditReceived(address sender, uint256 amount, bytes memory data) external;\r\n}",
+  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Originals\\contracts\\Interfaces\\ICreditor.sol",
   "ast": {
-    "absolutePath": "project:/contracts/Interfaces/ITokenEventSubscriber.sol",
+    "absolutePath": "project:/contracts/Interfaces/ICreditor.sol",
     "exportedSymbols": {
-      "ITokenEventSubscriber": [
-        6481
+      "ICreditor": [
+        6056
       ]
     },
-    "id": 6482,
+    "id": 6057,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 6470,
+        "id": 6045,
         "literals": [
           "solidity",
           "0.8",
           ".7"
         ],
         "nodeType": "PragmaDirective",
-        "src": "39:22:40"
+        "src": "39:22:32"
       },
       {
         "abstract": false,
@@ -62,42 +62,42 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 6471,
+          "id": 6046,
           "nodeType": "StructuredDocumentation",
-          "src": "65:73:40",
+          "src": "65:73:32",
           "text": " @title Storage\n @dev Store & retrieve value in a variable"
         },
         "fullyImplemented": false,
-        "id": 6481,
+        "id": 6056,
         "linearizedBaseContracts": [
-          6481
+          6056
         ],
-        "name": "ITokenEventSubscriber",
-        "nameLocation": "153:21:40",
+        "name": "ICreditor",
+        "nameLocation": "156:9:32",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
-            "functionSelector": "3c7df55d",
-            "id": 6480,
+            "functionSelector": "2f02a3ec",
+            "id": 6055,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
-            "name": "onTokenBalanceChanged",
-            "nameLocation": "191:21:40",
+            "name": "CreditReceived",
+            "nameLocation": "181:14:32",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 6478,
+              "id": 6053,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 6473,
+                  "id": 6048,
                   "mutability": "mutable",
-                  "name": "from",
-                  "nameLocation": "221:4:40",
+                  "name": "sender",
+                  "nameLocation": "204:6:32",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6480,
-                  "src": "213:12:40",
+                  "scope": 6055,
+                  "src": "196:14:32",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -105,10 +105,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 6472,
+                    "id": 6047,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "213:7:40",
+                    "src": "196:7:32",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -119,41 +119,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6475,
-                  "mutability": "mutable",
-                  "name": "to",
-                  "nameLocation": "235:2:40",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 6480,
-                  "src": "227:10:40",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
-                  },
-                  "typeName": {
-                    "id": 6474,
-                    "name": "address",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "227:7:40",
-                    "stateMutability": "nonpayable",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 6477,
+                  "id": 6050,
                   "mutability": "mutable",
                   "name": "amount",
-                  "nameLocation": "247:6:40",
+                  "nameLocation": "220:6:32",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6480,
-                  "src": "239:14:40",
+                  "scope": 6055,
+                  "src": "212:14:32",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -161,60 +133,87 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 6476,
+                    "id": 6049,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "239:7:40",
+                    "src": "212:7:32",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
                   "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6052,
+                  "mutability": "mutable",
+                  "name": "data",
+                  "nameLocation": "241:4:32",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6055,
+                  "src": "228:17:32",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 6051,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "228:5:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
                 }
               ],
-              "src": "212:42:40"
+              "src": "195:51:32"
             },
             "returnParameters": {
-              "id": 6479,
+              "id": 6054,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "263:0:40"
+              "src": "255:0:32"
             },
-            "scope": 6481,
-            "src": "182:82:40",
+            "scope": 6056,
+            "src": "172:84:32",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 6482,
-        "src": "143:125:40",
+        "scope": 6057,
+        "src": "146:113:32",
         "usedErrors": []
       }
     ],
-    "src": "39:229:40"
+    "src": "39:220:32"
   },
   "legacyAST": {
-    "absolutePath": "project:/contracts/Interfaces/ITokenEventSubscriber.sol",
+    "absolutePath": "project:/contracts/Interfaces/ICreditor.sol",
     "exportedSymbols": {
-      "ITokenEventSubscriber": [
-        6481
+      "ICreditor": [
+        6056
       ]
     },
-    "id": 6482,
+    "id": 6057,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 6470,
+        "id": 6045,
         "literals": [
           "solidity",
           "0.8",
           ".7"
         ],
         "nodeType": "PragmaDirective",
-        "src": "39:22:40"
+        "src": "39:22:32"
       },
       {
         "abstract": false,
@@ -222,42 +221,42 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 6471,
+          "id": 6046,
           "nodeType": "StructuredDocumentation",
-          "src": "65:73:40",
+          "src": "65:73:32",
           "text": " @title Storage\n @dev Store & retrieve value in a variable"
         },
         "fullyImplemented": false,
-        "id": 6481,
+        "id": 6056,
         "linearizedBaseContracts": [
-          6481
+          6056
         ],
-        "name": "ITokenEventSubscriber",
-        "nameLocation": "153:21:40",
+        "name": "ICreditor",
+        "nameLocation": "156:9:32",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
-            "functionSelector": "3c7df55d",
-            "id": 6480,
+            "functionSelector": "2f02a3ec",
+            "id": 6055,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
-            "name": "onTokenBalanceChanged",
-            "nameLocation": "191:21:40",
+            "name": "CreditReceived",
+            "nameLocation": "181:14:32",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 6478,
+              "id": 6053,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 6473,
+                  "id": 6048,
                   "mutability": "mutable",
-                  "name": "from",
-                  "nameLocation": "221:4:40",
+                  "name": "sender",
+                  "nameLocation": "204:6:32",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6480,
-                  "src": "213:12:40",
+                  "scope": 6055,
+                  "src": "196:14:32",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -265,10 +264,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 6472,
+                    "id": 6047,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "213:7:40",
+                    "src": "196:7:32",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -279,41 +278,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6475,
-                  "mutability": "mutable",
-                  "name": "to",
-                  "nameLocation": "235:2:40",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 6480,
-                  "src": "227:10:40",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
-                  },
-                  "typeName": {
-                    "id": 6474,
-                    "name": "address",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "227:7:40",
-                    "stateMutability": "nonpayable",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 6477,
+                  "id": 6050,
                   "mutability": "mutable",
                   "name": "amount",
-                  "nameLocation": "247:6:40",
+                  "nameLocation": "220:6:32",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6480,
-                  "src": "239:14:40",
+                  "scope": 6055,
+                  "src": "212:14:32",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -321,39 +292,66 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 6476,
+                    "id": 6049,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "239:7:40",
+                    "src": "212:7:32",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
                   "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6052,
+                  "mutability": "mutable",
+                  "name": "data",
+                  "nameLocation": "241:4:32",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6055,
+                  "src": "228:17:32",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 6051,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "228:5:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
                 }
               ],
-              "src": "212:42:40"
+              "src": "195:51:32"
             },
             "returnParameters": {
-              "id": 6479,
+              "id": 6054,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "263:0:40"
+              "src": "255:0:32"
             },
-            "scope": 6481,
-            "src": "182:82:40",
+            "scope": 6056,
+            "src": "172:84:32",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 6482,
-        "src": "143:125:40",
+        "scope": 6057,
+        "src": "146:113:32",
         "usedErrors": []
       }
     ],
-    "src": "39:229:40"
+    "src": "39:220:32"
   },
   "compiler": {
     "name": "solc",
@@ -361,7 +359,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.3",
-  "updatedAt": "2022-02-15T15:50:51.120Z",
+  "updatedAt": "2022-02-15T15:50:51.109Z",
   "devdoc": {
     "details": "Store & retrieve value in a variable",
     "kind": "dev",

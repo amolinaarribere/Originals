@@ -17,12 +17,12 @@ pragma solidity 0.8.7;
         address[] _voters;
     }
 
-    function requestIssuer(address owner, string memory name, string memory symbol, uint256 feeAmount, uint256 feeDecimals, Library.PaymentPlans paymentPlan) external payable;
+    function requestIssuer(address owner, string memory name, string memory symbol, uint256 feeAmount, uint256 feeDecimals, Library.PaymentPlans paymentPlan) external;
     function validateIssuer(uint256 id) external;
     function rejectIssuer(uint256 id) external;
 
-    function transferUnassignedCredit(uint256 NFTMarketId, uint256 tokenID) external payable;
-    function sendCredit(address addr) external payable;
+    //function transferUnassignedCredit(uint256 NFTMarketId, uint256 tokenID) external;
+    function sendCredit(address addr, uint256 amount) external;
     function addCredit(uint256 NFTMarketId, uint256 tokenID, address[] calldata addrs, uint256[] calldata amounts, uint256[] calldata factors) external;
     function reuseCredit(uint256 NFTMarketId, uint256 tokenID, address addr, uint256 amount) external;
     function withdraw(uint256 amount) external;

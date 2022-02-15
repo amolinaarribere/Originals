@@ -15,14 +15,18 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "../Base/ManagedBaseContract.sol";
 import "../Libraries/Library.sol";
+import "../Libraries/UintLibrary.sol";
 import "../Libraries/ItemsLibrary.sol";
 import "../Interfaces/ITreasury.sol";
 import "../Interfaces/IPool.sol";
 import "../Interfaces/INFTMarket.sol";
-
+import "../Interfaces/IPayments.sol";
 
  contract NFTMarket is  INFTMarket, Initializable, ManagedBaseContract, ERC721Upgradeable {
     using Library for *;
+    using UintLibrary for *;
+    using ItemsLibrary for *;
+
 
   // EVENTS /////////////////////////////////////////
   event _NewOwner(address indexed formerOwner, address newOwner);
@@ -123,7 +127,7 @@ import "../Interfaces/INFTMarket.sol";
       _ownerTransferFeeDecimals = newDecimals;
   }
 
-  function mintToken(uint256 tokenId, address receiver, uint256 price) external payable override
+  function mintToken(uint256 tokenId, address receiver, uint256 price) external override
     isTheOwner(msg.sender)
   {
       uint256 MintingFee = 0;
@@ -134,10 +138,10 @@ import "../Interfaces/INFTMarket.sol";
         uint[] memory Prices = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
         MintingFee = Prices[uint256(Library.Prices.MintingFee)];
         AdminMintingFee = Prices[uint256(Library.Prices.AdminMintingFee)];
-        require(msg.value >= MintingFee + AdminMintingFee, "Minting Fees not enough");
 
-        ItemsLibrary.TransferEtherTo(MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
-        ItemsLibrary.TransferEtherTo(msg.value - MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)]);
+        IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
+        payments.TransferFunds(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], MintingFee, _issuerID, bytes(""));
+        payments.TransferFunds(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminMintingFee, _issuerID, bytes(""));
       }
       _safeMint(receiver, tokenId);
       _tokenInfo[tokenId]._price = price;
@@ -221,21 +225,24 @@ import "../Interfaces/INFTMarket.sol";
     delete(_tokenOffer[tokenId]);
   }
 
-  function submitOffer(uint256 tokenId, address bidder, uint256 offer, bool FromCredit) external payable override
+  function submitOffer(uint256 tokenId, address bidder, uint256 offer, bool FromCredit) external override
     OfferInProgress(tokenId, false)
     priceOK(tokenId, offer)
   {
     if(address(0) != _tokenOffer[tokenId]._sender) assignToRejectedSender(tokenId);
 
-    uint256 receivedValue = msg.value;
-    if(FromCredit){
-      if(receivedValue > 0) IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).sendCredit{value:receivedValue}(msg.sender);
+    if(FromCredit)
       IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).reuseCredit(_issuerID, tokenId,  msg.sender, offer);
-    }
+    
     else{
-      require(receivedValue >= offer, "Not enough value sent to match the offer");
-      IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).transferUnassignedCredit{value: offer}(_issuerID, tokenId);
-      if(receivedValue > offer) IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).sendCredit{value: (receivedValue - offer)}(msg.sender);
+      bytes32[] memory dataArray = new bytes32[](3);
+      dataArray[0] = UintLibrary.UintToBytes32(uint256(Library.PublicPoolPaymentTypes.TransferUnassignedCredit));
+      dataArray[1] = UintLibrary.UintToBytes32(_issuerID);
+      dataArray[2] = UintLibrary.UintToBytes32(tokenId);
+      bytes memory data = Library.Bytes32ArrayToBytes(dataArray);
+
+      IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
+      payments.TransferFunds(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)], offer, _issuerID, data);
     }
 
     _tokenOffer[tokenId]._offer = offer;

@@ -9,12 +9,13 @@ pragma solidity 0.8.7;
 
 import "../Interfaces/IPayments.sol";
 import "../Interfaces/IPool.sol";
+import "../Interfaces/ICreditor.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../Libraries/UintLibrary.sol";
 import "../Base/StdPropositionBaseContract.sol";
 
 
-contract Payment is IPayments, StdPropositionBaseContract{
+contract Payments is IPayments, StdPropositionBaseContract{
     using UintLibrary for *;
 
     // EVENTS /////////////////////////////////////////
@@ -37,18 +38,18 @@ contract Payment is IPayments, StdPropositionBaseContract{
             addr == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)] || 
             addr == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)] || 
             isNFTMarket(addr, id) 
-        , "EC21-");
+        , "It is not from one of the certified contracts");
         _;
     }
 
     function isNFTMarket(address addr, uint256 id) internal view returns(bool)
     {
-        IPool PublicPool = IPool( _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]);
+        IPool PublicPool = IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]);
         return (addr == PublicPool.retrieveNFTMarketForIssuer(id));
     }
    
     // CONSTRUCTOR /////////////////////////////////////////
-    function Payment_init(address managerContractAddress, address chairPerson, address tokenAddress) public initializer 
+    function Payments_init(address managerContractAddress, address chairPerson, address tokenAddress) public initializer 
     {
         super.StdPropositionBaseContract_init(chairPerson, managerContractAddress);
         InternalupdateSettings(tokenAddress);
@@ -73,18 +74,18 @@ contract Payment is IPayments, StdPropositionBaseContract{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function TransferFundsFrom(address sender, address recipient, uint256 amount, uint256 id) external override
-        isFromCertifiedContract(msg.sender, id)
+    function TransferFunds(address sender, address recipient, uint256 amount, uint256 MarketId, bytes memory data) external override
+        isFromCertifiedContract(msg.sender, MarketId)
     {
         bool success = _TokenContract.transferFrom(sender, recipient, amount);
         require(true == success, "Transfer From did not work");
+        ICreditor(recipient).CreditReceived(sender, amount, data);
     }
 
-    function getBalanceFor(address account) external override view returns(uint256)
+    function BalanceOf(address account) external override view returns(uint256)
     {
         return(_TokenContract.balanceOf(account));
     }
-
 
     function retrieveSettings() external override view returns(address)
     {

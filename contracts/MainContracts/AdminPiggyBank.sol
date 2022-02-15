@@ -3,12 +3,15 @@
 pragma solidity 0.8.7;
 
 import "../Interfaces/IAdminPiggyBank.sol";
+import "../Interfaces/IPayments.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../Libraries/ItemsLibrary.sol";
 import "../Base/MultiSigContract.sol";
+import "../Base/CreditorBaseContract.sol";
 
-
-contract AdminPiggyBank is Initializable, MultiSigContract, IAdminPiggyBank {
+contract AdminPiggyBank is Initializable, MultiSigContract, CreditorBaseContract, IAdminPiggyBank {
+    using ItemsLibrary for *;
 
     // EVENTS /////////////////////////////////////////
     event _Pay(address indexed payer, uint amount);
@@ -29,7 +32,7 @@ contract AdminPiggyBank is Initializable, MultiSigContract, IAdminPiggyBank {
 
     modifier isAmountOK(uint256 amount)
     {
-        require(address(this).balance >= amount, "We cannot transfer more than the current balance");
+        require(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).BalanceOf(address(this)) >= amount, "We cannot transfer more than the current balance");
         _;
     }
 
@@ -46,16 +49,16 @@ contract AdminPiggyBank is Initializable, MultiSigContract, IAdminPiggyBank {
     }
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function AdminPiggyBank_init(address[] memory owners,  uint256 minOwners) public initializer {
-      super.MultiSigContract_init(owners, minOwners); 
+    function AdminPiggyBank_init(address[] memory owners, uint256 minOwners, address managerContractAddress) public initializer {
+      super.MultiSigContract_init(owners, minOwners);
+      super.CreditorBaseContract_init(managerContractAddress); 
     }
 
 
     // FUNCTIONALITY /////////////////////////////////////////
-
-    receive() external payable
+    function onCreditReceived(address sender, uint256 amount, bytes memory data) internal override
     {
-        emit _Pay(msg.sender, msg.value);
+        emit _Pay(sender, amount);
     }
 
     function transfer(address receiver, uint256 amount) external override
@@ -95,7 +98,7 @@ contract AdminPiggyBank is Initializable, MultiSigContract, IAdminPiggyBank {
             _transferInProgress._validations++;
 
             if(_transferInProgress._validations >= _minOwners){
-                ItemsLibrary.TransferEtherTo(_transferInProgress._amount, _transferInProgress._to);
+                ItemsLibrary.TransferTo(_transferInProgress._amount, _transferInProgress._to, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
                 emit _TransferValidated(_transferInProgress._to, _transferInProgress._amount);
                 deletingPendingTransfer();
             }

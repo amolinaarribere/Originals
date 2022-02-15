@@ -7,6 +7,7 @@ let NFTMarket = artifacts.require("./DeployedContracts/NFTMarket");
 let OriginalsToken = artifacts.require("./DeployedContracts/OriginalsToken");
 let PropositionSettings = artifacts.require("./DeployedContracts/PropositionSettings");
 let AdminPiggyBank = artifacts.require("./DeployedContracts/AdminPiggyBank");
+let Payments = artifacts.require("./DeployedContracts/Payments");
 let TransparentUpgradeableProxy = artifacts.require("@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol")
 
 const ManagerAbi = Manager.abi;
@@ -48,15 +49,9 @@ module.exports = async function(deployer, network, accounts){
   LibraryInstance = await Library.deployed();
   console.log("Library deployed");
 
-  await deployer.link(Library, UintLibrary);
-  console.log("Library linked to Uint Library");
-
   await deployer.deploy(UintLibrary);
   UintLibraryInstance = await UintLibrary.deployed();
   console.log("UintLibrary deployed");
-
-  await deployer.link(Library, AddressLibrary);
-  console.log("Library linked to Address Library");
 
   await deployer.deploy(AddressLibrary);
   AddressLibraryInstance = await AddressLibrary.deployed();
@@ -148,6 +143,11 @@ module.exports = async function(deployer, network, accounts){
         "internalType": "uint256",
         "name": "minOwners",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "managerContractAddress",
+        "type": "address"
       }
     ],
     "name": "AdminPiggyBank_init",
@@ -156,7 +156,7 @@ module.exports = async function(deployer, network, accounts){
     "type": "function"
   };
 
-  var AdminPiggyBankProxyInitializerParameters = [PublicOwners, PublicMinOwners];
+  var AdminPiggyBankProxyInitializerParameters = [PublicOwners, PublicMinOwners, ManagerProxyAddress];
   var AdminPiggyBankProxyData = web3.eth.abi.encodeFunctionCall(AdminPiggyBankProxyInitializerMethod, AdminPiggyBankProxyInitializerParameters);
 
   
@@ -359,6 +359,47 @@ module.exports = async function(deployer, network, accounts){
   var PublicPoolProxyInitializerParameters = [PublicOwners, PublicMinOwners, ManagerProxyAddress];
   var PublicPoolProxyData = web3.eth.abi.encodeFunctionCall(PublicPoolProxyInitializerMethod, PublicPoolProxyInitializerParameters);
   
+ // Payment -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ await deployer.link(Library, Payments);
+ console.log("Library linked to Payments");
+
+ await deployer.link(UintLibrary, Payments);
+ console.log("Uint Library linked to Payments");
+
+ await deployer.link(AddressLibrary, Payments);
+ console.log("AddressLibrary linked to Payments");
+
+ await deployer.deploy(Payments);
+ PaymentsInstance = await Payments.deployed();
+ console.log("Payments deployed : " + PaymentsInstance.address);
+
+ var PaymentsProxyInitializerMethod = {
+  "inputs": [
+    {
+      "internalType": "address",
+      "name": "managerContractAddress",
+      "type": "address"
+    },
+    {
+      "internalType": "address",
+      "name": "chairPerson",
+      "type": "address"
+    },
+    {
+      "internalType": "address",
+      "name": "tokenAddress",
+      "type": "address"
+    }
+  ],
+  "name": "Payments_init",
+  "outputs": [],
+  "stateMutability": "nonpayable",
+  "type": "function"
+};
+ var PaymentsProxyInitializerParameters = [ManagerProxyAddress, accounts[0], !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!];
+ var PaymentsProxyData = web3.eth.abi.encodeFunctionCall(PaymentsProxyInitializerMethod, PaymentsProxyInitializerParameters);
+ 
+
  await ManagerProxyInstance.methods.InitializeContracts(
   obj.returnUpgradeObject(PublicPoolInstance.address,
       TreasuryInstance.address,

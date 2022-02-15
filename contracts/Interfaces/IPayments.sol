@@ -10,8 +10,8 @@ pragma solidity 0.8.7;
 
 
 interface IPayments{
-    function TransferFundsFrom(address sender, address recipient, uint256 amount, uint256 id) external;
+    function TransferFunds(address sender, address recipient, uint256 amount, uint256 id, bytes memory data) external;
 
-    function getBalanceFor(address account) external view returns(uint256);
+    function BalanceOf(address account) external view returns(uint256);
     function retrieveSettings() external view returns(address);
 }
