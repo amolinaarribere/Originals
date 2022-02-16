@@ -1,9 +1,9 @@
 const BigNumber = require('bignumber.js');
 
-const NewIssuerFee = new BigNumber("500000000000000000");
-const AdminNewIssuerFee = new BigNumber("250000000000000000");
-const MintingFee = new BigNumber("100000000000000000");
-const AdminMintingFee = new BigNumber("50000000000000000");
+const NewIssuerFee = new BigNumber("500");
+const AdminNewIssuerFee = new BigNumber("250");
+const MintingFee = new BigNumber("10");
+const AdminMintingFee = new BigNumber("5");
 const TransferFeeAmount = 55;
 const TransferFeeDecimals = 1;
 const AdminTransferFeeAmount = 1;
@@ -18,7 +18,7 @@ const GasPrice = 10;
 // Mock -----------
 const MockName = "Mock DAI";
 const MockSymbol = "MDA";
-const MockSupply = 1000000000;
+const MockSupply = new BigNumber("100000000000000000000000000");
 // Mock -----------
 
 
