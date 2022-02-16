@@ -52,9 +52,6 @@ library ItemsLibrary{
     {
         bool success = IERC20(IPayments(PaymentContractAddress).retrieveSettings()).transfer(to, amount);
         require(success, "Error transfering funds to address");
-
-       /* (bool success, bytes memory data) = to.call{value: amount}("");
-        require(success, string(abi.encodePacked("Error transfering funds to address : ", data)));*/
     }
 
     function addBalance(_BalanceStruct storage balance, uint amount, uint factor) public

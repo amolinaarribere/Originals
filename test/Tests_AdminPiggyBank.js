@@ -7,6 +7,10 @@ const multisigcontract = require("../test_libraries/MultiSigContract.js");
 const AdminPiggyBank = artifacts.require("AdminPiggyBank");
 const AdminPiggyBankAbi = AdminPiggyBank.abi;
 
+const MockDai = artifacts.require("MockDai");
+const MockDaiAbi = MockDai.abi;
+
+
 
 const Gas = constants.Gas;
 
@@ -18,6 +22,7 @@ const Gas = constants.Gas;
 contract("Testing Admin Piggy Bank",function(accounts){
     var manager;
     var adminPiggyBankProxy;
+    var mockdai;
 
     // used addresses
     const chairPerson = accounts[0];
@@ -38,6 +43,8 @@ contract("Testing Admin Piggy Bank",function(accounts){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         manager = contracts[0];
         adminPiggyBankProxy = new web3.eth.Contract(AdminPiggyBankAbi, contracts[1][4]);
+        mockdai = new web3.eth.Contract(MockDaiAbi, contracts[2][7]);
+
     });
 
     // ****** TESTING Adding Owners ***************************************************************** //
@@ -84,8 +91,8 @@ contract("Testing Admin Piggy Bank",function(accounts){
 
     // ****** Testing Settings Configuration ***************************************************************** //
     it("Admin Piggy Bank Transfer Wrong",async function(){
-        let amount = new BigNumber("1000000000000000000");
-        await web3.eth.sendTransaction({from:user_1 , to:adminPiggyBankProxy._address, value:amount});
+        let amount = new BigNumber("10000");
+        await mockdai.methods.transfer(adminPiggyBankProxy._address, amount).send({from: user_1, gas: Gas}, function(error, result){});
         try{
             await adminPiggyBankProxy.methods.transfer(address_0, amount).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
             expect.fail();
