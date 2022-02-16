@@ -11,8 +11,8 @@ async function GetTokenContractAddress(network, deployer, MockDai, name, symbol,
     }
     else if("mainnet" != network)
     {
-        await deployer.deploy(MockDai);
-        let MockDAIInstance = await MockDai.deployed(name, symbol, supply, initialOwner);
+        await deployer.deploy(MockDai, name, symbol, supply, initialOwner);
+        let MockDAIInstance = await MockDai.deployed();
         TokenContractAddress = MockDAIInstance.address;
         console.log("MockDAI deployed : " + TokenContractAddress);
     }
