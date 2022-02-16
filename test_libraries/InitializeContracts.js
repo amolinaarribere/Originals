@@ -5,10 +5,13 @@ const PublicPool = artifacts.require("PublicPool");
 const NFTMarket = artifacts.require("NFTMarket");
 const OriginalsToken = artifacts.require("OriginalsToken");
 const PropositionSettings = artifacts.require("PropositionSettings");
+const Payments = artifacts.require("Payments");
 const TransparentUpgradeableProxy = artifacts.require("@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol");
 
 const ManagerAbi = Manager.abi;
 const TransparentUpgradeableProxyAbi = TransparentUpgradeableProxy.abi;
+
+const MockDai = artifacts.require("MockDai"); // Mock
 
 const constants = require("../test_libraries/constants.js");
 const obj = require("../test_libraries/objects.js");
@@ -175,6 +178,29 @@ const AdminPiggyBankProxyInitializerMethod = {
     }
   ],
   "name": "AdminPiggyBank_init",
+  "outputs": [],
+  "stateMutability": "nonpayable",
+  "type": "function"
+};
+const PaymentsProxyInitializerMethod = {
+  "inputs": [
+    {
+      "internalType": "address",
+      "name": "managerContractAddress",
+      "type": "address"
+    },
+    {
+      "internalType": "address",
+      "name": "chairPerson",
+      "type": "address"
+    },
+    {
+      "internalType": "address",
+      "name": "tokenAddress",
+      "type": "address"
+    }
+  ],
+  "name": "Payments_init",
   "outputs": [],
   "stateMutability": "nonpayable",
   "type": "function"

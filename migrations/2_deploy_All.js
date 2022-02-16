@@ -49,7 +49,7 @@ const Prices = [NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee, Tr
 const PublicMinOwners = 1;
 
 module.exports = async function(deployer, network, accounts){
-  let TokenContractAddress = await ExternalRegistries.GetTokenContractAddress(network, deployer, MockDai, MockName, MockSymbol, MockSupply, accounts[0], web3, accounts[0]);
+  let TokenContractAddress = await ExternalRegistries.GetTokenContractAddress(network, deployer, MockDai, MockName, MockSymbol, MockSupply, accounts[0]);
   
   const PublicOwners = [accounts[0]];
 

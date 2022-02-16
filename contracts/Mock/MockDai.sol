@@ -11,14 +11,12 @@ Before every token transfer we contact the token gouvernance Base contracts so t
 
  */
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
- contract MockDai is  Initializable, ERC20Upgradeable {
+ contract MockDai is ERC20 {
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function MockDai_init(string memory name, string memory symbol, uint256 MaxSupply, address initialOwner) public initializer {
-        super.__ERC20_init(name, symbol);
+    constructor (string memory name, string memory symbol, uint256 MaxSupply, address initialOwner) ERC20(name, symbol){
         _mint(initialOwner, MaxSupply);
     }
 
