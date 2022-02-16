@@ -15,6 +15,12 @@ const PropositionThreshold = 500;
 const minToPropose = 50;
 const Gas = 6721975;
 const GasPrice = 10;
+// Mock -----------
+const MockName = "Mock DAI";
+const MockSymbol = "MDA";
+const MockSupply = 1000000000;
+// Mock -----------
+
 
 exports.NewIssuerFee = NewIssuerFee;
 exports.AdminNewIssuerFee = AdminNewIssuerFee;
@@ -31,4 +37,9 @@ exports.PropositionThreshold = PropositionThreshold;
 exports.minToPropose = minToPropose;
 exports.Gas = Gas;
 exports.GasPrice = GasPrice;
+// Mock -----------
+exports.MockName = MockName;
+exports.MockSymbol = MockSymbol;
+exports.MockSupply = MockSupply;
+// Mock -----------
 

@@ -1,6 +1,5 @@
 const MainnetDAIAddress = ""
 const KovanDAIAddress = "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"
-let TransparentUpgradeableProxy = artifacts.require("@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol")
 
 async function GetTokenContractAddress(network, deployer, MockDai, name, symbol, supply, initialOwner){
 
