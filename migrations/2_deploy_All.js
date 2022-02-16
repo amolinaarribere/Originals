@@ -1,14 +1,21 @@
 const BigNumber = require('bignumber.js');
+let ExternalRegistries = require("./ExternalRegistries.js");
 
-let Manager = artifacts.require("./DeployedContracts/Manager");
-let Treasury = artifacts.require("./DeployedContracts/Treasury");
-let PublicPool = artifacts.require("./DeployedContracts/PublicPool");
-let NFTMarket = artifacts.require("./DeployedContracts/NFTMarket");
-let OriginalsToken = artifacts.require("./DeployedContracts/OriginalsToken");
-let PropositionSettings = artifacts.require("./DeployedContracts/PropositionSettings");
-let AdminPiggyBank = artifacts.require("./DeployedContracts/AdminPiggyBank");
-let Payments = artifacts.require("./DeployedContracts/Payments");
+let Manager = artifacts.require("./MainContracts/Manager");
+let Treasury = artifacts.require("./MainContracts/Treasury");
+let PublicPool = artifacts.require("./MainContracts/PublicPool");
+let NFTMarket = artifacts.require("./MainContracts/NFTMarket");
+let OriginalsToken = artifacts.require("./MainContracts/OriginalsToken");
+let PropositionSettings = artifacts.require("./MainContracts/PropositionSettings");
+let AdminPiggyBank = artifacts.require("./MainContracts/AdminPiggyBank");
+let Payments = artifacts.require("./MainContracts/Payments");
 let TransparentUpgradeableProxy = artifacts.require("@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol")
+
+//Mock
+let MockDai = artifacts.require("./Mock/MockDai");
+const MockName = "Mock Dai";
+const MockSymbol = "MDA";
+const MockSupply = 1000000000;
 
 const ManagerAbi = Manager.abi;
 const TransparentUpgradeableProxyAbi = TransparentUpgradeableProxy.abi;
@@ -42,6 +49,8 @@ const Prices = [NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee, Tr
 const PublicMinOwners = 1;
 
 module.exports = async function(deployer, network, accounts){
+  let TokenContractAddress = await ExternalRegistries.GetTokenContractAddress(network, deployer, MockDai, MockName, MockSymbol, MockSupply, accounts[0], web3, accounts[0]);
+  
   const PublicOwners = [accounts[0]];
 
   // Libraries -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -396,7 +405,7 @@ module.exports = async function(deployer, network, accounts){
   "stateMutability": "nonpayable",
   "type": "function"
 };
- var PaymentsProxyInitializerParameters = [ManagerProxyAddress, accounts[0], !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!];
+ var PaymentsProxyInitializerParameters = [ManagerProxyAddress, accounts[0], TokenContractAddress]
  var PaymentsProxyData = web3.eth.abi.encodeFunctionCall(PaymentsProxyInitializerMethod, PaymentsProxyInitializerParameters);
  
 
@@ -407,11 +416,13 @@ module.exports = async function(deployer, network, accounts){
       PropositionSettingsInstance.address,
       AdminPiggyBankInstance.address,
       NFTMarketInstance.address, 
+      PaymentsInstance.address,
       PublicPoolProxyData, 
       TreasuryProxyData, 
       OriginalsProxyData, 
       PropositionSettingsProxyData, 
-      AdminPiggyBankProxyData),
+      AdminPiggyBankProxyData,
+      PaymentsProxyData),
       ManagerProxyAddress).send({from: accounts[0], gas: Gas});
 
   console.log("Manager initialized");
@@ -453,6 +464,9 @@ module.exports = async function(deployer, network, accounts){
 
   console.log("AdminPiggyBank Proxy Address : " + TransparentProxies[i]);
   console.log("AdminPiggyBank Address : " + TransparentImpl[i++]);
+
+  console.log("Payments Proxy Address : " + TransparentProxies[i]);
+  console.log("Payments Address : " + TransparentImpl[i++]);
 
 
   let j=0;

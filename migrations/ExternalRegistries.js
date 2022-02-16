@@ -1,26 +1,61 @@
 const MainnetDAIAddress = ""
 const KovanDAIAddress = "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"
-const GoerliUSDTAddress = "0x07865c6e87b9f70255377e024ace6630c1eaa37f"
+let TransparentUpgradeableProxy = artifacts.require("@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol")
 
+async function GetTokenContractAddress(network, deployer, MockDai, name, symbol, supply, initialOwner, web3, proxyOwner){
 
-async function GetDAIAddress(network, deployer, MockDAI, rate, MockDecimals){
-
-    var DAIAddress = MainnetDAIAddress;
+    var TokenContractAddress = MainnetDAIAddress;
 
     if("kovan" == network){
-        DAIAddress = KovanDAIAddress;
+        TokenContractAddress = KovanDAIAddress;
     }
     else if("mainnet" != network)
     {
-        await deployer.deploy(MockDAI, rate, MockDecimals);
-        let MockDAIInstance = await MockDAI.deployed();
-        console.log("MockDAI deployed : " + MockDAIInstance.address);
-        DAIAddress = MockDAIInstance.address
+        await deployer.deploy(MockDai);
+        let MockDAIInstance = await MockDai.deployed();
+        console.log("MockDAI logic deployed : " + MockDAIInstance.address);
+
+        let TokenInitializerMethod = {
+            "inputs": [
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "symbol",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "MaxSupply",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address",
+                "name": "initialOwner",
+                "type": "address"
+              }
+            ],
+            "name": "MockDai_init",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        };
+        
+        let TokenProxyInitializerParameters = [name, symbol, supply, initialOwner];
+        let TokenProxyData = web3.eth.abi.encodeFunctionCall(TokenInitializerMethod, TokenProxyInitializerParameters);
+        
+        await deployer.deploy(TransparentUpgradeableProxy, MockDAIInstance.address, proxyOwner, TokenProxyData);
+        let TransparentUpgradeableProxyIns = await TransparentUpgradeableProxy.deployed();
+        TokenContractAddress = TransparentUpgradeableProxyIns.address;
+        console.log("MockDAI Proxy deployed : " + TokenContractAddress);
     }
 
-    return DAIAddress;
+    return TokenContractAddress;
   
 }
 
 
-exports.GetDAIAddress = GetDAIAddress;
+exports.GetTokenContractAddress = GetTokenContractAddress;
