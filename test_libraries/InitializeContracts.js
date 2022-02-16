@@ -275,8 +275,10 @@ async function retrieveProxies(manager, user_1){
   let propositionSettingsProxy = TransparentProxies[i];
   i++;
   let adminPiggyBank = TransparentProxies[i];
+  i++;
+  let payments = TransparentProxies[i];
 
-  return [publicPoolProxy, treasuryProxy, originalsTokenProxy, propositionSettingsProxy, adminPiggyBank];
+  return [publicPoolProxy, treasuryProxy, originalsTokenProxy, propositionSettingsProxy, adminPiggyBank, payments];
 }
 
 function getProxyData(method, parameters){
