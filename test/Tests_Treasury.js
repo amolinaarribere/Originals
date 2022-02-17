@@ -6,6 +6,7 @@ const init = require("../test_libraries/InitializeContracts.js");
 const constants = require("../test_libraries/constants.js");
 const proposition = require("../test_libraries/Propositions.js");
 const aux = require("../test_libraries/auxiliaries.js");
+const obj = require("../test_libraries/objects.js");
 
 const PublicPool = artifacts.require("PublicPool");
 const PublicPoolAbi = PublicPool.abi;
@@ -26,8 +27,6 @@ const AdminTransferFeeAmount = constants.AdminTransferFeeAmount;
 const AdminTransferFeeDecimals = constants.AdminTransferFeeDecimals;
 const OffersLifeTime = constants.OffersLifeTime;
 const Prices = [NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee, TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals, OffersLifeTime ];
-const NewIssuerFee = constants.NewIssuerFee;
-const AdminNewIssuerFee = constants.AdminNewIssuerFee;
 
 const Gas = constants.Gas;
 const GasPrice = constants.GasPrice;
@@ -73,7 +72,7 @@ contract("Testing Treasury",function(accounts){
         mockdai = new web3.eth.Contract(MockDaiAbi, contracts[2][7]);
     });
 
-/*
+
     // ****** TESTING Price Config ***************************************************************** //
     it("Retrieve Proposals Details",async function(){
         // act
@@ -105,11 +104,12 @@ contract("Testing Treasury",function(accounts){
             expect(error.message).to.match(NotEnoughBalance);
         }
     });
-*/
+
     it("Withdraw CORRECT",async function(){
         // act
-        let first_withdraw = NewIssuerFee.dividedBy(3);
-        await publicpoolProxy.methods.requestIssuer(user_1, "test", "t", issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans).send({from: user_1, gas: Gas}, function(error, result){});
+        let first_withdraw = NewIssuerFee.dividedBy(10);
+        await mockdai.methods.approve(paymentsProxyAddress, NewIssuerFee.plus(AdminNewIssuerFee)).send({from: user_1, gas: Gas}, function(error, result){});
+        await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(user_1, "test", "t", 0, 0, 0)).send({from: user_1, gas: Gas}, function(error, result){});
         // assert
         let TreasuryBalance = new BigNumber(await mockdai.methods.balanceOf(TreasuryProxy._address).call());
         let UserBalance_1 = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
