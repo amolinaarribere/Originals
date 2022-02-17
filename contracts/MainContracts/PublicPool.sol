@@ -58,19 +58,17 @@ import "../Interfaces/IPayments.sol";
 
 
   // MODIFIERS /////////////////////////////////////////
-  modifier validOwner(address owner){
-      require(address(0) != owner, "NFT Market owner cannot be address 0");
-      _;
-  }
-
   modifier IssuerPending(uint256 id){
       require(address(0) != _pendingIssuers[id]._issuer._owner, "This issuer id is not pending");
       _;
   }
 
-  modifier validFees(uint256 fee, uint256 decimals){
-      Library.validFees(fee, decimals);
-      _;
+  modifier validIssuerRequest(ItemsLibrary._issuerStruct memory requestedIssuer){
+    require(address(0) != requestedIssuer._owner, "NFT Market owner cannot be address 0");
+    Library.validFees(requestedIssuer._feeAmount, requestedIssuer._feeDecimals);
+    require(0 < bytes(requestedIssuer._name).length, "Name is empty");
+    require(0 < bytes(requestedIssuer._symbol).length, "Symbol is empty");
+     _;
   }
 
   modifier isNFTMarket(uint256 MarketId, address MarketAddress){
@@ -133,9 +131,8 @@ import "../Interfaces/IPayments.sol";
      
   }
 
-  function requestIssuer(address owner, string memory name, string memory symbol, uint256 feeAmount, uint256 feeDecimals, Library.PaymentPlans paymentPlan) external override
-    validOwner(owner)
-    validFees(feeAmount, feeDecimals)
+  function requestIssuer(ItemsLibrary._issuerStruct memory requestedIssuer) external override
+    validIssuerRequest(requestedIssuer)
   {
 
     uint[] memory Prices = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
@@ -146,19 +143,26 @@ import "../Interfaces/IPayments.sol";
     payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], NewIssuerFee, 0, bytes(""));
     payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminNewIssuerFee, 0, bytes(""));
 
-    uint256 IssuerID = getIssuerIdFromName(name);
+    uint256 IssuerID = getIssuerIdFromName(requestedIssuer._name);
+
+    addPendingIssuer(IssuerID, requestedIssuer);
+
+    emit _NewIssuerRequest(IssuerID, requestedIssuer._owner, requestedIssuer._name, requestedIssuer._symbol);
+  }
+
+  function addPendingIssuer(uint256 IssuerID, ItemsLibrary._issuerStruct memory requestedIssuer) internal
+  {
+
     require(address(0) == _pendingIssuers[IssuerID]._issuer._owner && address(0) == _issuers[IssuerID], "This Issuer Name has already been taken");
 
-    _pendingIssuers[IssuerID]._issuer._owner = owner;
-    _pendingIssuers[IssuerID]._issuer._name = name;
-    _pendingIssuers[IssuerID]._issuer._symbol = symbol;
-    _pendingIssuers[IssuerID]._issuer._feeAmount = feeAmount;
-    _pendingIssuers[IssuerID]._issuer._feeDecimals = feeDecimals;
-    _pendingIssuers[IssuerID]._issuer._paymentPlan = paymentPlan;
+    _pendingIssuers[IssuerID]._issuer._owner = requestedIssuer._owner;
+    _pendingIssuers[IssuerID]._issuer._name = requestedIssuer._name;
+    _pendingIssuers[IssuerID]._issuer._symbol = requestedIssuer._symbol;
+    _pendingIssuers[IssuerID]._issuer._feeAmount = requestedIssuer._feeAmount;
+    _pendingIssuers[IssuerID]._issuer._feeDecimals = requestedIssuer._feeDecimals;
+    _pendingIssuers[IssuerID]._issuer._paymentPlan = requestedIssuer._paymentPlan;
     _pendingIssuers[IssuerID]._pendingId = _listOfPendingIssuers.length;
     _listOfPendingIssuers.push(IssuerID);
-
-    emit _NewIssuerRequest(IssuerID, owner, name, symbol);
   }
 
   function getIssuerIdFromName(string memory name) internal pure returns(uint256)
@@ -277,27 +281,35 @@ import "../Interfaces/IPayments.sol";
     isNFTMarket(NFTMarketId, msg.sender)
     isTokenUnassignedCreditEmpty(NFTMarketId, tokenID)
   {
-    ItemsLibrary.InternalWithdraw(_creditOfAccount[addr], amount, address(0), false, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
+    ItemsLibrary.InternalWithdraw(
+      _creditOfAccount[addr], 
+      amount, 
+      address(0), 
+      false, 
+      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+      false,
+      bytes("")
+    );
     internalTransferUnassignedCredit(NFTMarketId, tokenID, amount);
     emit _CreditReused(NFTMarketId, tokenID, addr, amount);
   }
 
   function withdraw(uint amount) external override
   {
-    internalWithdraw(msg.sender, amount, address(0));
+    internalWithdraw(msg.sender, amount, address(0), false, bytes(""));
   }
   
   function withdrawAll() external override
   {
     uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[msg.sender]);
-    internalWithdraw(msg.sender, amount, address(0));
+    internalWithdraw(msg.sender, amount, address(0), false, bytes(""));
   }
   
-  function withdrawAllFor(uint256 NFTMarketId, address addr) external override
+  function withdrawAllFor(uint256 NFTMarketId, address addr, bytes memory data) external override
     isNFTMarket(NFTMarketId, msg.sender)
   {
     uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[addr]);
-    internalWithdraw(addr, amount, msg.sender);
+    internalWithdraw(addr, amount, msg.sender, true, data);
   }
 
   function internalTransferUnassignedCredit(uint256 NFTMarketId, uint256 tokenID, uint256 amount) internal
@@ -305,9 +317,17 @@ import "../Interfaces/IPayments.sol";
       _unassignedCreditForMarket[NFTMarketId][tokenID] = amount;
   }
 
-  function internalWithdraw(address addr, uint amount, address sender) internal
+  function internalWithdraw(address addr, uint amount, address sender, bool sendData, bytes memory data) internal
   {
-    ItemsLibrary.InternalWithdraw(_creditOfAccount[addr], amount, addr, true, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
+    ItemsLibrary.InternalWithdraw(
+      _creditOfAccount[addr], 
+      amount, 
+      addr, 
+      true, 
+      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+      sendData,
+      data
+    );
     if(address(0) != sender) emit _CreditWithdrawnFor(addr, amount, sender);
     else emit _CreditWithdrawn(addr, amount);
   }

@@ -181,9 +181,11 @@ import "../Interfaces/IPayments.sol";
     removeOffer(tokenId);
 
     IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).withdrawAllFor(_issuerID,
-      _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
+      _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)],
+      bytes(""));
     IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).withdrawAllFor(_issuerID,
-      _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)]);
+      _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)],
+      bytes(""));
   }
 
   function getFees(uint256 tokenId) internal view returns(uint256, uint256, uint256, uint256)

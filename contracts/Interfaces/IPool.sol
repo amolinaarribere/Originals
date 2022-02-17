@@ -17,7 +17,7 @@ pragma solidity 0.8.7;
         address[] _voters;
     }
 
-    function requestIssuer(address owner, string memory name, string memory symbol, uint256 feeAmount, uint256 feeDecimals, Library.PaymentPlans paymentPlan) external;
+    function requestIssuer(ItemsLibrary._issuerStruct memory requestedIssuer) external;
     function validateIssuer(uint256 id) external;
     function rejectIssuer(uint256 id) external;
 
@@ -27,7 +27,7 @@ pragma solidity 0.8.7;
     function reuseCredit(uint256 NFTMarketId, uint256 tokenID, address addr, uint256 amount) external;
     function withdraw(uint256 amount) external;
     function withdrawAll() external;
-    function withdrawAllFor(uint256 NFTMarketId, address addr) external;
+    function withdrawAllFor(uint256 NFTMarketId, address addr, bytes memory data) external;
 
 
     function retrieveIssuers() external view returns (uint256[] memory);

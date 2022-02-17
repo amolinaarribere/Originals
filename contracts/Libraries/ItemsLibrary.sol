@@ -4,7 +4,7 @@ pragma solidity 0.8.7;
 
 import "./Library.sol";
 import "./UintLibrary.sol";
-import "../Interfaces/IPayments.sol";
+import "../Interfaces/ICreditor.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
@@ -29,7 +29,7 @@ library ItemsLibrary{
     }
 
     // TREASURY & NFTMarket///////////////////////////
-    function InternalWithdraw(_BalanceStruct storage balance, uint amount, address to, bool transfer, address PaymentContractAddress) public 
+    function InternalWithdraw(_BalanceStruct storage balance, uint amount, address to, bool transfer, address TokenContractAddress, bool sendData, bytes memory data) public 
     {
         require(checkFullBalance(balance) >= amount, "EC20-");
 
@@ -44,14 +44,19 @@ library ItemsLibrary{
         addBalance(balance, remainder, commonDividend);
 
         if(transfer){
-            TransferTo(amount, to, PaymentContractAddress);
+            TransferTo(amount, to, TokenContractAddress, sendData, data);
         }
     }
 
-    function TransferTo(uint amount, address to, address PaymentContractAddress) public
+    function TransferTo(uint amount, address to, address TokenContractAddress, bool sendData, bytes memory data) public
     {
-        bool success = IERC20(IPayments(PaymentContractAddress).retrieveSettings()).transfer(to, amount);
-        require(success, "Error transfering funds to address");
+        IERC20 TokenContract = IERC20(TokenContractAddress);
+        require(TokenContract.balanceOf(address(this)) >= amount, "Contract does not have enough funds");
+
+        bool success = TokenContract.transfer(to, amount);
+        require(true == success, "Transfer did not work");
+
+        if(sendData) ICreditor(to).CreditReceived(address(this), amount, data);
     }
 
     function addBalance(_BalanceStruct storage balance, uint amount, uint factor) public

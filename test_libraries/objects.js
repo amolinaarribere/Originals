@@ -7,4 +7,16 @@ function returnUpgradeObject(address_1, address_2, address_3, address_4, address
         };  
 }
 
+function returnIssuerObject(owner, name, symbol, feeAmount, feeDecimals, paymentPlan){
+        return {
+            "_owner": owner,
+            "_name": name,
+            "_symbol": symbol,
+            "_feeAmount": feeAmount,
+            "_feeDecimals": feeDecimals,
+            "_paymentPlan": paymentPlan
+        };  
+}
+
 exports.returnUpgradeObject = returnUpgradeObject;
+exports.returnIssuerObject = returnIssuerObject;

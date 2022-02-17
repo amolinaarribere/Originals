@@ -180,7 +180,6 @@ contract("Testing Admin Piggy Bank",function(accounts){
         await adminPiggyBankProxy.methods.approve().send({from: PublicOwners[1], gas: Gas}, function(error, result){});
         finalBalance = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
         expect(finalBalance.toString()).to.equal(transferAmount.toString());
-
     });
 
 });

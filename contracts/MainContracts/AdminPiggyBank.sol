@@ -98,7 +98,13 @@ contract AdminPiggyBank is Initializable, MultiSigContract, CreditorBaseContract
             _transferInProgress._validations++;
 
             if(_transferInProgress._validations >= _minOwners){
-                ItemsLibrary.TransferTo(_transferInProgress._amount, _transferInProgress._to, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
+                ItemsLibrary.TransferTo(
+                    _transferInProgress._amount, 
+                    _transferInProgress._to, 
+                    IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+                    false,
+                    bytes("")
+                );
                 emit _TransferValidated(_transferInProgress._to, _transferInProgress._amount);
                 deletingPendingTransfer();
             }
