@@ -11,6 +11,8 @@ const Treasury = artifacts.require("Treasury");
 var TreasuryAbi = Treasury.abi;
 const OriginalsToken = artifacts.require("OriginalsToken");
 var OriginalsTokenAbi = OriginalsToken.abi;
+const MockDai = artifacts.require("MockDai");
+const MockDaiAbi = MockDai.abi;
 
 const NewIssuerFee = constants.NewIssuerFee;
 const AdminNewIssuerFee = constants.AdminNewIssuerFee;
@@ -35,6 +37,8 @@ contract("Testing Treasury",function(accounts){
     var manager;
     var originalsTokenProxy;
     var TreasuryProxy;
+    var mockdai;
+    var paymentsProxyAddress;
     // used addresses
     const chairPerson = accounts[0];
     const PublicOwners = [accounts[1], accounts[2], accounts[3]];
@@ -60,9 +64,11 @@ contract("Testing Treasury",function(accounts){
         manager = contracts[0];
         TreasuryProxy = new web3.eth.Contract(TreasuryAbi, contracts[1][1]);
         originalsTokenProxy = new web3.eth.Contract(OriginalsTokenAbi, contracts[1][2]);
+        paymentsProxyAddress = contracts[1][5];
+        mockdai = new web3.eth.Contract(MockDaiAbi, contracts[2][7]);
     });
 
-
+/*
     // ****** TESTING Price Config ***************************************************************** //
     it("Retrieve Proposals Details",async function(){
         // act
@@ -94,38 +100,35 @@ contract("Testing Treasury",function(accounts){
             expect(error.message).to.match(NotEnoughBalance);
         }
     });
-
+*/
     it("Withdraw CORRECT",async function(){
         // act
         let amount = new BigNumber("3000000000000000000");
         let first_withdraw = new BigNumber("1000000000000000000");
-        await web3.eth.sendTransaction({to: TreasuryProxy._address, from: chairPerson, value: amount,  gas: Gas, gasPrice: GasPrice})
+        await mockdai.methods.transfer(TreasuryProxy._address, amount).send({from: user_1, gas: Gas}, function(error, result){});
 
         // assert
-        let TreasuryBalance = new BigNumber(await web3.eth.getBalance(TreasuryProxy._address));
-        let UserBalance_1 = new BigNumber(await web3.eth.getBalance(chairPerson));
+        let TreasuryBalance = new BigNumber(await mockdai.methods.balanceOf(TreasuryProxy._address).call());
+        let UserBalance_1 = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
         let AggregatedAmount = new BigNumber(await TreasuryProxy.methods.retrieveAggregatedAmount().call());
         expect(amount.toString()).to.be.equal(TreasuryBalance.toString());
+        expect("0").to.be.equal(UserBalance_1.toString());
         expect(amount.toString()).to.be.equal(AggregatedAmount.toString());
 
-        let receipt = await TreasuryProxy.methods.withdraw(first_withdraw).send({from: chairPerson, gas: Gas, gasPrice: GasPrice}, function(error, result){});
-        let GasUsed = new BigNumber(receipt.cumulativeGasUsed);
-        let GasCost = GasUsed.multipliedBy(GasPrice);
-        TreasuryBalance = new BigNumber(await web3.eth.getBalance(TreasuryProxy._address));
-        let UserBalance_2 = new BigNumber(await web3.eth.getBalance(chairPerson));
+        await TreasuryProxy.methods.withdraw(first_withdraw).send({from: chairPerson, gas: Gas}, function(error, result){});
+        TreasuryBalance = new BigNumber(await mockdai.methods.balanceOf(TreasuryProxy._address).call());
+        let UserBalance_2 = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
         AggregatedAmount = new BigNumber(await TreasuryProxy.methods.retrieveAggregatedAmount().call());
         expect(amount.minus(first_withdraw).toString()).to.be.equal(TreasuryBalance.toString());
-        expect(UserBalance_1.minus(GasCost).plus(first_withdraw).toString()).to.be.equal(UserBalance_2.toString());
+        expect(first_withdraw.toString()).to.be.equal(UserBalance_2.toString());
         expect(amount.toString()).to.be.equal(AggregatedAmount.toString());
 
-        receipt = await TreasuryProxy.methods.withdrawAll().send({from: chairPerson,  gas: Gas, gasPrice: GasPrice}, function(error, result){});
-        GasUsed = new BigNumber(receipt.cumulativeGasUsed);
-        GasCost = GasUsed.multipliedBy(GasPrice);
-        TreasuryBalance = new BigNumber(await web3.eth.getBalance(TreasuryProxy._address));
-        let UserBalance_3 = new BigNumber(await web3.eth.getBalance(chairPerson));
+        await TreasuryProxy.methods.withdrawAll().send({from: chairPerson,  gas: Gas}, function(error, result){});
+        TreasuryBalance = new BigNumber(await mockdai.methods.balanceOf(TreasuryProxy._address).call());
+        let UserBalance_3 = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
         AggregatedAmount = new BigNumber(await TreasuryProxy.methods.retrieveAggregatedAmount().call());
         expect("0").to.be.equal(TreasuryBalance.toString());
-        expect(UserBalance_2.minus(GasCost).plus(amount.minus(first_withdraw)).toString()).to.be.equal(UserBalance_3.toString());
+        expect(amount.toString()).to.be.equal(UserBalance_3.toString());
         expect(amount.toString()).to.be.equal(AggregatedAmount.toString());
     });
 

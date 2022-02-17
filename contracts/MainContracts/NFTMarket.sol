@@ -140,8 +140,8 @@ import "../Interfaces/IPayments.sol";
         AdminMintingFee = Prices[uint256(Library.Prices.AdminMintingFee)];
 
         IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
-        payments.TransferFunds(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], MintingFee, _issuerID, bytes(""));
-        payments.TransferFunds(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminMintingFee, _issuerID, bytes(""));
+        payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], MintingFee, _issuerID, bytes(""));
+        payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminMintingFee, _issuerID, bytes(""));
       }
       _safeMint(receiver, tokenId);
       _tokenInfo[tokenId]._price = price;
@@ -242,7 +242,7 @@ import "../Interfaces/IPayments.sol";
       bytes memory data = Library.Bytes32ArrayToBytes(dataArray);
 
       IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
-      payments.TransferFunds(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)], offer, _issuerID, data);
+      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)], offer, _issuerID, data);
     }
 
     _tokenOffer[tokenId]._offer = offer;

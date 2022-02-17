@@ -74,13 +74,22 @@ contract Payments is IPayments, StdPropositionBaseContract{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function TransferFunds(address sender, address recipient, uint256 amount, uint256 MarketId, bytes memory data) external override
+    function TransferFrom(address sender, address recipient, uint256 amount, uint256 MarketId, bytes memory data) external override
         isFromCertifiedContract(msg.sender, MarketId)
     {
         require(_TokenContract.allowance(sender, address(this)) >= amount, "Contract does not have enough approved funds");
         bool success = _TokenContract.transferFrom(sender, recipient, amount);
         require(true == success, "Transfer From did not work");
         ICreditor(recipient).CreditReceived(sender, amount, data);
+    }
+
+    function Transfer(address recipient, uint256 amount, uint256 MarketId, bytes memory data) external override
+        isFromCertifiedContract(msg.sender, MarketId)
+    {
+        require(_TokenContract.balanceOf(address(this)) >= amount, "Contract does not have enough funds");
+        bool success = _TokenContract.transfer(recipient, amount);
+        require(true == success, "Transfer did not work");
+        ICreditor(recipient).CreditReceived(address(this), amount, data);
     }
 
     function BalanceOf(address account) external override view returns(uint256)
