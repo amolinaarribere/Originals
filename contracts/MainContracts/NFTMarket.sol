@@ -161,7 +161,7 @@ import "../Interfaces/IPayments.sol";
     isTokenOwnerOrApproved(tokenId)
     OfferInProgress(tokenId, true)
   {
-    emit _AcceptOffer(tokenId, ownerOf(tokenId),  _tokenOffer[tokenId]._bidder,  _tokenOffer[tokenId]._offer);
+    emit _AcceptOffer(tokenId, ownerOf(tokenId), _tokenOffer[tokenId]._bidder, _tokenOffer[tokenId]._offer);
 
     (uint256 OwnerTransferFeeAmount, uint256 TransferFeeAmount, uint256 AdminTransferFeeAmount, uint256 commonDecimals) = getFees(tokenId);
 

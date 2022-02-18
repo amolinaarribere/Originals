@@ -14,8 +14,11 @@ abstract contract CreditorBaseContract is ICreditor, ManagedBaseContract{
     // DATA /////////////////////////////////////////
 
     // MODIFIERS /////////////////////////////////////////
-    modifier isFromPaymentContract(address addr){
-        Library.ItIsSomeone(addr, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
+    modifier isFromCertifiedContract(address addr){
+        require(
+            addr == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)] || 
+            addr == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]
+        , "It is not from one of the certified contracts");
         _;
     }
     
@@ -26,7 +29,7 @@ abstract contract CreditorBaseContract is ICreditor, ManagedBaseContract{
 
     // FUNCTIONALITY /////////////////////////////////////////
     function CreditReceived(address sender, uint256 amount, bytes memory data) external override
-        isFromPaymentContract(msg.sender)
+        isFromCertifiedContract(msg.sender)
     {
         onCreditReceived(sender, amount, data);
     }
