@@ -72,7 +72,7 @@ async function returnContractManagerSettings(contractAddress, user_1){
 
 async function checkPropositionSettings(contractAddress, propBytes, user_1){
     let _propSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    for(let i=0; i < 3; i++){
+    for(let i=0; i < _propSettings.length; i++){
         expect(aux.Bytes32ToInt(propBytes[i])).to.equal(parseInt(_propSettings[i]));
     }
 }
@@ -102,6 +102,11 @@ async function checkContracts(contractAddress, ContractsBytes, user_1){
     i++;
     i++;
     i++;
+}
+
+async function checkPayments(contractAddress, paymentBytes, user_1){
+    let _paymentSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
+    expect(aux.Bytes32ToAddress(paymentBytes[0])).to.equal(_paymentSettings);
 }
 
 // tests
@@ -177,6 +182,27 @@ async function Config_ContractsManager_Correct(contractAddress, originalsTokenPr
         result[i++]
     ];
     await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkContracts, true);
+   
+};
+
+async function Config_Payments_Wrong(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
+    await Config_CommonProposition_Wrong(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
+    let tooMuch = TotalTokenSupply + 1;
+    // act
+    try{
+        await contractAddress.methods.sendProposition([zeroBytes]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(WrongConfig);
+    }  
+};
+
+async function Config_Payments_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
+    let _paymentsSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
+    let InitValue = [aux.AddressToBytes32(_paymentsSettings)];
+    await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPayments, true);
    
 };
 
@@ -380,6 +406,8 @@ exports.Config_Treasury_Wrong = Config_Treasury_Wrong;
 exports.Config_Treasury_Correct = Config_Treasury_Correct;
 exports.Config_ContractsManager_Wrong = Config_ContractsManager_Wrong;
 exports.Config_ContractsManager_Correct = Config_ContractsManager_Correct;
+exports.Config_Payments_Wrong = Config_Payments_Wrong;
+exports.Config_Payments_Correct = Config_Payments_Correct;
 exports.SplitTokenSupply = SplitTokenSupply;
 exports.Check_Proposition_Details = Check_Proposition_Details;
 exports.Check_Votes_Reassignment = Check_Votes_Reassignment;
