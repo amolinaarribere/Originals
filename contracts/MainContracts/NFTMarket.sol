@@ -127,7 +127,7 @@ import "../Interfaces/IPayments.sol";
       _ownerTransferFeeDecimals = newDecimals;
   }
 
-  function mintToken(uint256 tokenId, address receiver, uint256 price) external override
+  function mintToken(uint256 tokenId, address receiver, uint256 price, bool FromCredit) external override
     isTheOwner(msg.sender)
   {
       uint256 MintingFee = 0;
@@ -139,10 +139,17 @@ import "../Interfaces/IPayments.sol";
         MintingFee = Prices[uint256(Library.Prices.MintingFee)];
         AdminMintingFee = Prices[uint256(Library.Prices.AdminMintingFee)];
 
-        IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
-        payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], MintingFee, _issuerID, bytes(""));
-        payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminMintingFee, _issuerID, bytes(""));
+        if(FromCredit){
+          IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
+          IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, AdminMintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)]);
+        } 
+        else{
+          IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
+          payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], MintingFee, _issuerID, bytes(""));
+          payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminMintingFee, _issuerID, bytes(""));
+        }
       }
+
       _safeMint(receiver, tokenId);
       _tokenInfo[tokenId]._price = price;
       _tokenInfo[tokenId]._paymentPlan = _paymentPlan;

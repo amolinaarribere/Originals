@@ -27,7 +27,7 @@ pragma solidity 0.8.7;
     function changeOffersLifeTime(uint256 newLifeTime) external;
     function changeOwnerTransferFees(uint256 newAmount, uint256 newDecimals) external;
 
-    function mintToken(uint256 tokenId, address receiver, uint256 price) external;
+    function mintToken(uint256 tokenId, address receiver, uint256 price, bool FromCredit) external;
 
     function setTokenPrice(uint256 tokenId, uint256 price) external;
     function acceptOffer(uint256 tokenId) external;

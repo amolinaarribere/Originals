@@ -54,11 +54,12 @@ contract("Testing Public Pool",function(accounts){
     const NameNOK = new RegExp("Name is empty");
     const SymbolNOK = new RegExp("Symbol is empty");
     const NotEnoughFees = new RegExp("Contract does not have enough approved funds");
-    const TooMuch = new RegExp("EC20-");
+    const NotEnoughCredit = new RegExp("EC20-");
     const NotAnOwner = new RegExp("EC9-");
     const OwnerAlreadyvoted = new RegExp("EC5-");
     const IssuerIDTaken = new RegExp("This Issuer Name has already been taken");
     const NotPending = new RegExp("This issuer id is not pending");
+    const MarketNotOK = new RegExp("The Market Id and Address do not correspond");
 
 
 
@@ -118,7 +119,7 @@ contract("Testing Public Pool",function(accounts){
 
     it("Add Issuer WRONG",async function(){
         try{
-            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, 1001, 1, 0)).send({from: user_1, gas: Gas}, function(error, result){});
+            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, 1001, 1, 0), false).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -127,7 +128,7 @@ contract("Testing Public Pool",function(accounts){
         }
         // act
         try{
-            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(address_0, issuer_1_name, issuer_1_symbol, 10, 0, 0)).send({from: user_1, gas: Gas}, function(error, result){});
+            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(address_0, issuer_1_name, issuer_1_symbol, 10, 0, 0), false).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -136,7 +137,7 @@ contract("Testing Public Pool",function(accounts){
         }
         // act
         try{
-            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, "", issuer_1_symbol, 10, 0, 0)).send({from: user_1, gas: Gas}, function(error, result){});
+            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, "", issuer_1_symbol, 10, 0, 0), false).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -145,7 +146,7 @@ contract("Testing Public Pool",function(accounts){
         }
         // act
         try{
-            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, "", 10, 0, 0)).send({from: user_1, gas: Gas}, function(error, result){});
+            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, "", 10, 0, 0), false).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -156,18 +157,27 @@ contract("Testing Public Pool",function(accounts){
         try{
             let amount = NewIssuerAmount.minus(1)
             await mockdai.methods.approve(paymentsProxyAddress, amount).send({from: user_1, gas: Gas}, function(error, result){});
-            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, 10, 0, 0)).send({from: user_1, gas: Gas}, function(error, result){});
+            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, 10, 0, 0), false).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
         catch(error){
             expect(error.message).to.match(NotEnoughFees);
         }
+         // act
+         try{
+            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, 10, 0, 0), true).send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NotEnoughCredit);
+        }
         // act
         try{
             await mockdai.methods.approve(paymentsProxyAddress, 1 + NewIssuerAmount).send({from: user_1, gas: Gas}, function(error, result){});
-            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, 10, 0, 0)).send({from: user_1, gas: Gas}, function(error, result){});
-            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_2, issuer_1_name, "test", 10, 0, 0)).send({from: user_1, gas: Gas}, function(error, result){});
+            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, 10, 0, 0), false).send({from: user_1, gas: Gas}, function(error, result){});
+            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_2, issuer_1_name, "test", 10, 0, 0), false).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -185,7 +195,7 @@ contract("Testing Public Pool",function(accounts){
         expect(PiggyBankBalance.toString()).to.equal("0");
         expect(AggregatedAmount.toString()).to.equal("0");
 
-        let response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans)).send({from: user_1, gas: Gas}, function(error, result){});
+        let response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), false).send({from: user_1, gas: Gas}, function(error, result){});
         let issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
 
         let pendingIssuers = await publicpoolProxy.methods.retrievePendingIssuers().call();
@@ -209,7 +219,8 @@ contract("Testing Public Pool",function(accounts){
         pendingIssuers = await publicpoolProxy.methods.retrievePendingIssuers().call();
         expect(pendingIssuers.length).to.equal(0);
 
-        response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans)).send({from: user_1, gas: Gas}, function(error, result){});
+        await publicpoolProxy.methods.sendCredit(user_1, NewIssuerAmount).send({from: user_1, gas: Gas}, function(error, result){});
+        response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), true).send({from: user_1, gas: Gas}, function(error, result){});
         issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
 
         pendingIssuers = await publicpoolProxy.methods.retrievePendingIssuers().call();
@@ -240,7 +251,7 @@ contract("Testing Public Pool",function(accounts){
         expect(IssuersAddress).to.equal(NFTMarketAddress);
 
         try{
-            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_2, issuer_1_name, "whatever", 10, 0, 0)).send({from: user_1, gas: Gas}, function(error, result){});
+            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_2, issuer_1_name, "whatever", 10, 0, 0), false).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -258,7 +269,7 @@ contract("Testing Public Pool",function(accounts){
     // ****** TESTING Voting On Issuers ***************************************************************** //
     it("Voting Issuer WRONG",async function(){
         await mockdai.methods.approve(paymentsProxyAddress, NewIssuerAmount).send({from: user_1, gas: Gas}, function(error, result){});
-        let response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans)).send({from: user_1, gas: Gas}, function(error, result){});;
+        let response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), false).send({from: user_1, gas: Gas}, function(error, result){});;
         let issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
         try{
             await publicpoolProxy.methods.rejectIssuer(issuerId).send({from: user_1, gas: Gas}, function(error, result){});
@@ -313,6 +324,45 @@ contract("Testing Public Pool",function(accounts){
        
     });
 
+    // ****** TESTING Spending Credit ***************************************************************** //
+    it("Spend, Add, WithdrawForAll and Reuse Credit WRONG",async function(){
+        await mockdai.methods.approve(paymentsProxyAddress, NewIssuerAmount).send({from: user_1, gas: Gas}, function(error, result){});
+        let response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), false).send({from: user_1, gas: Gas}, function(error, result){});;
+        let issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
+        try{
+            await publicpoolProxy.methods.spendCredit(issuerId, user_1, 0, user_1).send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(MarketNotOK);
+        }
+        try{
+            await publicpoolProxy.methods.addCredit(issuerId, 0, [], [], []).send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(MarketNotOK);
+        }
+        try{
+            await publicpoolProxy.methods.withdrawAllFor(issuerId, user_1, "0x").send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(MarketNotOK);
+        }
+        try{
+            await publicpoolProxy.methods.reuseCredit(issuerId, 0, user_1, 0).send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(MarketNotOK);
+        }
+    });
+
     // ****** TESTING Credit ***************************************************************** //
     it("Withdraw Credit WRONG",async function(){
         try{
@@ -321,7 +371,7 @@ contract("Testing Public Pool",function(accounts){
         }
         // assert
         catch(error){
-            expect(error.message).to.match(TooMuch);
+            expect(error.message).to.match(NotEnoughCredit);
         }
 
     });

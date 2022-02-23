@@ -23,7 +23,6 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import "../Base/CreditorBaseContract.sol";
 import "../Interfaces/IPayments.sol";
 
-
  contract PublicPool is  Initializable, MultiSigContract, CreditorBaseContract, IPool {
   using ItemsLibrary for *;
   using UintLibrary for *;
@@ -41,6 +40,7 @@ import "../Interfaces/IPayments.sol";
   event _CreditUnAssignedReceived(uint256 indexed NFTMarketId, uint256 indexed tokenID, uint256 amount);
   event _CreditAssigned(uint256 indexed NFTMarketId, uint256 indexed tokenID, address indexed receiver, uint256 amount, uint256 factor);
   event _CreditReused(uint256 indexed NFTMarketId, uint256 indexed tokenID, address indexed creditor, uint256 amount);
+  event _CreditSpent(uint256 indexed NFTMarketId, address indexed from, uint256 amount, address indexed to);
   event _CreditWithdrawn(address indexed withdrawer, uint256 amount);
   event _CreditWithdrawnFor(address indexed withdrawer, uint256 amount, address indexed sender);
 
@@ -131,7 +131,7 @@ import "../Interfaces/IPayments.sol";
      
   }
 
-  function requestIssuer(ItemsLibrary._issuerStruct memory requestedIssuer) external override
+  function requestIssuer(ItemsLibrary._issuerStruct memory requestedIssuer, bool FromCredit) external override
     validIssuerRequest(requestedIssuer)
   {
 
@@ -139,9 +139,15 @@ import "../Interfaces/IPayments.sol";
     uint256 NewIssuerFee = Prices[uint256(Library.Prices.NewIssuerFee)];
     uint256 AdminNewIssuerFee = Prices[uint256(Library.Prices.AdminNewIssuerFee)];
 
-    IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
-    payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], NewIssuerFee, 0, bytes(""));
-    payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminNewIssuerFee, 0, bytes(""));
+    if(FromCredit){
+      internalSpendCredit(0, msg.sender, NewIssuerFee,  _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
+      internalSpendCredit(0, msg.sender, AdminNewIssuerFee,  _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)]);
+    }
+    else{
+      IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
+      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], NewIssuerFee, 0, bytes(""));
+      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminNewIssuerFee, 0, bytes(""));
+    }
 
     uint256 IssuerID = getIssuerIdFromName(requestedIssuer._name);
 
@@ -292,6 +298,27 @@ import "../Interfaces/IPayments.sol";
     );
     internalTransferUnassignedCredit(NFTMarketId, tokenID, amount);
     emit _CreditReused(NFTMarketId, tokenID, addr, amount);
+  }
+
+  function spendCredit(uint256 NFTMarketId, address from, uint256 amount, address to) external override
+    isNFTMarket(NFTMarketId, msg.sender)
+  {
+    internalSpendCredit(NFTMarketId, from, amount, to);
+  }
+
+  function internalSpendCredit(uint256 NFTMarketId, address from, uint256 amount, address to) internal 
+  {
+    bytes memory emptyData = bytes("");
+    ItemsLibrary.InternalWithdraw(  
+      _creditOfAccount[from], 
+      amount, 
+      to, 
+      true, 
+      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+      true,
+      bytes("")
+    );
+    emit _CreditSpent(NFTMarketId, from, amount, to);
   }
 
   function withdraw(uint amount) external override
