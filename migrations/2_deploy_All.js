@@ -395,9 +395,9 @@ module.exports = async function(deployer, network, accounts){
       "type": "address"
     },
     {
-      "internalType": "address",
-      "name": "tokenAddress",
-      "type": "address"
+      "internalType": "address[]",
+      "name": "tokenAddresses",
+      "type": "address[]"
     }
   ],
   "name": "Payments_init",
@@ -405,7 +405,7 @@ module.exports = async function(deployer, network, accounts){
   "stateMutability": "nonpayable",
   "type": "function"
 };
- var PaymentsProxyInitializerParameters = [ManagerProxyAddress, accounts[0], TokenContractAddress]
+ var PaymentsProxyInitializerParameters = [ManagerProxyAddress, accounts[0], [TokenContractAddress]]
  var PaymentsProxyData = web3.eth.abi.encodeFunctionCall(PaymentsProxyInitializerMethod, PaymentsProxyInitializerParameters);
  
 

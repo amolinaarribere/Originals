@@ -130,7 +130,7 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
             amount, 
             msg.sender, 
             true, 
-            IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+            IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0],
             false,
             bytes("")
         );

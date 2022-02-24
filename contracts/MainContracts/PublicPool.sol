@@ -145,8 +145,8 @@ import "../Interfaces/IPayments.sol";
     }
     else{
       IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
-      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], NewIssuerFee, 0, bytes(""));
-      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminNewIssuerFee, 0, bytes(""));
+      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], NewIssuerFee, 0, bytes(""), 0);
+      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminNewIssuerFee, 0, bytes(""), 0);
     }
 
     uint256 IssuerID = getIssuerIdFromName(requestedIssuer._name);
@@ -268,7 +268,7 @@ import "../Interfaces/IPayments.sol";
     bytes memory data = Library.Bytes32ArrayToBytes(dataArray);
 
     IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
-    payments.TransferFrom(msg.sender, address(this), amount, 0, data);
+    payments.TransferFrom(msg.sender, address(this), amount, 0, data, 0);
   }
 
   function addCredit(uint256 NFTMarketId, uint256 tokenID, address[] calldata addrs, uint256[] calldata amounts, uint256[] calldata factors) external override
@@ -292,7 +292,7 @@ import "../Interfaces/IPayments.sol";
       amount, 
       address(0), 
       false, 
-      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0],
       false,
       bytes("")
     );
@@ -314,7 +314,7 @@ import "../Interfaces/IPayments.sol";
       amount, 
       to, 
       true, 
-      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0],
       true,
       bytes("")
     );
@@ -351,7 +351,7 @@ import "../Interfaces/IPayments.sol";
       amount, 
       addr, 
       true, 
-      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0],
       sendData,
       data
     );

@@ -32,7 +32,7 @@ contract AdminPiggyBank is Initializable, MultiSigContract, CreditorBaseContract
 
     modifier isAmountOK(uint256 amount)
     {
-        require(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).BalanceOf(address(this)) >= amount, "We cannot transfer more than the current balance");
+        require(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).BalanceOf(address(this), 0) >= amount, "We cannot transfer more than the current balance");
         _;
     }
 
@@ -101,7 +101,7 @@ contract AdminPiggyBank is Initializable, MultiSigContract, CreditorBaseContract
                 ItemsLibrary.TransferTo(
                     _transferInProgress._amount, 
                     _transferInProgress._to, 
-                    IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+                    IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0],
                     false,
                     bytes("")
                 );

@@ -8,6 +8,7 @@ const Gas = constants.Gas;
 const Unauthorized = new RegExp("EC8-");
 const CannotProposeChanges = new RegExp("EC22-");
 const WrongConfig = new RegExp("EC21-");
+const MissingTokenAddresses = new RegExp("At least one token address must be provided");
 const NoPropositionActivated = new RegExp("EC25-");
 const PropositionAlreadyInProgress = new RegExp("EC24-");
 const CanNotVote = new RegExp("EC23-");
@@ -72,6 +73,7 @@ async function returnContractManagerSettings(contractAddress, user_1){
 
 async function checkPropositionSettings(contractAddress, propBytes, user_1){
     let _propSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
+    expect(propBytes.length).to.equal(_propSettings.length);
     for(let i=0; i < _propSettings.length; i++){
         expect(aux.Bytes32ToInt(propBytes[i])).to.equal(parseInt(_propSettings[i]));
     }
@@ -79,6 +81,7 @@ async function checkPropositionSettings(contractAddress, propBytes, user_1){
 
 async function checkPrice(contractAddress, PricesBytes, user_1){
     let _Prices =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
+    expect(PricesBytes.length).to.equal(_Prices.length);
     for(let i=0; i < _Prices.length; i++){
         expect(aux.Bytes32ToInt(PricesBytes[i])).to.equal(parseInt(_Prices[i]));
     }
@@ -106,7 +109,10 @@ async function checkContracts(contractAddress, ContractsBytes, user_1){
 
 async function checkPayments(contractAddress, paymentBytes, user_1){
     let _paymentSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    expect(aux.Bytes32ToAddress(paymentBytes[0])).to.equal(_paymentSettings);
+    expect(paymentBytes.length).to.equal(_paymentSettings.length);
+    for(let i=0; i < _paymentSettings.length; i++){
+        expect(aux.Bytes32ToAddress(paymentBytes[i])).to.equal(_paymentSettings[i]);
+    }
 }
 
 // tests
@@ -187,7 +193,6 @@ async function Config_ContractsManager_Correct(contractAddress, originalsTokenPr
 
 async function Config_Payments_Wrong(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     await Config_CommonProposition_Wrong(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
-    let tooMuch = TotalTokenSupply + 1;
     // act
     try{
         await contractAddress.methods.sendProposition([zeroBytes]).send({from: chairPerson, gas: Gas}, function(error, result){});
@@ -196,12 +201,23 @@ async function Config_Payments_Wrong(contractAddress, originalsTokenProxy, token
     // assert
     catch(error){
         expect(error.message).to.match(WrongConfig);
-    }  
+    } 
+    try{
+        await contractAddress.methods.sendProposition([]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(MissingTokenAddresses);
+    } 
 };
 
 async function Config_Payments_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     let _paymentsSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    let InitValue = [aux.AddressToBytes32(_paymentsSettings)];
+    let InitValue = [];
+    for(let i=0; i < _paymentsSettings.length; i++){
+        InitValue.push(aux.AddressToBytes32(_paymentsSettings[i]));
+    }
     await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPayments, true);
    
 };

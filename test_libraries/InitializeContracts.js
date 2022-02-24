@@ -208,9 +208,9 @@ const PaymentsProxyInitializerMethod = {
       "type": "address"
     },
     {
-      "internalType": "address",
-      "name": "tokenAddress",
-      "type": "address"
+      "internalType": "address[]",
+      "name": "tokenAddresses",
+      "type": "address[]"
     }
   ],
   "name": "Payments_init",
@@ -235,7 +235,7 @@ async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1)
   await TransparentUpgradeableProxyInstance.methods.changeAdmin(ProxyAdmin).send({from: chairPerson, gas: Gas});;
 
   let implementations = await deployImplementations(user_1);
-  let ProxyData = returnProxyInitData(PublicOwners, minOwners, ManagerProxyAddress, chairPerson, implementations[7]);
+  let ProxyData = returnProxyInitData(PublicOwners, minOwners, ManagerProxyAddress, chairPerson, [implementations[7]]);
 
   await ManagerProxy.methods.InitializeContracts(obj.returnUpgradeObject(implementations[0], implementations[1], implementations[2], implementations[3], implementations[4], implementations[5], implementations[6],
     ProxyData[0], ProxyData[1], ProxyData[2], ProxyData[3], ProxyData[4], ProxyData[5]),
@@ -285,13 +285,13 @@ function getProxyData(method, parameters){
   return web3.eth.abi.encodeFunctionCall(method, parameters);
 }
 
-function returnProxyInitData(PublicOwners, minOwners, manager, chairPerson, tokenAddress){
+function returnProxyInitData(PublicOwners, minOwners, manager, chairPerson, tokenAddresses){
   let PublicPoolProxyData = getProxyData(PublicPoolProxyInitializerMethod, [PublicOwners, minOwners, manager]);
   let TreasuryProxyData = getProxyData(TreasuryProxyInitializerMethod, [Prices, manager, chairPerson]);
   let OriginalsProxyData = getProxyData(OriginalsTokenProxyInitializerMethod, ["Originals Token for Test", "ORI", TotalTokenSupply, manager, 0, chairPerson]);
   let PropositionSettingsProxyData = getProxyData(PropositionSettingsProxyInitializerMethod, [manager, chairPerson, PropositionLifeTime, PropositionThreshold, minToPropose]);
   let AdminPiggyBankProxyData = getProxyData(AdminPiggyBankProxyInitializerMethod, [PublicOwners, minOwners, manager]);
-  let PaymentsProxyData = getProxyData(PaymentsProxyInitializerMethod, [manager, chairPerson, tokenAddress]);
+  let PaymentsProxyData = getProxyData(PaymentsProxyInitializerMethod, [manager, chairPerson, tokenAddresses]);
 
   return [PublicPoolProxyData, TreasuryProxyData, OriginalsProxyData, PropositionSettingsProxyData, AdminPiggyBankProxyData, PaymentsProxyData];
 }
