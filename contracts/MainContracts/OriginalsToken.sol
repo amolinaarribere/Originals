@@ -46,7 +46,9 @@ import "../Base/ManagedBaseContract.sol";
             
             ITokenEventSubscriber(Proxies[uint256(Library.TransparentProxies.Treasury)]).onTokenBalanceChanged(from, to, amount); // Treasury
             ITokenEventSubscriber(Proxies[uint256(Library.TransparentProxies.PropSettings)]).onTokenBalanceChanged(from, to, amount); // Proposition Settings
+            ITokenEventSubscriber(Proxies[uint256(Library.TransparentProxies.Payments)]).onTokenBalanceChanged(from, to, amount); // Payments
             ITokenEventSubscriber(address(_managerContract)).onTokenBalanceChanged(from, to, amount); // Certificate Pool Manager
+
         }
     }
 

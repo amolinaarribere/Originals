@@ -14,16 +14,21 @@ Before every token transfer we contact the token gouvernance Base contracts so t
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "../Interfaces/IPool.sol";
 import "../Interfaces/ITreasury.sol";
-import "../Base/ManagedBaseContract.sol";
 import "../Base/MultiSigContract.sol";
 import "../Libraries/ItemsLibrary.sol";
 import "../Libraries/UintLibrary.sol";
+import "../Libraries/Library.sol";
+import "../Libraries/AddressLibrary.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+import "../Base/CreditorBaseContract.sol";
+import "../Interfaces/IPayments.sol";
 
-
- contract PublicPool is  Initializable, MultiSigContract, ManagedBaseContract, IPool {
+ contract PublicPool is  Initializable, MultiSigContract, CreditorBaseContract, IPool {
   using ItemsLibrary for *;
   using UintLibrary for *;
+  using Library for *;
+  using AddressLibrary for *;
+
 
   // EVENTS /////////////////////////////////////////
   event _NewIssuerRequest(uint256 indexed id, address owner, string name, string symbol);
@@ -35,6 +40,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
   event _CreditUnAssignedReceived(uint256 indexed NFTMarketId, uint256 indexed tokenID, uint256 amount);
   event _CreditAssigned(uint256 indexed NFTMarketId, uint256 indexed tokenID, address indexed receiver, uint256 amount, uint256 factor);
   event _CreditReused(uint256 indexed NFTMarketId, uint256 indexed tokenID, address indexed creditor, uint256 amount);
+  event _CreditSpent(uint256 indexed NFTMarketId, address indexed from, uint256 amount, address indexed to);
   event _CreditWithdrawn(address indexed withdrawer, uint256 amount);
   event _CreditWithdrawnFor(address indexed withdrawer, uint256 amount, address indexed sender);
 
@@ -52,19 +58,17 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 
   // MODIFIERS /////////////////////////////////////////
-  modifier validOwner(address owner){
-      require(address(0) != owner, "NFT Market owner cannot be address 0");
-      _;
-  }
-
   modifier IssuerPending(uint256 id){
       require(address(0) != _pendingIssuers[id]._issuer._owner, "This issuer id is not pending");
       _;
   }
 
-  modifier validFees(uint256 fee, uint256 decimals){
-      Library.validFees(fee, decimals);
-      _;
+  modifier validIssuerRequest(ItemsLibrary._issuerStruct memory requestedIssuer){
+    require(address(0) != requestedIssuer._owner, "NFT Market owner cannot be address 0");
+    Library.validFees(requestedIssuer._feeAmount, requestedIssuer._feeDecimals);
+    require(0 < bytes(requestedIssuer._name).length, "Name is empty");
+    require(0 < bytes(requestedIssuer._symbol).length, "Symbol is empty");
+     _;
   }
 
   modifier isNFTMarket(uint256 MarketId, address MarketAddress){
@@ -103,36 +107,68 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
   // CONSTRUCTOR /////////////////////////////////////////
   function PublicPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
       super.MultiSigContract_init(owners, minOwners); 
-      super.ManagedBaseContract_init(managerContractAddress); 
+      super.CreditorBaseContract_init(managerContractAddress); 
   }
 
   // FUNCTIONALITY /////////////////////////////////////////
-  function requestIssuer(address owner, string memory name, string memory symbol, uint256 feeAmount, uint256 feeDecimals, Library.PaymentPlans paymentPlan) external override payable
-    validOwner(owner)
-    validFees(feeAmount, feeDecimals)
+  function onCreditReceived(address sender, uint256 amount, bytes memory data) internal override
+  {
+    bytes32[] memory receivedData = Library.BytestoBytes32(data);
+    Library.PublicPoolPaymentTypes paymentType = Library.PublicPoolPaymentTypes(uint256(receivedData[0]));
+
+    if(Library.PublicPoolPaymentTypes.SendCredit == paymentType){
+      address account = AddressLibrary.Bytes32ToAddress(receivedData[1]);
+      ItemsLibrary.addBalance(_creditOfAccount[account], amount, 1);
+      emit _CreditReceived(account, amount, sender);
+    }
+
+    else{
+      uint256 NFTMarketId = UintLibrary.Bytes32ToUint(receivedData[1]);
+      uint256 tokenID = UintLibrary.Bytes32ToUint(receivedData[2]);
+      internalTransferUnassignedCredit(NFTMarketId, tokenID, amount);
+      emit _CreditUnAssignedReceived(NFTMarketId, tokenID, amount);
+    }
+     
+  }
+
+  function requestIssuer(ItemsLibrary._issuerStruct memory requestedIssuer, bool FromCredit) external override
+    validIssuerRequest(requestedIssuer)
   {
 
     uint[] memory Prices = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
     uint256 NewIssuerFee = Prices[uint256(Library.Prices.NewIssuerFee)];
     uint256 AdminNewIssuerFee = Prices[uint256(Library.Prices.AdminNewIssuerFee)];
-    require(msg.value >= NewIssuerFee + AdminNewIssuerFee, "New Issuer Fees not enough");
 
-    ItemsLibrary.TransferEtherTo(NewIssuerFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
-    ItemsLibrary.TransferEtherTo(msg.value - NewIssuerFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)]);
+    if(FromCredit){
+      internalSpendCredit(0, msg.sender, NewIssuerFee,  _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
+      internalSpendCredit(0, msg.sender, AdminNewIssuerFee,  _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)]);
+    }
+    else{
+      IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
+      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], NewIssuerFee, 0, bytes(""));
+      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminNewIssuerFee, 0, bytes(""));
+    }
 
-    uint256 IssuerID = getIssuerIdFromName(name);
+    uint256 IssuerID = getIssuerIdFromName(requestedIssuer._name);
+
+    addPendingIssuer(IssuerID, requestedIssuer);
+
+    emit _NewIssuerRequest(IssuerID, requestedIssuer._owner, requestedIssuer._name, requestedIssuer._symbol);
+  }
+
+  function addPendingIssuer(uint256 IssuerID, ItemsLibrary._issuerStruct memory requestedIssuer) internal
+  {
+
     require(address(0) == _pendingIssuers[IssuerID]._issuer._owner && address(0) == _issuers[IssuerID], "This Issuer Name has already been taken");
 
-    _pendingIssuers[IssuerID]._issuer._owner = owner;
-    _pendingIssuers[IssuerID]._issuer._name = name;
-    _pendingIssuers[IssuerID]._issuer._symbol = symbol;
-    _pendingIssuers[IssuerID]._issuer._feeAmount = feeAmount;
-    _pendingIssuers[IssuerID]._issuer._feeDecimals = feeDecimals;
-    _pendingIssuers[IssuerID]._issuer._paymentPlan = paymentPlan;
+    _pendingIssuers[IssuerID]._issuer._owner = requestedIssuer._owner;
+    _pendingIssuers[IssuerID]._issuer._name = requestedIssuer._name;
+    _pendingIssuers[IssuerID]._issuer._symbol = requestedIssuer._symbol;
+    _pendingIssuers[IssuerID]._issuer._feeAmount = requestedIssuer._feeAmount;
+    _pendingIssuers[IssuerID]._issuer._feeDecimals = requestedIssuer._feeDecimals;
+    _pendingIssuers[IssuerID]._issuer._paymentPlan = requestedIssuer._paymentPlan;
     _pendingIssuers[IssuerID]._pendingId = _listOfPendingIssuers.length;
     _listOfPendingIssuers.push(IssuerID);
-
-    emit _NewIssuerRequest(IssuerID, owner, name, symbol);
   }
 
   function getIssuerIdFromName(string memory name) internal pure returns(uint256)
@@ -224,18 +260,15 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
   // Credit Functionality
 
-  function sendCredit(address addr) external override payable
+  function sendCredit(address addr, uint256 amount) external override
   {
-    ItemsLibrary.addBalance(_creditOfAccount[addr], msg.value, 1);
-    emit _CreditReceived(addr, msg.value, msg.sender);
-  }
+    bytes32[] memory dataArray = new bytes32[](3);
+    dataArray[0] = UintLibrary.UintToBytes32(uint256(Library.PublicPoolPaymentTypes.SendCredit));
+    dataArray[1] = AddressLibrary.AddressToBytes32(addr);
+    bytes memory data = Library.Bytes32ArrayToBytes(dataArray);
 
-  function transferUnassignedCredit(uint256 NFTMarketId, uint256 tokenID) external override payable
-    isNFTMarket(NFTMarketId, msg.sender)
-    isTokenUnassignedCreditEmpty(NFTMarketId, tokenID)
-  {
-    internalTransferUnassignedCredit(NFTMarketId, tokenID, msg.value);
-    emit _CreditUnAssignedReceived(NFTMarketId, tokenID, msg.value);
+    IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
+    payments.TransferFrom(msg.sender, address(this), amount, 0, data);
   }
 
   function addCredit(uint256 NFTMarketId, uint256 tokenID, address[] calldata addrs, uint256[] calldata amounts, uint256[] calldata factors) external override
@@ -254,27 +287,56 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
     isNFTMarket(NFTMarketId, msg.sender)
     isTokenUnassignedCreditEmpty(NFTMarketId, tokenID)
   {
-    ItemsLibrary.InternalWithdraw(_creditOfAccount[addr], amount, address(0), false);
+    ItemsLibrary.InternalWithdraw(
+      _creditOfAccount[addr], 
+      amount, 
+      address(0), 
+      false, 
+      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+      false,
+      bytes("")
+    );
     internalTransferUnassignedCredit(NFTMarketId, tokenID, amount);
     emit _CreditReused(NFTMarketId, tokenID, addr, amount);
   }
 
+  function spendCredit(uint256 NFTMarketId, address from, uint256 amount, address to) external override
+    isNFTMarket(NFTMarketId, msg.sender)
+  {
+    internalSpendCredit(NFTMarketId, from, amount, to);
+  }
+
+  function internalSpendCredit(uint256 NFTMarketId, address from, uint256 amount, address to) internal 
+  {
+    bytes memory emptyData = bytes("");
+    ItemsLibrary.InternalWithdraw(  
+      _creditOfAccount[from], 
+      amount, 
+      to, 
+      true, 
+      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+      true,
+      bytes("")
+    );
+    emit _CreditSpent(NFTMarketId, from, amount, to);
+  }
+
   function withdraw(uint amount) external override
   {
-    internalWithdraw(msg.sender, amount, address(0));
+    internalWithdraw(msg.sender, amount, address(0), false, bytes(""));
   }
   
   function withdrawAll() external override
   {
     uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[msg.sender]);
-    internalWithdraw(msg.sender, amount, address(0));
+    internalWithdraw(msg.sender, amount, address(0), false, bytes(""));
   }
   
-  function withdrawAllFor(uint256 NFTMarketId, address addr) external override
+  function withdrawAllFor(uint256 NFTMarketId, address addr, bytes memory data) external override
     isNFTMarket(NFTMarketId, msg.sender)
   {
     uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[addr]);
-    internalWithdraw(addr, amount, msg.sender);
+    internalWithdraw(addr, amount, msg.sender, true, data);
   }
 
   function internalTransferUnassignedCredit(uint256 NFTMarketId, uint256 tokenID, uint256 amount) internal
@@ -282,9 +344,17 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
       _unassignedCreditForMarket[NFTMarketId][tokenID] = amount;
   }
 
-  function internalWithdraw(address addr, uint amount, address sender) internal
+  function internalWithdraw(address addr, uint amount, address sender, bool sendData, bytes memory data) internal
   {
-    ItemsLibrary.InternalWithdraw(_creditOfAccount[addr], amount, addr, true);
+    ItemsLibrary.InternalWithdraw(
+      _creditOfAccount[addr], 
+      amount, 
+      addr, 
+      true, 
+      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+      sendData,
+      data
+    );
     if(address(0) != sender) emit _CreditWithdrawnFor(addr, amount, sender);
     else emit _CreditWithdrawn(addr, amount);
   }

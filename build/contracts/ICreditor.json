@@ -1,0 +1,375 @@
+{
+  "contractName": "ICreditor",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "name": "CreditReceived",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"CreditReceived\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Store & retrieve value in a variable\",\"kind\":\"dev\",\"methods\":{},\"title\":\"Storage\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces/ICreditor.sol\":\"ICreditor\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"project:/contracts/Interfaces/ICreditor.sol\":{\"keccak256\":\"0xe464388741c620b8d842f19c9ac8ccebf22351f8c94a2e9a76b2e91f7c193588\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://ef552f5b31f6fb41b61c4fb7f9eafc68c90e4c3f6edb6516fc7921340127ad38\",\"dweb:/ipfs/QmdptDw3LEc3bJmmvGqV2z5TRW1orSvafXExvffQ3NYYer\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\n\r\n\r\ninterface ICreditor{\r\n    function CreditReceived(address sender, uint256 amount, bytes memory data) external;\r\n}",
+  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Originals\\contracts\\Interfaces\\ICreditor.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/Interfaces/ICreditor.sol",
+    "exportedSymbols": {
+      "ICreditor": [
+        6640
+      ]
+    },
+    "id": 6641,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 6629,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".7"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "39:22:34"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 6630,
+          "nodeType": "StructuredDocumentation",
+          "src": "65:73:34",
+          "text": " @title Storage\n @dev Store & retrieve value in a variable"
+        },
+        "fullyImplemented": false,
+        "id": 6640,
+        "linearizedBaseContracts": [
+          6640
+        ],
+        "name": "ICreditor",
+        "nameLocation": "156:9:34",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "2f02a3ec",
+            "id": 6639,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "CreditReceived",
+            "nameLocation": "181:14:34",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6637,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6632,
+                  "mutability": "mutable",
+                  "name": "sender",
+                  "nameLocation": "204:6:34",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6639,
+                  "src": "196:14:34",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 6631,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "196:7:34",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6634,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nameLocation": "220:6:34",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6639,
+                  "src": "212:14:34",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 6633,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "212:7:34",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6636,
+                  "mutability": "mutable",
+                  "name": "data",
+                  "nameLocation": "241:4:34",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6639,
+                  "src": "228:17:34",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 6635,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "228:5:34",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "195:51:34"
+            },
+            "returnParameters": {
+              "id": 6638,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "255:0:34"
+            },
+            "scope": 6640,
+            "src": "172:84:34",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 6641,
+        "src": "146:113:34",
+        "usedErrors": []
+      }
+    ],
+    "src": "39:220:34"
+  },
+  "legacyAST": {
+    "absolutePath": "project:/contracts/Interfaces/ICreditor.sol",
+    "exportedSymbols": {
+      "ICreditor": [
+        6640
+      ]
+    },
+    "id": 6641,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 6629,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".7"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "39:22:34"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 6630,
+          "nodeType": "StructuredDocumentation",
+          "src": "65:73:34",
+          "text": " @title Storage\n @dev Store & retrieve value in a variable"
+        },
+        "fullyImplemented": false,
+        "id": 6640,
+        "linearizedBaseContracts": [
+          6640
+        ],
+        "name": "ICreditor",
+        "nameLocation": "156:9:34",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "2f02a3ec",
+            "id": 6639,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "CreditReceived",
+            "nameLocation": "181:14:34",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6637,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6632,
+                  "mutability": "mutable",
+                  "name": "sender",
+                  "nameLocation": "204:6:34",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6639,
+                  "src": "196:14:34",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 6631,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "196:7:34",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6634,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nameLocation": "220:6:34",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6639,
+                  "src": "212:14:34",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 6633,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "212:7:34",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6636,
+                  "mutability": "mutable",
+                  "name": "data",
+                  "nameLocation": "241:4:34",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 6639,
+                  "src": "228:17:34",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 6635,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "228:5:34",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "195:51:34"
+            },
+            "returnParameters": {
+              "id": 6638,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "255:0:34"
+            },
+            "scope": 6640,
+            "src": "172:84:34",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 6641,
+        "src": "146:113:34",
+        "usedErrors": []
+      }
+    ],
+    "src": "39:220:34"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.7+commit.e28d00a7.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.3",
+  "updatedAt": "2022-02-24T07:26:35.778Z",
+  "devdoc": {
+    "details": "Store & retrieve value in a variable",
+    "kind": "dev",
+    "methods": {},
+    "title": "Storage",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

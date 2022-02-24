@@ -23,9 +23,11 @@ import "../Libraries/ItemsLibrary.sol";
 import "../Libraries/Library.sol";
 import "../Base/StdPropositionBaseContract.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "../Base/CreditorBaseContract.sol";
+import "../Interfaces/IPayments.sol";
 
 
-contract Treasury is ITreasury, StdPropositionBaseContract{
+contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract{
     using Library for *;
     using UintLibrary for *;
     using ItemsLibrary for *;
@@ -83,11 +85,11 @@ contract Treasury is ITreasury, StdPropositionBaseContract{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    receive() external payable
+    function onCreditReceived(address sender, uint256 amount, bytes memory data) internal override
     {
-        _AggregatedDividendAmount += msg.value;
+        _AggregatedDividendAmount += amount;
 
-        emit _Pay(msg.sender, msg.value, _AggregatedDividendAmount);
+        emit _Pay(sender, amount, _AggregatedDividendAmount);
     }
 
     function InternalonTokenBalanceChanged(address from, address to, uint256 amount) internal override
@@ -123,7 +125,15 @@ contract Treasury is ITreasury, StdPropositionBaseContract{
     function InternalWithdraw(uint amount) internal 
     {
         InternalAssignDividends(msg.sender);
-        ItemsLibrary.InternalWithdraw(_balances[msg.sender], amount, msg.sender, true);
+        ItemsLibrary.InternalWithdraw(
+            _balances[msg.sender], 
+            amount, 
+            msg.sender, 
+            true, 
+            IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings(),
+            false,
+            bytes("")
+        );
 
         emit _Withdraw(msg.sender, amount);
     }

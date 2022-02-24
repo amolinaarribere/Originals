@@ -7,6 +7,10 @@ const multisigcontract = require("../test_libraries/MultiSigContract.js");
 const AdminPiggyBank = artifacts.require("AdminPiggyBank");
 const AdminPiggyBankAbi = AdminPiggyBank.abi;
 
+const MockDai = artifacts.require("MockDai");
+const MockDaiAbi = MockDai.abi;
+
+
 
 const Gas = constants.Gas;
 
@@ -18,6 +22,7 @@ const Gas = constants.Gas;
 contract("Testing Admin Piggy Bank",function(accounts){
     var manager;
     var adminPiggyBankProxy;
+    var mockdai;
 
     // used addresses
     const chairPerson = accounts[0];
@@ -27,6 +32,8 @@ contract("Testing Admin Piggy Bank",function(accounts){
     const extra_owner = accounts[5];
     const address_0 = "0x0000000000000000000000000000000000000000";
     const MustBeOwner = new RegExp("EC9-");
+    const HasAlreadyVoted = new RegExp("EC5-");
+
 
     const CannotTransferToAddress0 = new RegExp("We cannot transfer to address 0");
     const CannotTransferMoreThan = new RegExp("We cannot transfer more than the current balance");
@@ -38,6 +45,8 @@ contract("Testing Admin Piggy Bank",function(accounts){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         manager = contracts[0];
         adminPiggyBankProxy = new web3.eth.Contract(AdminPiggyBankAbi, contracts[1][4]);
+        mockdai = new web3.eth.Contract(MockDaiAbi, contracts[2][7]);
+
     });
 
     // ****** TESTING Adding Owners ***************************************************************** //
@@ -84,8 +93,8 @@ contract("Testing Admin Piggy Bank",function(accounts){
 
     // ****** Testing Settings Configuration ***************************************************************** //
     it("Admin Piggy Bank Transfer Wrong",async function(){
-        let amount = new BigNumber("1000000000000000000");
-        await web3.eth.sendTransaction({from:user_1 , to:adminPiggyBankProxy._address, value:amount});
+        let amount = new BigNumber("10000");
+        await mockdai.methods.transfer(adminPiggyBankProxy._address, amount).send({from: user_1, gas: Gas}, function(error, result){});
         try{
             await adminPiggyBankProxy.methods.transfer(address_0, amount).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
             expect.fail();
@@ -119,7 +128,58 @@ contract("Testing Admin Piggy Bank",function(accounts){
         catch(error){
             expect(error.message).to.match(TransferInProgress);
         }
+        try{
+            await adminPiggyBankProxy.methods.approve().send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(MustBeOwner);
+        }
+        try{
+            await adminPiggyBankProxy.methods.reject().send({from: user_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(MustBeOwner);
+        }
+        try{
+            await adminPiggyBankProxy.methods.approve().send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(HasAlreadyVoted);
+        }
+        try{
+            await adminPiggyBankProxy.methods.reject().send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(HasAlreadyVoted);
+        }
        
+    });
+
+    it("Admin Piggy Bank Transfer Correct",async function(){
+        let amount = new BigNumber("10000");
+        let transferAmount = amount.dividedBy(2);
+
+        let initialBalance = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
+        await mockdai.methods.transfer(adminPiggyBankProxy._address, amount).send({from: user_1, gas: Gas}, function(error, result){});
+        await adminPiggyBankProxy.methods.transfer(chairPerson, transferAmount).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+        await adminPiggyBankProxy.methods.reject().send({from: PublicOwners[1], gas: Gas}, function(error, result){});
+        await adminPiggyBankProxy.methods.reject().send({from: PublicOwners[2], gas: Gas}, function(error, result){});
+        let finalBalance = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
+        expect(initialBalance.toString()).to.equal("0");
+        expect(finalBalance.toString()).to.equal("0");
+
+        await adminPiggyBankProxy.methods.transfer(chairPerson, transferAmount).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+        await adminPiggyBankProxy.methods.approve().send({from: PublicOwners[1], gas: Gas}, function(error, result){});
+        finalBalance = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
+        expect(finalBalance.toString()).to.equal(transferAmount.toString());
     });
 
 });

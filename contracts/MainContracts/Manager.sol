@@ -13,6 +13,7 @@ Transparent Proxies:
     - 3 : Originals Token
     - 4 : Proposition Settings
     - 5 : Admin Piggy Bank
+    - 6 : Payments
 
 Beacons:
     - 0 : NFT
@@ -109,8 +110,8 @@ contract Manager is IManager, StdPropositionBaseContract{
         for(uint i=0; i < initialContracts.TransparentAddresses.length; i++){
             addTransparentProxy(initialContracts.TransparentAddresses[i], initialContracts.TransparentData[i]);
         }
-        for(uint i=0; i < initialContracts.BeaconAddresses.length; i++){
-            addBeacon(initialContracts.BeaconAddresses[i]);
+        for(uint j=0; j < initialContracts.BeaconAddresses.length; j++){
+            addBeacon(initialContracts.BeaconAddresses[j]);
         }
     }
 

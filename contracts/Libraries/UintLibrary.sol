@@ -6,10 +6,7 @@ pragma solidity 0.8.7;
  Uint data type common functionality
  */
 
-import "./Library.sol";
-
 library UintLibrary{
-    using Library for *;
 
     // AUX FUNCTIONALITY /////////////////////////////////////////
     function FindUintPosition(uint value, uint[] memory list) public pure returns (uint)

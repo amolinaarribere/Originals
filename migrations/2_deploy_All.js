@@ -1,13 +1,21 @@
 const BigNumber = require('bignumber.js');
+let ExternalRegistries = require("./ExternalRegistries.js");
 
-let Manager = artifacts.require("./DeployedContracts/Manager");
-let Treasury = artifacts.require("./DeployedContracts/Treasury");
-let PublicPool = artifacts.require("./DeployedContracts/PublicPool");
-let NFTMarket = artifacts.require("./DeployedContracts/NFTMarket");
-let OriginalsToken = artifacts.require("./DeployedContracts/OriginalsToken");
-let PropositionSettings = artifacts.require("./DeployedContracts/PropositionSettings");
-let AdminPiggyBank = artifacts.require("./DeployedContracts/AdminPiggyBank");
+let Manager = artifacts.require("./MainContracts/Manager");
+let Treasury = artifacts.require("./MainContracts/Treasury");
+let PublicPool = artifacts.require("./MainContracts/PublicPool");
+let NFTMarket = artifacts.require("./MainContracts/NFTMarket");
+let OriginalsToken = artifacts.require("./MainContracts/OriginalsToken");
+let PropositionSettings = artifacts.require("./MainContracts/PropositionSettings");
+let AdminPiggyBank = artifacts.require("./MainContracts/AdminPiggyBank");
+let Payments = artifacts.require("./MainContracts/Payments");
 let TransparentUpgradeableProxy = artifacts.require("@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol")
+
+//Mock
+let MockDai = artifacts.require("./Mock/MockDai");
+const MockName = "Mock Dai";
+const MockSymbol = "MDA";
+const MockSupply = new BigNumber("1000000000000000000000000000");
 
 const ManagerAbi = Manager.abi;
 const TransparentUpgradeableProxyAbi = TransparentUpgradeableProxy.abi;
@@ -27,10 +35,10 @@ const TokenName = "OriginalsToken";
 const TokenSymbol = "ORI";
 const TokenSupply = 100000000;
 const TokenDecimals = 0;
-const NewIssuerFee = new BigNumber("500000000000000000");
-const AdminNewIssuerFee = new BigNumber("250000000000000000");
-const MintingFee = new BigNumber("100000000000000000");
-const AdminMintingFee = new BigNumber("50000000000000000");
+const NewIssuerFee = new BigNumber("100000000000000000000");
+const AdminNewIssuerFee = new BigNumber("50000000000000000000");
+const MintingFee = new BigNumber("1000000000000000000");
+const AdminMintingFee = new BigNumber("500000000000000000");
 const TransferFeeAmount = 55;
 const TransferFeeDecimals = 1;
 const AdminTransferFeeAmount = 1;
@@ -41,6 +49,8 @@ const Prices = [NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee, Tr
 const PublicMinOwners = 1;
 
 module.exports = async function(deployer, network, accounts){
+  let TokenContractAddress = await ExternalRegistries.GetTokenContractAddress(network, deployer, MockDai, MockName, MockSymbol, MockSupply, accounts[0]);
+  
   const PublicOwners = [accounts[0]];
 
   // Libraries -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -48,15 +58,9 @@ module.exports = async function(deployer, network, accounts){
   LibraryInstance = await Library.deployed();
   console.log("Library deployed");
 
-  await deployer.link(Library, UintLibrary);
-  console.log("Library linked to Uint Library");
-
   await deployer.deploy(UintLibrary);
   UintLibraryInstance = await UintLibrary.deployed();
   console.log("UintLibrary deployed");
-
-  await deployer.link(Library, AddressLibrary);
-  console.log("Library linked to Address Library");
 
   await deployer.deploy(AddressLibrary);
   AddressLibraryInstance = await AddressLibrary.deployed();
@@ -148,6 +152,11 @@ module.exports = async function(deployer, network, accounts){
         "internalType": "uint256",
         "name": "minOwners",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "managerContractAddress",
+        "type": "address"
       }
     ],
     "name": "AdminPiggyBank_init",
@@ -156,7 +165,7 @@ module.exports = async function(deployer, network, accounts){
     "type": "function"
   };
 
-  var AdminPiggyBankProxyInitializerParameters = [PublicOwners, PublicMinOwners];
+  var AdminPiggyBankProxyInitializerParameters = [PublicOwners, PublicMinOwners, ManagerProxyAddress];
   var AdminPiggyBankProxyData = web3.eth.abi.encodeFunctionCall(AdminPiggyBankProxyInitializerMethod, AdminPiggyBankProxyInitializerParameters);
 
   
@@ -359,6 +368,47 @@ module.exports = async function(deployer, network, accounts){
   var PublicPoolProxyInitializerParameters = [PublicOwners, PublicMinOwners, ManagerProxyAddress];
   var PublicPoolProxyData = web3.eth.abi.encodeFunctionCall(PublicPoolProxyInitializerMethod, PublicPoolProxyInitializerParameters);
   
+ // Payment -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ await deployer.link(Library, Payments);
+ console.log("Library linked to Payments");
+
+ await deployer.link(UintLibrary, Payments);
+ console.log("Uint Library linked to Payments");
+
+ await deployer.link(AddressLibrary, Payments);
+ console.log("AddressLibrary linked to Payments");
+
+ await deployer.deploy(Payments);
+ PaymentsInstance = await Payments.deployed();
+ console.log("Payments deployed : " + PaymentsInstance.address);
+
+ var PaymentsProxyInitializerMethod = {
+  "inputs": [
+    {
+      "internalType": "address",
+      "name": "managerContractAddress",
+      "type": "address"
+    },
+    {
+      "internalType": "address",
+      "name": "chairPerson",
+      "type": "address"
+    },
+    {
+      "internalType": "address",
+      "name": "tokenAddress",
+      "type": "address"
+    }
+  ],
+  "name": "Payments_init",
+  "outputs": [],
+  "stateMutability": "nonpayable",
+  "type": "function"
+};
+ var PaymentsProxyInitializerParameters = [ManagerProxyAddress, accounts[0], TokenContractAddress]
+ var PaymentsProxyData = web3.eth.abi.encodeFunctionCall(PaymentsProxyInitializerMethod, PaymentsProxyInitializerParameters);
+ 
+
  await ManagerProxyInstance.methods.InitializeContracts(
   obj.returnUpgradeObject(PublicPoolInstance.address,
       TreasuryInstance.address,
@@ -366,11 +416,13 @@ module.exports = async function(deployer, network, accounts){
       PropositionSettingsInstance.address,
       AdminPiggyBankInstance.address,
       NFTMarketInstance.address, 
+      PaymentsInstance.address,
       PublicPoolProxyData, 
       TreasuryProxyData, 
       OriginalsProxyData, 
       PropositionSettingsProxyData, 
-      AdminPiggyBankProxyData),
+      AdminPiggyBankProxyData,
+      PaymentsProxyData),
       ManagerProxyAddress).send({from: accounts[0], gas: Gas});
 
   console.log("Manager initialized");
@@ -412,6 +464,9 @@ module.exports = async function(deployer, network, accounts){
 
   console.log("AdminPiggyBank Proxy Address : " + TransparentProxies[i]);
   console.log("AdminPiggyBank Address : " + TransparentImpl[i++]);
+
+  console.log("Payments Proxy Address : " + TransparentProxies[i]);
+  console.log("Payments Address : " + TransparentImpl[i++]);
 
 
   let j=0;
