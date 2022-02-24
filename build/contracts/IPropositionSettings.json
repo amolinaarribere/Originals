@@ -25,7 +25,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"retrieveSettings\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces/IPropositionSettings.sol\":\"IPropositionSettings\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"project:/contracts/Interfaces/IPropositionSettings.sol\":{\"keccak256\":\"0xf7929fa0cb7c851c7a9a401f500c12c025dca9e3744436a026841dcc849a9b2b\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://6fae61f086d20d6d07354e3f5b8e89f87693a81869dd56e8e039598106b8abd9\",\"dweb:/ipfs/QmWNxV3uA9iqXkUdxT1YYuGRDWH6BtYDzm2vP9rbeuxGxr\"]},\"project:/contracts/Libraries/Library.sol\":{\"keccak256\":\"0xee63f5339dfc36407d2b4ba57e7af84d8938ed3cc6cb0360ecb84bf654cc1f8e\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://23a7081badfabb4366bbc1c7788fe85e3f652a608fa29fd45ce864685ebcb9f2\",\"dweb:/ipfs/QmT3LDFTLHDWRppwqgjixnAdEyGmJ6y8tEVnC4xKUWizkS\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"retrieveSettings\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces/IPropositionSettings.sol\":\"IPropositionSettings\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"keccak256\":\"0x61437cb513a887a1bbad006e7b1c8b414478427d33de47c5600af3c748f108da\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://2c3d0973630ed74f2b5ce3944677a885dc70ec32fc83b35f55045a10224da32b\",\"dweb:/ipfs/QmbefZ5RoEZKNHXCALfh683PnaNYzKPcKMFjyY1DVAgq8A\"]},\"project:/contracts/Interfaces/IPropositionSettings.sol\":{\"keccak256\":\"0xf7929fa0cb7c851c7a9a401f500c12c025dca9e3744436a026841dcc849a9b2b\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://6fae61f086d20d6d07354e3f5b8e89f87693a81869dd56e8e039598106b8abd9\",\"dweb:/ipfs/QmWNxV3uA9iqXkUdxT1YYuGRDWH6BtYDzm2vP9rbeuxGxr\"]},\"project:/contracts/Libraries/Library.sol\":{\"keccak256\":\"0x604d21b96d7b4a209dc833762d666bcffb551d81616c4fb6396985646e02ce1c\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://8f91ff6dc519ecf296cfa73c38ac5d4d3b83bfd258031959cb05c20e6585ed01\",\"dweb:/ipfs/QmadTtANMHWrnJAcHsnUZWA1mbTKgpwLXF7bFURxTduXfL\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -38,19 +38,22 @@
   "ast": {
     "absolutePath": "project:/contracts/Interfaces/IPropositionSettings.sol",
     "exportedSymbols": {
+      "IERC20": [
+        3971
+      ],
       "IPropositionSettings": [
-        7048
+        7049
       ],
       "Library": [
-        7877
+        7885
       ]
     },
-    "id": 7049,
+    "id": 7050,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 7037,
+        "id": 7038,
         "literals": [
           "solidity",
           "0.8",
@@ -62,11 +65,11 @@
       {
         "absolutePath": "project:/contracts/Libraries/Library.sol",
         "file": "../Libraries/Library.sol",
-        "id": 7038,
+        "id": 7039,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 7049,
-        "sourceUnit": 7878,
+        "scope": 7050,
+        "sourceUnit": 7886,
         "src": "143:34:40",
         "symbolAliases": [],
         "unitAlias": ""
@@ -77,9 +80,9 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 7048,
+        "id": 7049,
         "linearizedBaseContracts": [
-          7048
+          7049
         ],
         "name": "IPropositionSettings",
         "nameLocation": "192:20:40",
@@ -87,7 +90,7 @@
         "nodes": [
           {
             "functionSelector": "b049473f",
-            "id": 7047,
+            "id": 7048,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -95,23 +98,23 @@
             "nameLocation": "232:16:40",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 7039,
+              "id": 7040,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "248:2:40"
             },
             "returnParameters": {
-              "id": 7046,
+              "id": 7047,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 7041,
+                  "id": 7042,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 7047,
+                  "scope": 7048,
                   "src": "273:7:40",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -120,7 +123,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 7040,
+                    "id": 7041,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "273:7:40",
@@ -133,12 +136,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 7043,
+                  "id": 7044,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 7047,
+                  "scope": 7048,
                   "src": "282:7:40",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -147,7 +150,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 7042,
+                    "id": 7043,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "282:7:40",
@@ -160,12 +163,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 7045,
+                  "id": 7046,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 7047,
+                  "scope": 7048,
                   "src": "291:7:40",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -174,7 +177,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 7044,
+                    "id": 7045,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "291:7:40",
@@ -188,14 +191,14 @@
               ],
               "src": "272:27:40"
             },
-            "scope": 7048,
+            "scope": 7049,
             "src": "223:77:40",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 7049,
+        "scope": 7050,
         "src": "182:123:40",
         "usedErrors": []
       }
@@ -205,19 +208,22 @@
   "legacyAST": {
     "absolutePath": "project:/contracts/Interfaces/IPropositionSettings.sol",
     "exportedSymbols": {
+      "IERC20": [
+        3971
+      ],
       "IPropositionSettings": [
-        7048
+        7049
       ],
       "Library": [
-        7877
+        7885
       ]
     },
-    "id": 7049,
+    "id": 7050,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 7037,
+        "id": 7038,
         "literals": [
           "solidity",
           "0.8",
@@ -229,11 +235,11 @@
       {
         "absolutePath": "project:/contracts/Libraries/Library.sol",
         "file": "../Libraries/Library.sol",
-        "id": 7038,
+        "id": 7039,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 7049,
-        "sourceUnit": 7878,
+        "scope": 7050,
+        "sourceUnit": 7886,
         "src": "143:34:40",
         "symbolAliases": [],
         "unitAlias": ""
@@ -244,9 +250,9 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 7048,
+        "id": 7049,
         "linearizedBaseContracts": [
-          7048
+          7049
         ],
         "name": "IPropositionSettings",
         "nameLocation": "192:20:40",
@@ -254,7 +260,7 @@
         "nodes": [
           {
             "functionSelector": "b049473f",
-            "id": 7047,
+            "id": 7048,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -262,23 +268,23 @@
             "nameLocation": "232:16:40",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 7039,
+              "id": 7040,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "248:2:40"
             },
             "returnParameters": {
-              "id": 7046,
+              "id": 7047,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 7041,
+                  "id": 7042,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 7047,
+                  "scope": 7048,
                   "src": "273:7:40",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -287,7 +293,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 7040,
+                    "id": 7041,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "273:7:40",
@@ -300,12 +306,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 7043,
+                  "id": 7044,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 7047,
+                  "scope": 7048,
                   "src": "282:7:40",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -314,7 +320,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 7042,
+                    "id": 7043,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "282:7:40",
@@ -327,12 +333,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 7045,
+                  "id": 7046,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 7047,
+                  "scope": 7048,
                   "src": "291:7:40",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -341,7 +347,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 7044,
+                    "id": 7045,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "291:7:40",
@@ -355,14 +361,14 @@
               ],
               "src": "272:27:40"
             },
-            "scope": 7048,
+            "scope": 7049,
             "src": "223:77:40",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 7049,
+        "scope": 7050,
         "src": "182:123:40",
         "usedErrors": []
       }
@@ -375,7 +381,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.3",
-  "updatedAt": "2022-02-24T09:15:08.269Z",
+  "updatedAt": "2022-02-24T14:33:05.503Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

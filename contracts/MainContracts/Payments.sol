@@ -17,27 +17,33 @@ import "../Base/StdPropositionBaseContract.sol";
 
 contract Payments is IPayments, StdPropositionBaseContract{
     using UintLibrary for *;
+    using Library for *;
 
     // EVENTS /////////////////////////////////////////
     event _NewAddresses(address[] TokenAddresses);
 
     // DATA /////////////////////////////////////////
-    mapping(uint256 => IERC20) internal _TokenContracts;
-    uint256[] internal _TokenContractsId;
-    uint256 internal _lastTokenContractId;
-    //IERC20 internal _TokenContract;
+    Library.PaymentTokenStruct[] _Tokens;
 
     // MODIFIERS /////////////////////////////////////////
     modifier areAddressesOK(bytes[] memory NewValues)
     {
-        if(NewValues.length > _TokenContractsId.length){
-            for(uint256 i=0; i < NewValues.length; i++){
-                require(address(0) != AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[i])[0]), "EC21-");
+        require(NewValues.length > 0, "At least one token address must be provided");
+
+        if(NewValues.length > _Tokens.length){
+            for(uint256 i=_Tokens.length; i < NewValues.length; i++){
+                require(address(0) != AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[i])[0]), "New Token addresses cannot be empty");
             }
         }
         else{
-            require(NewValues.length > 0, "At least one token address must be provided");
-            require(address(0) != AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[0])[0]), "EC21-");
+            bool AtLeastOneActiveToken = false;
+            for(uint256 i=0; i < NewValues.length; i++){
+                if(address(0) != AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[i])[0])) {
+                    AtLeastOneActiveToken = true;
+                    break;
+                }
+            }
+            require(AtLeastOneActiveToken, "EC21-");
         }
         _;
     }
@@ -62,7 +68,9 @@ contract Payments is IPayments, StdPropositionBaseContract{
 
     modifier isTokenIdOK(uint256 tokenId)
     {
-        require(tokenId < _TokenContractsId.length, "this token Id does not have a corresponding Token address");
+        require(tokenId < _Tokens.length && 
+            address(0) != address(_Tokens[tokenId].TokenContract), "this token Id does not have a corresponding Token address");
+        require(true == _Tokens[tokenId].active, "this token Id is not active");
         _;
     }
    
@@ -92,28 +100,20 @@ contract Payments is IPayments, StdPropositionBaseContract{
 
     function InternalupdateSettings(address[] memory tokenAddresses) internal
     {
-        uint256[] memory idsToRemove = new uint256[](_TokenContractsId.length);
-        uint256 lastId;
-
-        for(uint256 i=0; i < _TokenContractsId.length; i++){
-            if(i < tokenAddresses.length && address(0) != tokenAddresses[i]) _TokenContracts[_TokenContractsId[i]] = IERC20(tokenAddresses[i]);
-            else delete(_TokenContracts[_TokenContractsId[i]]);
-            if(address(0) == address(_TokenContracts[_TokenContractsId[i]])){
-                idsToRemove[lastId] = i;
-                lastId++;
+        for(uint256 i=0; i < _Tokens.length; i++){
+            if(i < tokenAddresses.length && address(0) != tokenAddresses[i]) {
+                _Tokens[i].TokenContract = IERC20(tokenAddresses[i]);
+                if(!_Tokens[i].active)_Tokens[i].active = true;
+            }
+            else{
+                if(_Tokens[i].active)_Tokens[i].active = false;
             }
         }
 
-        for(uint256 k=_TokenContractsId.length; k < tokenAddresses.length; k++){
-            _TokenContractsId.push(_lastTokenContractId);
-            _TokenContracts[_lastTokenContractId] = IERC20(tokenAddresses[k]);
-            _lastTokenContractId++;
+        for(uint256 k=_Tokens.length; k < tokenAddresses.length; k++){
+            _Tokens[k].TokenContract = IERC20(tokenAddresses[k]);
+            _Tokens[k].active = true;
         }
-
-        for(uint256 j=0; j < lastId; j++){
-            UintLibrary.UintArrayRemoveResize(idsToRemove[j], _TokenContractsId);
-        }
-
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
@@ -121,25 +121,21 @@ contract Payments is IPayments, StdPropositionBaseContract{
         isFromCertifiedContract(msg.sender, MarketId)
         isTokenIdOK(tokenId)
     {
-        require(_TokenContracts[_TokenContractsId[tokenId]].allowance(sender, address(this)) >= amount, "Contract does not have enough approved funds");
-        bool success = _TokenContracts[_TokenContractsId[tokenId]].transferFrom(sender, recipient, amount);
+        require(_Tokens[tokenId].TokenContract.allowance(sender, address(this)) >= amount, "Contract does not have enough approved funds");
+        bool success = _Tokens[tokenId].TokenContract.transferFrom(sender, recipient, amount);
         require(true == success, "Transfer From did not work");
         ICreditor(recipient).CreditReceived(sender, amount, data);
     }
 
     function BalanceOf(address account, uint256 tokenId) external override view returns(uint256)
     {
-        if(tokenId >= _TokenContractsId.length) return 0;
-        return(_TokenContracts[_TokenContractsId[tokenId]].balanceOf(account));
+        if(tokenId >= _Tokens.length || address(0) == address(_Tokens[tokenId].TokenContract)) return 0;
+        return(_Tokens[tokenId].TokenContract.balanceOf(account));
     }
 
-    function retrieveSettings() external override view returns(address[] memory)
+    function retrieveSettings() external override view returns(Library.PaymentTokenStruct[] memory)
     {
-        address[] memory tokenAddresses = new address[](_TokenContractsId.length);
-        for(uint256 i=0; i < _TokenContractsId.length; i++){
-            tokenAddresses[i] = address(_TokenContracts[_TokenContractsId[i]]);
-        }
-        return(tokenAddresses);
+        return(_Tokens);
     }
 
 }

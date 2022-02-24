@@ -101,7 +101,7 @@ contract AdminPiggyBank is Initializable, MultiSigContract, CreditorBaseContract
                 ItemsLibrary.TransferTo(
                     _transferInProgress._amount, 
                     _transferInProgress._to, 
-                    IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0],
+                    address(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0].TokenContract),
                     false,
                     bytes("")
                 );

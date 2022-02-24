@@ -292,7 +292,7 @@ import "../Interfaces/IPayments.sol";
       amount, 
       address(0), 
       false, 
-      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0],
+      address(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0].TokenContract),
       false,
       bytes("")
     );
@@ -314,7 +314,7 @@ import "../Interfaces/IPayments.sol";
       amount, 
       to, 
       true, 
-      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0],
+      address(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0].TokenContract),
       true,
       bytes("")
     );
@@ -351,7 +351,7 @@ import "../Interfaces/IPayments.sol";
       amount, 
       addr, 
       true, 
-      IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0],
+      address(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0].TokenContract),
       sendData,
       data
     );

@@ -33,6 +33,10 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
     using ItemsLibrary for *;
 
     // EVENTS /////////////////////////////////////////
+    /*event _NewPrices(uint[] Prices, address tokenContract);
+    event _Pay(address indexed Payer, uint Amount, uint AggregatedAmount, address tokenContract);
+    event _AssignDividend(address indexed Recipient, uint Amount, uint TotalSupply, address tokenContract);
+    event _Withdraw(address indexed Recipient, uint Amount, address tokenContract);*/
     event _NewPrices(uint[] Prices);
     event _Pay(address indexed Payer, uint Amount, uint AggregatedAmount);
     event _AssignDividend(address indexed Recipient, uint Amount, uint TotalSupply);
@@ -40,13 +44,17 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
 
     // DATA /////////////////////////////////////////
     // prices parameters usd
+    //mapping(uint256 => uint256[]) private _Prices;
     uint256[] private _Prices;
 
     // last amount at which dividends where assigned for each token owner
+    //mapping(uint256 => uint256) private _AggregatedDividendAmount;
     uint256 private _AggregatedDividendAmount;
+    //mapping(uint256 => mapping(address => uint256)) private _lastAssigned;
     mapping(address => uint256) private _lastAssigned;
 
     // dividends per token owner
+    //mapping(uint256 => mapping(address => ItemsLibrary._BalanceStruct)) private _balances;
     mapping(address => ItemsLibrary._BalanceStruct) private _balances;
 
     // MODIFIERS /////////////////////////////////////////
@@ -130,7 +138,7 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
             amount, 
             msg.sender, 
             true, 
-            IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0],
+            address(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0].TokenContract),
             false,
             bytes("")
         );

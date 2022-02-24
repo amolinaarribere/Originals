@@ -6,6 +6,9 @@ pragma solidity 0.8.7;
 Common functionality for all contracts and libraries
 */
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+
 library Library{
 
     // DATA /////////////////////////////////////////
@@ -23,6 +26,11 @@ library Library{
         address[] TransparentAddresses;
         address[] BeaconAddresses;
         bytes[] TransparentData;
+    }
+
+    struct PaymentTokenStruct{
+        IERC20 TokenContract;
+        bool active;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
