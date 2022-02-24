@@ -109,7 +109,7 @@ contract("Testing Treasury",function(accounts){
         // act
         let first_withdraw = NewIssuerFee.dividedBy(10);
         await mockdai.methods.approve(paymentsProxyAddress, NewIssuerFee.plus(AdminNewIssuerFee)).send({from: user_1, gas: Gas}, function(error, result){});
-        await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(user_1, "test", "t", 0, 0, 0)).send({from: user_1, gas: Gas}, function(error, result){});
+        await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(user_1, "test", "t", 0, 0, 0), false).send({from: user_1, gas: Gas}, function(error, result){});
         // assert
         let TreasuryBalance = new BigNumber(await mockdai.methods.balanceOf(TreasuryProxy._address).call());
         let UserBalance_1 = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
