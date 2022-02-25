@@ -34,10 +34,10 @@ import "../Interfaces/IPayments.sol";
   event _NewOffersLifeTime(uint256 indexed formerLifeTime, uint256 newLifeTime);
   event _NewOwnerFees(uint256 indexed formerAmount, uint256 indexed formerDecimals, uint256 newAmount, uint256 newDecimals);
 
-  event _MintToken(uint256 indexed tokenId, address receiver, uint256 price, Library.PaymentPlans plan, uint256 MintingFee, uint256 AdminMintingFee);
-  event _SetTokenPrice(uint256 indexed tokenId, uint256 indexed formerPrice, uint256 newPrice);
-  event _SubmitOffer(uint256 indexed tokenId, address indexed sender, address indexed bidder, uint256 offer, bool FromCredit);
-  event _AcceptOffer(uint256 indexed tokenId, address indexed formerOwner, address indexed newOwner, uint256 offer);
+  event _MintToken(uint256 indexed tokenId, address receiver, uint256[] prices, Library.PaymentPlans plan, uint256 MintingFee, uint256 AdminMintingFee);
+  event _SetTokenPrice(uint256 indexed tokenId, uint256[] formerPrices, uint256[] newPrices);
+  event _SubmitOffer(uint256 indexed tokenId, address indexed sender, address indexed bidder, uint256 offer, bool FromCredit, uint256 paymentTokenID);
+  event _AcceptOffer(uint256 indexed tokenId, address indexed formerOwner, address indexed newOwner, uint256 offer, uint256 paymentTokenID);
   event _RejectOffer(uint256 indexed tokenId);
   event _WithdrawOffer(uint256 indexed tokenId);
   
@@ -71,8 +71,8 @@ import "../Interfaces/IPayments.sol";
       _;
   }
 
-  modifier priceOK(uint256 tokenId, uint256 offer){
-      require(offer >= _tokenInfo[tokenId]._price, "The offer is below the minimum price");
+  modifier priceOK(uint256 tokenId, uint256 offer, uint256 paymentTokenID){
+      require(offer >= _tokenInfo[tokenId]._prices[paymentTokenID], "The offer is below the minimum price");
       _;
   }
 
@@ -127,7 +127,7 @@ import "../Interfaces/IPayments.sol";
       _ownerTransferFeeDecimals = newDecimals;
   }
 
-  function mintToken(uint256 tokenId, address receiver, uint256 price, bool FromCredit) external override
+  function mintToken(uint256 tokenId, address receiver, uint256[] memory prices, bool FromCredit, uint256 paymentTokenID) external override
     isTheOwner(msg.sender)
   {
       uint256 MintingFee = 0;
@@ -140,35 +140,35 @@ import "../Interfaces/IPayments.sol";
         AdminMintingFee = Prices[uint256(Library.Prices.AdminMintingFee)][0];
 
         if(FromCredit){
-          IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], 0);
-          IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, AdminMintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], 0);
+          IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], paymentTokenID);
+          IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, AdminMintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], paymentTokenID);
         } 
         else{
           IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
-          payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], MintingFee, _issuerID, bytes(""), 0);
-          payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminMintingFee, _issuerID, bytes(""), 0);
+          payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], MintingFee, _issuerID, bytes(""), paymentTokenID);
+          payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], AdminMintingFee, _issuerID, bytes(""), paymentTokenID);
         }
       }
 
       _safeMint(receiver, tokenId);
-      _tokenInfo[tokenId]._price = price;
+      _tokenInfo[tokenId]._prices = prices;
       _tokenInfo[tokenId]._paymentPlan = _paymentPlan;
 
-      emit _MintToken(tokenId, receiver, price, _paymentPlan, MintingFee, AdminMintingFee);
+      emit _MintToken(tokenId, receiver, prices, _paymentPlan, MintingFee, AdminMintingFee);
   }
 
-  function setTokenPrice(uint256 tokenId, uint256 price) external override
+  function setTokenPrice(uint256 tokenId, uint256[] memory prices) external override
     isTokenOwnerOrApproved(tokenId)
   {
-      emit _SetTokenPrice(tokenId, _tokenInfo[tokenId]._price, price);
-      _tokenInfo[tokenId]._price = price;
+      emit _SetTokenPrice(tokenId, _tokenInfo[tokenId]._prices, prices);
+      _tokenInfo[tokenId]._prices = prices;
   }
 
   function acceptOffer(uint256 tokenId) external override
     isTokenOwnerOrApproved(tokenId)
     OfferInProgress(tokenId, true)
   {
-    emit _AcceptOffer(tokenId, ownerOf(tokenId), _tokenOffer[tokenId]._bidder, _tokenOffer[tokenId]._offer);
+    emit _AcceptOffer(tokenId, ownerOf(tokenId), _tokenOffer[tokenId]._bidder, _tokenOffer[tokenId]._offer, _tokenOffer[tokenId]._paymentTokenID);
 
     (uint256 OwnerTransferFeeAmount, uint256 TransferFeeAmount, uint256 AdminTransferFeeAmount, uint256 commonDecimals) = getFees(tokenId);
 
@@ -189,11 +189,11 @@ import "../Interfaces/IPayments.sol";
 
     IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).withdrawAllFor(_issuerID,
       _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)],
-      0,
+      _tokenOffer[tokenId]._paymentTokenID,
       bytes(""));
     IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).withdrawAllFor(_issuerID,
       _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)],
-      0,
+      _tokenOffer[tokenId]._paymentTokenID,
       bytes(""));
   }
 
@@ -236,14 +236,14 @@ import "../Interfaces/IPayments.sol";
     delete(_tokenOffer[tokenId]);
   }
 
-  function submitOffer(uint256 tokenId, address bidder, uint256 offer, bool FromCredit) external override
+  function submitOffer(uint256 tokenId, address bidder, uint256 offer, bool FromCredit, uint256 paymentTokenID) external override
     OfferInProgress(tokenId, false)
-    priceOK(tokenId, offer)
+    priceOK(tokenId, offer, paymentTokenID)
   {
     if(address(0) != _tokenOffer[tokenId]._sender) assignToRejectedSender(tokenId);
 
     if(FromCredit)
-      IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).reuseCredit(_issuerID, tokenId,  msg.sender, offer, 0);
+      IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).reuseCredit(_issuerID, tokenId,  msg.sender, offer, paymentTokenID);
     
     else{
       bytes32[] memory dataArray = new bytes32[](3);
@@ -253,15 +253,16 @@ import "../Interfaces/IPayments.sol";
       bytes memory data = Library.Bytes32ArrayToBytes(dataArray);
 
       IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
-      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)], offer, _issuerID, data, 0);
+      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)], offer, _issuerID, data, paymentTokenID);
     }
 
     _tokenOffer[tokenId]._offer = offer;
+    _tokenOffer[tokenId]._paymentTokenID = paymentTokenID;
     _tokenOffer[tokenId]._sender = msg.sender;
     _tokenOffer[tokenId]._bidder = bidder;
     _tokenOffer[tokenId]._deadline = block.timestamp + _offersLifeTime;
 
-    emit _SubmitOffer(tokenId, msg.sender, bidder, offer, FromCredit);
+    emit _SubmitOffer(tokenId, msg.sender, bidder, offer, FromCredit, paymentTokenID);
   }
     
   function withdrawOffer(uint256 tokenId) external override

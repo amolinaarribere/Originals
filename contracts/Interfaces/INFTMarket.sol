@@ -12,6 +12,7 @@ pragma solidity 0.8.7;
  interface INFTMarket  {
     struct _offerStruct{
         uint256 _offer;
+        uint256 _paymentTokenID;
         address _sender;
         address _bidder;
         uint256 _deadline; 
@@ -19,7 +20,7 @@ pragma solidity 0.8.7;
 
     struct _tokenStruct{
         Library.PaymentPlans _paymentPlan;
-        uint256 _price;
+        uint256[] _prices;
     }
 
     function changeOwner(address newOwner) external;
@@ -27,14 +28,14 @@ pragma solidity 0.8.7;
     function changeOffersLifeTime(uint256 newLifeTime) external;
     function changeOwnerTransferFees(uint256 newAmount, uint256 newDecimals) external;
 
-    function mintToken(uint256 tokenId, address receiver, uint256 price, bool FromCredit) external;
+    function mintToken(uint256 tokenId, address receiver, uint256[] memory prices, bool FromCredit, uint256 paymentTokenID) external;
 
-    function setTokenPrice(uint256 tokenId, uint256 price) external;
+    function setTokenPrice(uint256 tokenId, uint256[] memory prices) external;
     function acceptOffer(uint256 tokenId) external;
     function rejectOffer(uint256 tokenId) external;
 
 
-    function submitOffer(uint256 tokenId, address bidder, uint256 offer, bool FromCredit) external;
+    function submitOffer(uint256 tokenId, address bidder, uint256 offer, bool FromCredit, uint256 paymentTokenID) external;
     function withdrawOffer(uint256 tokenId) external;
 
     function retrieveIssuer() external view returns (ItemsLibrary._issuerStruct memory, uint256);
