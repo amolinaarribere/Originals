@@ -33,65 +33,84 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
     using ItemsLibrary for *;
 
     // EVENTS /////////////////////////////////////////
-    event _NewPrices(uint[][] Prices);
+    event _NewFees(uint[][] Prices);
     event _Pay(address indexed Payer, uint Amount, uint AggregatedAmount, uint256 tokenContractId);
     event _AssignDividend(address indexed Recipient, uint Amount, uint TotalSupply, uint256 tokenContractId);
     event _Withdraw(address indexed Recipient, uint Amount, uint256 tokenContractId);
-    /*event _NewPrices(uint[] Prices);
-    event _Pay(address indexed Payer, uint Amount, uint AggregatedAmount);
-    event _AssignDividend(address indexed Recipient, uint Amount, uint TotalSupply);
-    event _Withdraw(address indexed Recipient, uint Amount);*/
 
     // DATA /////////////////////////////////////////
-    // prices parameters usd
-    uint256[][] private _Prices;
-    //uint256[] private _Prices;
+    // prices parameters
+    uint256[][] private _Fees;
+    uint256[] private _TransferFees;
+    uint256[] private _OfferSettings;
 
     // last amount at which dividends where assigned for each token owner
     uint256[] private _AggregatedDividendAmount;
-    //uint256 private _AggregatedDividendAmount;
     mapping(uint256 => mapping(address => uint256)) private _lastAssigned;
-    //mapping(address => uint256) private _lastAssigned;
 
     // dividends per token owner
     mapping(uint256 => mapping(address => ItemsLibrary._BalanceStruct)) private _balances;
-    //mapping(address => ItemsLibrary._BalanceStruct) private _balances;
 
     // MODIFIERS /////////////////////////////////////////
     
     // CONSTRUCTOR /////////////////////////////////////////
-    function Treasury_init(uint256[][] memory Prices, address managerContractAddress, address chairPerson) public initializer 
+    function Treasury_init(uint256[][] memory Fees, uint256[] memory TransferFees, uint256[] memory OfferSettings, address managerContractAddress, address chairPerson) public initializer 
     {
         super.StdPropositionBaseContract_init(chairPerson, managerContractAddress);
-        InternalupdatePrices(Prices);
+        InternalupdateSettings(Fees, TransferFees, OfferSettings);
     }
 
     // GOVERNANCE /////////////////////////////////////////
     function checkProposition(bytes[] memory NewValues) internal override 
-    {}
+    {
+        require(NewValues.length >= 3, "Missing Settings");
+    }
 
     function UpdateAll() internal override
     {
+        uint256 count;
         bytes32[] memory ProposedNewValues = PropositionsToBytes32();
-        uint256 PricesPerToken = UintLibrary.Bytes32ToUint(ProposedNewValues[0]);
-        uint256[][] memory newPrices;
+        uint256 numberOfTokens = UintLibrary.Bytes32ToUint(ProposedNewValues[count++]);
+        uint256 FeesPerToken = UintLibrary.Bytes32ToUint(ProposedNewValues[count++]);
+        uint256 numberOfTransferFees = UintLibrary.Bytes32ToUint(ProposedNewValues[count++]);
+        uint256[][] memory newFees;
+        uint256[] memory newTransferFees;
+        uint256[] memory newOfferSettings;
 
-        for (uint256 i=1; i < ProposedNewValues.length; i++) {
-            uint256 paymentTokenID = (i - 1) / PricesPerToken;
-            uint256 PriceId = (i - 1) % PricesPerToken;
-            newPrices[PriceId][paymentTokenID] = UintLibrary.Bytes32ToUint(ProposedNewValues[i]);
+        require(ProposedNewValues.length >= count + (numberOfTokens * FeesPerToken) + numberOfTransferFees, "There are some missing fees and/or settings");
+
+        for (uint256 i=count; i < (numberOfTokens * FeesPerToken) + count; i++) {
+            uint256 paymentTokenID = (i - count) / FeesPerToken;
+            uint256 PriceId = (i - count) % FeesPerToken;
+            newFees[PriceId][paymentTokenID] = UintLibrary.Bytes32ToUint(ProposedNewValues[i]);
         }
 
-        InternalupdatePrices(newPrices);
+        for (uint256 j=(numberOfTokens * FeesPerToken) + count; j < (numberOfTokens * FeesPerToken) + count + numberOfTransferFees; j++) {
+            newTransferFees[j - ((numberOfTokens * FeesPerToken) + count)] = UintLibrary.Bytes32ToUint(ProposedNewValues[j]);
+        }
 
-        emit _NewPrices(newPrices);
+        for (uint256 k=(numberOfTokens * FeesPerToken) + count + numberOfTransferFees; k < ProposedNewValues.length; k++) {
+            newOfferSettings[k - ((numberOfTokens * FeesPerToken) + count + numberOfTransferFees)] = UintLibrary.Bytes32ToUint(ProposedNewValues[k]);
+        }
+
+        InternalupdateSettings(newFees, newTransferFees, newOfferSettings);
+
+        emit _NewFees(newFees);
     }
 
-    function InternalupdatePrices(uint256[][] memory Prices) internal
+    function InternalupdateSettings(uint256[][] memory Fees, uint256[] memory TransferFees, uint256[] memory OfferSettings) internal
     {
-        for (uint i=0; i < Prices.length; i++) {
-            if(i < _Prices.length)_Prices[i] = Prices[i];
-            else _Prices.push(Prices[i]);
+        for (uint i=0; i < Fees.length; i++) {
+            if(i < _Fees.length)_Fees[i] = Fees[i];
+            else _Fees.push(Fees[i]);
+        }
+        for (uint j=0; j < TransferFees.length; j++) {
+            if(j < _TransferFees.length)_TransferFees[j] = TransferFees[j];
+            else _TransferFees.push(TransferFees[j]);
+        }
+        for (uint k=0; k < OfferSettings.length; k++) {
+            if(k < _OfferSettings.length)_OfferSettings[k] = OfferSettings[k];
+            else _OfferSettings.push(OfferSettings[k]);
         }
     }
 
@@ -169,9 +188,9 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
         return ItemsLibrary.checkFullBalance(_balances[paymentTokenID][addr]);
     }
 
-    function retrieveSettings() external override view returns(uint[][] memory)
+    function retrieveSettings() external override view returns(uint256[][] memory, uint256[] memory, uint256[] memory)
     {
-        return(_Prices);
+        return(_Fees, _TransferFees, _OfferSettings);
     }
 
     function retrieveAggregatedAmount(uint256 paymentTokenID) external override view returns(uint){

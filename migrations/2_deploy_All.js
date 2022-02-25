@@ -285,27 +285,27 @@ module.exports = async function(deployer, network, accounts){
   console.log("Treasury deployed : " + TreasuryInstance.address);
 
   var TreasuryProxyInitializerMethod = {
-  "inputs": [
-    {
-      "internalType": "uint256[]",
-      "name": "Prices",
-      "type": "uint256[]"
-    },
-    {
-      "internalType": "address",
-      "name": "managerContractAddress",
-      "type": "address"
-    },
-    {
-      "internalType": "address",
-      "name": "chairPerson",
-      "type": "address"
-    }
-  ],
-  "name": "Treasury_init",
-  "outputs": [],
-  "stateMutability": "nonpayable",
-  "type": "function"
+    "inputs": [
+      {
+        "internalType": "uint256[][]",
+        "name": "Prices",
+        "type": "uint256[][]"
+      },
+      {
+        "internalType": "address",
+        "name": "managerContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "chairPerson",
+        "type": "address"
+      }
+    ],
+    "name": "Treasury_init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   };
 
   var TreasuryProxyInitializerParameters = [Prices, ManagerProxyAddress, accounts[0]];

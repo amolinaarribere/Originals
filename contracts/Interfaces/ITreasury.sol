@@ -16,7 +16,7 @@ pragma solidity 0.8.7;
 
     function retrieveLastAssigned(address addr, uint256 tokenId) external view returns(uint256);
     function retrieveFullBalance(address addr, uint256 tokenId) external view returns(uint256);
-    function retrieveSettings() external view returns(uint256[][] memory);
+    function retrieveSettings() external view returns(uint256[][] memory, uint256[] memory, uint256[] memory);
     function retrieveAggregatedAmount(uint256 tokenId) external view returns(uint256);
 
 }

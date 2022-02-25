@@ -135,9 +135,9 @@ import "../Interfaces/IPayments.sol";
 
       if(_paymentPlan == Library.PaymentPlans.Minting)
       {
-        uint[][] memory Prices = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
-        MintingFee = Prices[uint256(Library.Prices.MintingFee)][0];
-        AdminMintingFee = Prices[uint256(Library.Prices.AdminMintingFee)][0];
+        (uint[][] memory Fees, , ) = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
+        MintingFee = Fees[uint256(Library.Fees.MintingFee)][paymentTokenID];
+        AdminMintingFee = Fees[uint256(Library.Fees.AdminMintingFee)][paymentTokenID];
 
         if(FromCredit){
           IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], paymentTokenID);
@@ -207,11 +207,11 @@ import "../Interfaces/IPayments.sol";
     uint256 AdminTransferFeeDecimals = 0;
 
     if(Library.PaymentPlans.TransferFee == _tokenInfo[tokenId]._paymentPlan){
-        uint[][] memory Prices = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
-        TransferFeeAmount = Prices[uint256(Library.Prices.TransferFeeAmount)][0];
-        TransferFeeDecimals = Prices[uint256(Library.Prices.TransferFeeDecimals)][0];
-        AdminTransferFeeAmount = Prices[uint256(Library.Prices.AdminTransferFeeAmount)][0];
-        AdminTransferFeeDecimals = Prices[uint256(Library.Prices.AdminTransferFeeDecimals)][0];
+        ( , uint[] memory TransferFees, ) = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
+        TransferFeeAmount = TransferFees[uint256(Library.TransferFees.TransferFeeAmount)];
+        TransferFeeDecimals = TransferFees[uint256(Library.TransferFees.TransferFeeDecimals)];
+        AdminTransferFeeAmount = TransferFees[uint256(Library.TransferFees.AdminTransferFeeAmount)];
+        AdminTransferFeeDecimals = TransferFees[uint256(Library.TransferFees.AdminTransferFeeDecimals)];
     }
 
     uint256 commonDecimals = getLargest([OwnerTransferFeeDecimals, TransferFeeDecimals, AdminTransferFeeDecimals]); 
