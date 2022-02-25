@@ -111,8 +111,8 @@ contract Payments is IPayments, StdPropositionBaseContract{
         }
 
         for(uint256 k=_Tokens.length; k < tokenAddresses.length; k++){
-            _Tokens[k].TokenContract = IERC20(tokenAddresses[k]);
-            _Tokens[k].active = true;
+            Library.PaymentTokenStruct memory newToken = Library.PaymentTokenStruct(IERC20(tokenAddresses[k]), true);
+            _Tokens.push(newToken);
         }
     }
 
@@ -124,7 +124,7 @@ contract Payments is IPayments, StdPropositionBaseContract{
         require(_Tokens[tokenId].TokenContract.allowance(sender, address(this)) >= amount, "Contract does not have enough approved funds");
         bool success = _Tokens[tokenId].TokenContract.transferFrom(sender, recipient, amount);
         require(true == success, "Transfer From did not work");
-        ICreditor(recipient).CreditReceived(sender, amount, data);
+        ICreditor(recipient).CreditReceived(sender, amount, tokenId, data);
     }
 
     function BalanceOf(address account, uint256 tokenId) external override view returns(uint256)

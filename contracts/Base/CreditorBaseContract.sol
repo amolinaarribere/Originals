@@ -28,12 +28,12 @@ abstract contract CreditorBaseContract is ICreditor, ManagedBaseContract{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function CreditReceived(address sender, uint256 amount, bytes memory data) external override
+    function CreditReceived(address sender, uint256 amount, uint256 tokenId, bytes memory data) external override
         isFromCertifiedContract(msg.sender)
     {
-        onCreditReceived(sender, amount, data);
+        onCreditReceived(sender, amount, tokenId, data);
     }
 
-    function onCreditReceived(address sender, uint256 amount, bytes memory data) internal virtual;
+    function onCreditReceived(address sender, uint256 amount, uint256 tokenId, bytes memory data) internal virtual;
 
 }

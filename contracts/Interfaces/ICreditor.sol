@@ -10,5 +10,5 @@ pragma solidity 0.8.7;
 
 
 interface ICreditor{
-    function CreditReceived(address sender, uint256 amount, bytes memory data) external;
+    function CreditReceived(address sender, uint256 amount, uint256 tokenId, bytes memory data) external;
 }

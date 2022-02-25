@@ -111,7 +111,7 @@ import "../Interfaces/IPayments.sol";
   }
 
   // FUNCTIONALITY /////////////////////////////////////////
-  function onCreditReceived(address sender, uint256 amount, bytes memory data) internal override
+  function onCreditReceived(address sender, uint256 amount, uint256 tokenId, bytes memory data) internal override
   {
     bytes32[] memory receivedData = Library.BytestoBytes32(data);
     Library.PublicPoolPaymentTypes paymentType = Library.PublicPoolPaymentTypes(uint256(receivedData[0]));
@@ -135,9 +135,9 @@ import "../Interfaces/IPayments.sol";
     validIssuerRequest(requestedIssuer)
   {
 
-    uint[] memory Prices = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
-    uint256 NewIssuerFee = Prices[uint256(Library.Prices.NewIssuerFee)];
-    uint256 AdminNewIssuerFee = Prices[uint256(Library.Prices.AdminNewIssuerFee)];
+    uint[][] memory Prices = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
+    uint256 NewIssuerFee = Prices[uint256(Library.Prices.NewIssuerFee)][0];
+    uint256 AdminNewIssuerFee = Prices[uint256(Library.Prices.AdminNewIssuerFee)][0];
 
     if(FromCredit){
       internalSpendCredit(0, msg.sender, NewIssuerFee,  _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
@@ -230,7 +230,7 @@ import "../Interfaces/IPayments.sol";
   function GenerateNewNFTMarket(address owner, string memory name, string memory symbol, uint256 feeAmount, uint256 feeDecimals, uint256 id, Library.PaymentPlans paymentPlan) internal returns(address)
   {
     address beaconAddress = _managerContract.retrieveBeacons()[uint256(Library.Beacons.NFT)];
-    uint256 OffersLifeTime = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings()[uint256(Library.Prices.OffersLifeTime)];
+    uint256 OffersLifeTime = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings()[uint256(Library.Prices.OffersLifeTime)][0];
     bytes memory data = abi.encodeWithSignature("NFTMarket_init(address,address,string,string,uint256,uint256,uint256,uint256,uint8)", address(_managerContract), owner, name, symbol, OffersLifeTime, feeAmount, feeDecimals, id, uint8(paymentPlan));
 
     BeaconProxy beaconProxy = new BeaconProxy(beaconAddress, data);
@@ -294,7 +294,8 @@ import "../Interfaces/IPayments.sol";
       false, 
       address(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0].TokenContract),
       false,
-      bytes("")
+      bytes(""),
+      0
     );
     internalTransferUnassignedCredit(NFTMarketId, tokenID, amount);
     emit _CreditReused(NFTMarketId, tokenID, addr, amount);
@@ -316,7 +317,8 @@ import "../Interfaces/IPayments.sol";
       true, 
       address(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0].TokenContract),
       true,
-      bytes("")
+      bytes(""),
+      0
     );
     emit _CreditSpent(NFTMarketId, from, amount, to);
   }
@@ -353,7 +355,8 @@ import "../Interfaces/IPayments.sol";
       true, 
       address(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[0].TokenContract),
       sendData,
-      data
+      data,
+      0
     );
     if(address(0) != sender) emit _CreditWithdrawnFor(addr, amount, sender);
     else emit _CreditWithdrawn(addr, amount);
