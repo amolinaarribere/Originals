@@ -31,18 +31,18 @@ import "../Interfaces/IPayments.sol";
 
 
   // EVENTS /////////////////////////////////////////
-  event _NewIssuerRequest(uint256 indexed id, address owner, string name, string symbol);
+  event _NewIssuerRequest(uint256 indexed id, address owner, string name, string symbol, uint256 paymentTokenID);
   event _VoteForIssuer(uint256 indexed id, address voter, bool vote);
   event _IssuerValidation(uint256 indexed id, address NFTMarket);
   event _IssuerRejection(uint256 indexed id);
 
-  event _CreditReceived(address indexed receiver, uint256 amount, address indexed sender);
-  event _CreditUnAssignedReceived(uint256 indexed NFTMarketId, uint256 indexed tokenID, uint256 amount);
-  event _CreditAssigned(uint256 indexed NFTMarketId, uint256 indexed tokenID, address indexed receiver, uint256 amount, uint256 factor);
-  event _CreditReused(uint256 indexed NFTMarketId, uint256 indexed tokenID, address indexed creditor, uint256 amount);
-  event _CreditSpent(uint256 indexed NFTMarketId, address indexed from, uint256 amount, address indexed to);
-  event _CreditWithdrawn(address indexed withdrawer, uint256 amount);
-  event _CreditWithdrawnFor(address indexed withdrawer, uint256 amount, address indexed sender);
+  event _CreditReceived(address indexed receiver, uint256 amount, address indexed sender, uint256 paymentTokenID);
+  event _CreditUnAssignedReceived(uint256 indexed NFTMarketId, uint256 indexed tokenID, uint256 amount, uint256 paymentTokenID);
+  event _CreditAssigned(uint256 indexed NFTMarketId, uint256 indexed tokenID, address indexed receiver, uint256 amount, uint256 factor, uint256 paymentTokenID);
+  event _CreditReused(uint256 indexed NFTMarketId, uint256 indexed tokenID, address indexed creditor, uint256 amount, uint256 paymentTokenID);
+  event _CreditSpent(uint256 indexed NFTMarketId, address indexed from, uint256 amount, address indexed to, uint256 paymentTokenID);
+  event _CreditWithdrawn(address indexed withdrawer, uint256 amount, uint256 paymentTokenID);
+  event _CreditWithdrawnFor(address indexed withdrawer, uint256 amount, address indexed sender, uint256 paymentTokenID);
 
 
   // DATA /////////////////////////////////////////
@@ -124,14 +124,14 @@ import "../Interfaces/IPayments.sol";
     if(Library.PublicPoolPaymentTypes.SendCredit == paymentType){
       address account = AddressLibrary.Bytes32ToAddress(receivedData[1]);
       ItemsLibrary.addBalance(_creditOfAccount[paymentTokenID][account], amount, 1);
-      emit _CreditReceived(account, amount, sender);
+      emit _CreditReceived(account, amount, sender, paymentTokenID);
     }
 
     else{
       uint256 NFTMarketId = UintLibrary.Bytes32ToUint(receivedData[1]);
       uint256 tokenID = UintLibrary.Bytes32ToUint(receivedData[2]);
       internalTransferUnassignedCredit(NFTMarketId, tokenID, amount, paymentTokenID);
-      emit _CreditUnAssignedReceived(NFTMarketId, tokenID, amount);
+      emit _CreditUnAssignedReceived(NFTMarketId, tokenID, amount, paymentTokenID);
     }
      
   }
@@ -158,7 +158,7 @@ import "../Interfaces/IPayments.sol";
 
     addPendingIssuer(IssuerID, requestedIssuer);
 
-    emit _NewIssuerRequest(IssuerID, requestedIssuer._owner, requestedIssuer._name, requestedIssuer._symbol);
+    emit _NewIssuerRequest(IssuerID, requestedIssuer._owner, requestedIssuer._name, requestedIssuer._symbol, paymentTokenID);
   }
 
   function addPendingIssuer(uint256 IssuerID, ItemsLibrary._issuerStruct memory requestedIssuer) internal
@@ -287,9 +287,10 @@ import "../Interfaces/IPayments.sol";
 
   function addCreditinternal(uint256 NFTMarketId, uint256 tokenID, address[] calldata addrs, uint256[] calldata amounts, uint256[] calldata factors) internal 
   {
+    uint256 paymentTokenID = _unassignedCreditForMarket[NFTMarketId][tokenID]._paymentTokenID;
     for(uint i=0; i < addrs.length; i++){
-      ItemsLibrary.addBalance(_creditOfAccount[_unassignedCreditForMarket[NFTMarketId][tokenID]._paymentTokenID][addrs[i]], amounts[i], factors[i]);
-      emit _CreditAssigned(NFTMarketId, tokenID, addrs[i], amounts[i], factors[i]);
+      ItemsLibrary.addBalance(_creditOfAccount[paymentTokenID][addrs[i]], amounts[i], factors[i]);
+      emit _CreditAssigned(NFTMarketId, tokenID, addrs[i], amounts[i], factors[i], paymentTokenID);
     }
   }
 
@@ -308,7 +309,7 @@ import "../Interfaces/IPayments.sol";
       paymentTokenID
     );
     internalTransferUnassignedCredit(NFTMarketId, tokenID, amount, paymentTokenID);
-    emit _CreditReused(NFTMarketId, tokenID, addr, amount);
+    emit _CreditReused(NFTMarketId, tokenID, addr, amount, paymentTokenID);
   }
 
   function spendCredit(uint256 NFTMarketId, address from, uint256 amount, address to, uint256 paymentTokenID) external override
@@ -330,7 +331,7 @@ import "../Interfaces/IPayments.sol";
       bytes(""),
       paymentTokenID
     );
-    emit _CreditSpent(NFTMarketId, from, amount, to);
+    emit _CreditSpent(NFTMarketId, from, amount, to, paymentTokenID);
   }
 
   function withdraw(uint amount, uint256 paymentTokenID) external override
@@ -369,8 +370,8 @@ import "../Interfaces/IPayments.sol";
       data,
       paymentTokenID
     );
-    if(address(0) != sender) emit _CreditWithdrawnFor(addr, amount, sender);
-    else emit _CreditWithdrawn(addr, amount);
+    if(address(0) != sender) emit _CreditWithdrawnFor(addr, amount, sender, paymentTokenID);
+    else emit _CreditWithdrawn(addr, amount, paymentTokenID);
   }
 
   function retrieveCredit(address addr, uint256 paymentTokenID) external override view returns (uint256)
