@@ -140,8 +140,8 @@ import "../Interfaces/IPayments.sol";
         AdminMintingFee = Prices[uint256(Library.Prices.AdminMintingFee)][0];
 
         if(FromCredit){
-          IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]);
-          IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, AdminMintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)]);
+          IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], 0);
+          IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, AdminMintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], 0);
         } 
         else{
           IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
@@ -189,9 +189,11 @@ import "../Interfaces/IPayments.sol";
 
     IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).withdrawAllFor(_issuerID,
       _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)],
+      0,
       bytes(""));
     IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).withdrawAllFor(_issuerID,
       _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)],
+      0,
       bytes(""));
   }
 
@@ -241,7 +243,7 @@ import "../Interfaces/IPayments.sol";
     if(address(0) != _tokenOffer[tokenId]._sender) assignToRejectedSender(tokenId);
 
     if(FromCredit)
-      IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).reuseCredit(_issuerID, tokenId,  msg.sender, offer);
+      IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).reuseCredit(_issuerID, tokenId,  msg.sender, offer, 0);
     
     else{
       bytes32[] memory dataArray = new bytes32[](3);

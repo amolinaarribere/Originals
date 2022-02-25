@@ -11,13 +11,13 @@ interface IAdminPiggyBank {
     struct _TransferStruct{
         address _to;
         uint256 _amount;
-        uint256 _tokenId;
+        uint256 _paymentTokenID;
         uint _validations;
         uint _rejections;
         address[] _voters;
     }
 
-    function transfer(address receiver, uint256 amount, uint256 tokenId) external;
+    function transfer(address receiver, uint256 amount, uint256 paymentTokenID) external;
     function approve() external;
     function reject() external;
 
