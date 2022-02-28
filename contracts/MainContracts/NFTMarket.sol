@@ -136,8 +136,8 @@ import "../Interfaces/IPayments.sol";
       if(_paymentPlan == Library.PaymentPlans.Minting)
       {
         (uint[][] memory Fees, , ) = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
-        MintingFee = Fees[uint256(Library.Fees.MintingFee)][paymentTokenID];
-        AdminMintingFee = Fees[uint256(Library.Fees.AdminMintingFee)][paymentTokenID];
+        MintingFee = Fees[paymentTokenID][uint256(Library.Fees.MintingFee)];
+        AdminMintingFee = Fees[paymentTokenID][uint256(Library.Fees.AdminMintingFee)];
 
         if(FromCredit){
           IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], paymentTokenID);
@@ -151,7 +151,9 @@ import "../Interfaces/IPayments.sol";
       }
 
       _safeMint(receiver, tokenId);
-      _tokenInfo[tokenId]._prices = prices;
+      for(uint256 i=0; i < prices.length; i++){
+          _tokenInfo[tokenId]._prices.push(prices[i]);
+      }
       _tokenInfo[tokenId]._paymentPlan = _paymentPlan;
 
       emit _MintToken(tokenId, receiver, prices, _paymentPlan, MintingFee, AdminMintingFee);
@@ -160,8 +162,11 @@ import "../Interfaces/IPayments.sol";
   function setTokenPrice(uint256 tokenId, uint256[] memory prices) external override
     isTokenOwnerOrApproved(tokenId)
   {
-      emit _SetTokenPrice(tokenId, _tokenInfo[tokenId]._prices, prices);
-      _tokenInfo[tokenId]._prices = prices;
+    emit _SetTokenPrice(tokenId, _tokenInfo[tokenId]._prices, prices);
+    for(uint256 i=0; i < prices.length; i++){
+      if(i < _tokenInfo[tokenId]._prices.length) _tokenInfo[tokenId]._prices[i] = prices[i];
+      else _tokenInfo[tokenId]._prices.push(prices[i]);
+    }
   }
 
   function acceptOffer(uint256 tokenId) external override

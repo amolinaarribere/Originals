@@ -141,8 +141,8 @@ import "../Interfaces/IPayments.sol";
   {
 
     (uint256[][] memory Fees, , ) = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
-    uint256 NewIssuerFee = Fees[uint256(Library.Fees.NewIssuerFee)][paymentTokenID];
-    uint256 AdminNewIssuerFee = Fees[uint256(Library.Fees.AdminNewIssuerFee)][paymentTokenID];
+    uint256 NewIssuerFee = Fees[paymentTokenID][uint256(Library.Fees.NewIssuerFee)];
+    uint256 AdminNewIssuerFee = Fees[paymentTokenID][uint256(Library.Fees.AdminNewIssuerFee)];
 
     if(FromCredit){
       internalSpendCredit(0, msg.sender, NewIssuerFee,  _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], paymentTokenID);

@@ -96,7 +96,7 @@ contract("Testing Admin Piggy Bank",function(accounts){
         let amount = new BigNumber("10000");
         await mockdai.methods.transfer(adminPiggyBankProxy._address, amount).send({from: user_1, gas: Gas}, function(error, result){});
         try{
-            await adminPiggyBankProxy.methods.transfer(address_0, amount).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+            await adminPiggyBankProxy.methods.transfer(address_0, amount, 0).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -104,7 +104,7 @@ contract("Testing Admin Piggy Bank",function(accounts){
             expect(error.message).to.match(CannotTransferToAddress0);
         }
         try{
-            await adminPiggyBankProxy.methods.transfer(chairPerson, amount.multipliedBy(2)).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+            await adminPiggyBankProxy.methods.transfer(chairPerson, amount.multipliedBy(2), 0).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -112,7 +112,7 @@ contract("Testing Admin Piggy Bank",function(accounts){
             expect(error.message).to.match(CannotTransferMoreThan);
         }
         try{
-            await adminPiggyBankProxy.methods.transfer(chairPerson, amount).send({from: user_1, gas: Gas}, function(error, result){});
+            await adminPiggyBankProxy.methods.transfer(chairPerson, amount, 0).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -120,8 +120,8 @@ contract("Testing Admin Piggy Bank",function(accounts){
             expect(error.message).to.match(MustBeOwner);
         }
         try{
-            await adminPiggyBankProxy.methods.transfer(chairPerson, 1).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
-            await adminPiggyBankProxy.methods.transfer(chairPerson, 1).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+            await adminPiggyBankProxy.methods.transfer(chairPerson, 1, 0).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+            await adminPiggyBankProxy.methods.transfer(chairPerson, 1, 0).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -169,14 +169,14 @@ contract("Testing Admin Piggy Bank",function(accounts){
 
         let initialBalance = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
         await mockdai.methods.transfer(adminPiggyBankProxy._address, amount).send({from: user_1, gas: Gas}, function(error, result){});
-        await adminPiggyBankProxy.methods.transfer(chairPerson, transferAmount).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+        await adminPiggyBankProxy.methods.transfer(chairPerson, transferAmount, 0).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
         await adminPiggyBankProxy.methods.reject().send({from: PublicOwners[1], gas: Gas}, function(error, result){});
         await adminPiggyBankProxy.methods.reject().send({from: PublicOwners[2], gas: Gas}, function(error, result){});
         let finalBalance = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
         expect(initialBalance.toString()).to.equal("0");
         expect(finalBalance.toString()).to.equal("0");
 
-        await adminPiggyBankProxy.methods.transfer(chairPerson, transferAmount).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+        await adminPiggyBankProxy.methods.transfer(chairPerson, transferAmount, 0).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
         await adminPiggyBankProxy.methods.approve().send({from: PublicOwners[1], gas: Gas}, function(error, result){});
         finalBalance = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
         expect(finalBalance.toString()).to.equal(transferAmount.toString());

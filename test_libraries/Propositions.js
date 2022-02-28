@@ -123,7 +123,7 @@ async function checkPayments(contractAddress, paymentBytes, user_1){
     let _paymentSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
     expect(paymentBytes.length).to.equal(_paymentSettings.length);
     for(let i=0; i < _paymentSettings.length; i++){
-        expect(aux.Bytes32ToAddress(paymentBytes[i])).to.equal(_paymentSettings[i]);
+        expect(aux.Bytes32ToAddress(paymentBytes[i])).to.equal(_paymentSettings[i][0]);
     }
 }
 
@@ -156,7 +156,7 @@ async function Config_Proposition_Wrong(contractAddress, originalsTokenProxy, to
 async function Config_Proposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     let _propositionSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
     let InitValue = [aux.IntToBytes32(_propositionSettings[0]), aux.IntToBytes32(_propositionSettings[1]), aux.IntToBytes32(_propositionSettings[2])];
-    await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPropositionSettings, true);
+    await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPropositionSettings, true, true);
 };
 
 async function Config_Treasury_Wrong(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
@@ -169,7 +169,7 @@ async function Config_Treasury_Correct(contractAddress, originalsTokenProxy, tok
     for(let i=0; i < _price.length; i++){
         InitValue.push(aux.IntToBytes32(_price[i]));
     }
-    await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkFees, true);
+    await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkFees, true, true);
    
 };
 
@@ -198,7 +198,7 @@ async function Config_ContractsManager_Correct(contractAddress, originalsTokenPr
         result[i++],
         result[i++]
     ];
-    await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkContracts, true);
+    await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkContracts, true, true);
    
 };
 
@@ -227,9 +227,9 @@ async function Config_Payments_Correct(contractAddress, originalsTokenProxy, tok
     let _paymentsSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
     let InitValue = [];
     for(let i=0; i < _paymentsSettings.length; i++){
-        InitValue.push(aux.AddressToBytes32(_paymentsSettings[i]));
+        InitValue.push(aux.AddressToBytes32(_paymentsSettings[i][0]));
     }
-    await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPayments, true);
+    await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPayments, true, false);
    
 };
 
@@ -324,7 +324,7 @@ async function Config_CommonProposition_Wrong(contractAddress, originalsTokenPro
     
 };
 
-async function Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkFunction, fullTest){
+async function Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkFunction, fullTest, validatedAgain){
     var EmptyProposition = EmptyPropositions(NewValues);
 
     if(fullTest){
@@ -365,20 +365,23 @@ async function Config_CommonProposition_Correct(contractAddress, originalsTokenP
     await checkFunction(contractAddress, NewValues, user_1);
     await checkProposition(contractAddress, EmptyProposition, user_1);
 
-    // Validated again
-    await contractAddress.methods.sendProposition(InitValue).send({from: chairPerson, gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, NewValues, user_1);
-    await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, NewValues, user_1);
-    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, NewValues, user_1);
-    await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, NewValues, user_1);
-    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, NewValues, user_1);
-    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[4], gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, InitValue, user_1);
-    await checkProposition(contractAddress, EmptyProposition, user_1);
+    if(validatedAgain){
+        // Validated again
+        await contractAddress.methods.sendProposition(InitValue).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, NewValues, user_1);
+        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, NewValues, user_1);
+        await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, NewValues, user_1);
+        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, NewValues, user_1);
+        await contractAddress.methods.voteProposition(true).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, NewValues, user_1);
+        await contractAddress.methods.voteProposition(true).send({from: tokenOwner[4], gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, InitValue, user_1);
+        await checkProposition(contractAddress, EmptyProposition, user_1);
+    }
+    
  };
 
 async function Check_Proposition_Details(contractAddress, originalsTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues){

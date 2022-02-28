@@ -82,7 +82,7 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
         for (uint256 i=count; i < (numberOfTokens * FeesPerToken) + count; i++) {
             uint256 paymentTokenID = (i - count) / FeesPerToken;
             uint256 PriceId = (i - count) % FeesPerToken;
-            newFees[PriceId][paymentTokenID] = UintLibrary.Bytes32ToUint(ProposedNewValues[i]);
+            newFees[paymentTokenID][PriceId] = UintLibrary.Bytes32ToUint(ProposedNewValues[i]);
         }
 
         for (uint256 j=(numberOfTokens * FeesPerToken) + count; j < (numberOfTokens * FeesPerToken) + count + numberOfTransferFees; j++) {
@@ -101,8 +101,15 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
     function InternalupdateSettings(uint256[][] memory Fees, uint256[] memory TransferFees, uint256[] memory OfferSettings) internal
     {
         for (uint i=0; i < Fees.length; i++) {
-            if(i < _Fees.length)_Fees[i] = Fees[i];
-            else _Fees.push(Fees[i]);
+            if(i < _Fees.length){
+                for(uint p=0; p < Fees[i].length; p++){
+                    if(p < _Fees[i].length)_Fees[i][p] = Fees[i][p];
+                    else _Fees[i].push(Fees[i][p]);
+                }
+            }
+            else {
+                _Fees.push(Fees[i]);
+            }
         }
         for (uint j=0; j < TransferFees.length; j++) {
             if(j < _TransferFees.length)_TransferFees[j] = TransferFees[j];
