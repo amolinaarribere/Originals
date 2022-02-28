@@ -35,17 +35,19 @@ const TokenName = "OriginalsToken";
 const TokenSymbol = "ORI";
 const TokenSupply = 100000000;
 const TokenDecimals = 0;
-const NewIssuerFee = new BigNumber("100000000000000000000");
-const AdminNewIssuerFee = new BigNumber("50000000000000000000");
-const MintingFee = new BigNumber("1000000000000000000");
-const AdminMintingFee = new BigNumber("500000000000000000");
+const NewIssuerFee = new BigNumber("180000000000000000000").toString();
+const AdminNewIssuerFee = new BigNumber("50000000000000000000").toString();
+const MintingFee = new BigNumber("1000000000000000000").toString();
+const AdminMintingFee = new BigNumber("500000000000000000").toString();
 const TransferFeeAmount = 55;
 const TransferFeeDecimals = 1;
 const AdminTransferFeeAmount = 1;
 const AdminTransferFeeDecimals = 0;
 const OffersLifeTime = 600;
-const Prices = [NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee, TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals, OffersLifeTime ];
-
+const Fees = [NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee];
+const AllFees = [Fees];
+const TransferFees = [TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals];
+const OfferSettings = [OffersLifeTime]
 const PublicMinOwners = 1;
 
 module.exports = async function(deployer, network, accounts){
@@ -288,8 +290,18 @@ module.exports = async function(deployer, network, accounts){
     "inputs": [
       {
         "internalType": "uint256[][]",
-        "name": "Prices",
+        "name": "Fees",
         "type": "uint256[][]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "TransferFees",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "OfferSettings",
+        "type": "uint256[]"
       },
       {
         "internalType": "address",
@@ -308,7 +320,7 @@ module.exports = async function(deployer, network, accounts){
     "type": "function"
   };
 
-  var TreasuryProxyInitializerParameters = [Prices, ManagerProxyAddress, accounts[0]];
+  var TreasuryProxyInitializerParameters = [AllFees, TransferFees, OfferSettings, ManagerProxyAddress, accounts[0]];
   var TreasuryProxyData = web3.eth.abi.encodeFunctionCall(TreasuryProxyInitializerMethod, TreasuryProxyInitializerParameters);
 
   // NFT Market -----------------------------------------------------------------------------------------------------------------------------------------------------------------

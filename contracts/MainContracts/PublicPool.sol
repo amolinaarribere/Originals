@@ -23,7 +23,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import "../Base/CreditorBaseContract.sol";
 import "../Interfaces/IPayments.sol";
 
- contract PublicPool is  Initializable, MultiSigContract, CreditorBaseContract, IPool {
+ contract PublicPool is  IPool, Initializable, MultiSigContract, CreditorBaseContract {
   using ItemsLibrary for *;
   using UintLibrary for *;
   using Library for *;
@@ -298,16 +298,7 @@ import "../Interfaces/IPayments.sol";
     isNFTMarket(NFTMarketId, msg.sender)
     isTokenUnassignedCreditEmpty(NFTMarketId, tokenID)
   {
-    ItemsLibrary.InternalWithdraw(
-      _creditOfAccount[paymentTokenID][addr], 
-      amount, 
-      address(0), 
-      false, 
-      address(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[paymentTokenID].TokenContract),
-      false,
-      bytes(""),
-      paymentTokenID
-    );
+    internalWithdraw(address(0), amount, addr, false, bytes(""), paymentTokenID, false);
     internalTransferUnassignedCredit(NFTMarketId, tokenID, amount, paymentTokenID);
     emit _CreditReused(NFTMarketId, tokenID, addr, amount, paymentTokenID);
   }
@@ -320,36 +311,29 @@ import "../Interfaces/IPayments.sol";
 
   function internalSpendCredit(uint256 NFTMarketId, address from, uint256 amount, address to, uint256 paymentTokenID) internal 
   {
-    bytes memory emptyData = bytes("");
-    ItemsLibrary.InternalWithdraw(  
-      _creditOfAccount[paymentTokenID][from], 
-      amount, 
-      to, 
-      true, 
-      address(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[paymentTokenID].TokenContract),
-      true,
-      bytes(""),
-      paymentTokenID
-    );
+    internalWithdraw(to, amount, from, true, bytes(""), paymentTokenID, true);
     emit _CreditSpent(NFTMarketId, from, amount, to, paymentTokenID);
   }
 
   function withdraw(uint amount, uint256 paymentTokenID) external override
   {
-    internalWithdraw(msg.sender, amount, address(0), false, bytes(""), paymentTokenID);
+    internalWithdraw(msg.sender, amount, msg.sender, false, bytes(""), paymentTokenID, true);
+    emit _CreditWithdrawn(msg.sender, amount, paymentTokenID);
   }
   
   function withdrawAll(uint256 paymentTokenID) external override
   {
     uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[paymentTokenID][msg.sender]);
-    internalWithdraw(msg.sender, amount, address(0), false, bytes(""), paymentTokenID);
+    internalWithdraw(msg.sender, amount, msg.sender, false, bytes(""), paymentTokenID, true);
+    emit _CreditWithdrawn(msg.sender, amount, paymentTokenID);
   }
   
   function withdrawAllFor(uint256 NFTMarketId, address addr, uint256 paymentTokenID, bytes memory data) external override
     isNFTMarket(NFTMarketId, msg.sender)
   {
     uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[paymentTokenID][addr]);
-    internalWithdraw(addr, amount, msg.sender, true, data, paymentTokenID);
+    internalWithdraw(addr, amount, addr, true, data, paymentTokenID, true);
+    emit _CreditWithdrawnFor(addr, amount, msg.sender, paymentTokenID);
   }
 
   function internalTransferUnassignedCredit(uint256 NFTMarketId, uint256 tokenID, uint256 amount, uint256 paymentTokenID) internal
@@ -358,20 +342,18 @@ import "../Interfaces/IPayments.sol";
       _unassignedCreditForMarket[NFTMarketId][tokenID]._paymentTokenID = paymentTokenID;
   }
 
-  function internalWithdraw(address addr, uint amount, address sender, bool sendData, bytes memory data, uint256 paymentTokenID) internal
+  function internalWithdraw(address to, uint amount, address sender, bool sendData, bytes memory data, uint256 paymentTokenID, bool transfer) internal
   {
     ItemsLibrary.InternalWithdraw(
-      _creditOfAccount[paymentTokenID][addr], 
+      _creditOfAccount[paymentTokenID][sender], 
       amount, 
-      addr, 
-      true, 
+      to, 
+      transfer, 
       address(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[paymentTokenID].TokenContract),
       sendData,
       data,
       paymentTokenID
     );
-    if(address(0) != sender) emit _CreditWithdrawnFor(addr, amount, sender, paymentTokenID);
-    else emit _CreditWithdrawn(addr, amount, paymentTokenID);
   }
 
   function retrieveCredit(address addr, uint256 paymentTokenID) external override view returns (uint256)
