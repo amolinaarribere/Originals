@@ -33,7 +33,10 @@ const MockName = constants.MockName;
 const MockSymbol = constants.MockSymbol;
 const MockSupply = constants.MockSupply;
 // Mock -------------
-const Prices = [NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee, TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals, OffersLifeTime ];
+const Fees = [NewIssuerFee.toString(), AdminNewIssuerFee.toString(), MintingFee.toString(), AdminMintingFee.toString()];
+const AllFees = [Fees];
+const TransferFees = [TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals];
+const OfferSettings = [OffersLifeTime]
 
 const PropositionLifeTime = constants.PropositionLifeTime;
 const PropositionThreshold = constants.PropositionThreshold;
@@ -129,8 +132,18 @@ const OriginalsTokenProxyInitializerMethod = {
 const TreasuryProxyInitializerMethod = {
   "inputs": [
     {
+      "internalType": "uint256[][]",
+      "name": "Fees",
+      "type": "uint256[][]"
+    },
+    {
       "internalType": "uint256[]",
-      "name": "Prices",
+      "name": "TransferFees",
+      "type": "uint256[]"
+    },
+    {
+      "internalType": "uint256[]",
+      "name": "OfferSettings",
       "type": "uint256[]"
     },
     {
@@ -287,7 +300,7 @@ function getProxyData(method, parameters){
 
 function returnProxyInitData(PublicOwners, minOwners, manager, chairPerson, tokenAddresses){
   let PublicPoolProxyData = getProxyData(PublicPoolProxyInitializerMethod, [PublicOwners, minOwners, manager]);
-  let TreasuryProxyData = getProxyData(TreasuryProxyInitializerMethod, [Prices, manager, chairPerson]);
+  let TreasuryProxyData = getProxyData(TreasuryProxyInitializerMethod, [AllFees, TransferFees, OfferSettings, manager, chairPerson]);
   let OriginalsProxyData = getProxyData(OriginalsTokenProxyInitializerMethod, ["Originals Token for Test", "ORI", TotalTokenSupply, manager, 0, chairPerson]);
   let PropositionSettingsProxyData = getProxyData(PropositionSettingsProxyInitializerMethod, [manager, chairPerson, PropositionLifeTime, PropositionThreshold, minToPropose]);
   let AdminPiggyBankProxyData = getProxyData(AdminPiggyBankProxyInitializerMethod, [PublicOwners, minOwners, manager]);

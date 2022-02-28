@@ -1,9 +1,9 @@
 const BigNumber = require('bignumber.js');
 
-const NewIssuerFee = new BigNumber("500");
-const AdminNewIssuerFee = new BigNumber("250");
-const MintingFee = new BigNumber("10");
-const AdminMintingFee = new BigNumber("5");
+const NewIssuerFee = new BigNumber("100000000000000000000");
+const AdminNewIssuerFee = new BigNumber("50000000000000000000");
+const MintingFee = new BigNumber("10000000000000000000");
+const AdminMintingFee = new BigNumber("5000000000000000000");
 const TransferFeeAmount = 55;
 const TransferFeeDecimals = 1;
 const AdminTransferFeeAmount = 1;
