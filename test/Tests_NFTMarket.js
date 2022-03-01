@@ -110,7 +110,7 @@ contract("Testing NFT Markets",function(accounts){
         }
     }
 
-/*
+
     // ****** TESTING Changing Configs ***************************************************************** //
     it("Change Configuration WRONG",async function(){
         await GenerateMarkets(false);
@@ -178,7 +178,7 @@ contract("Testing NFT Markets",function(accounts){
         expect(after[1]).to.equal(newLifeTime.toString());
        
     });
-*/
+
      // ****** TESTING Minting ***************************************************************** //
      it("Minting WRONG",async function(){
         await GenerateMarkets(false);
@@ -213,7 +213,7 @@ contract("Testing NFT Markets",function(accounts){
         await GenerateMarkets(true);
         let tokenId = 0;
         let tokenPrice = 10;
-        await mockdai.methods.approve(paymentsProxyAddress, 2 * mintingFee).send({from: issuer_1, gas: Gas}, function(error, result){});
+        await mockdai.methods.approve(paymentsProxyAddress, mintingFee.multipliedBy(2)).send({from: issuer_1, gas: Gas}, function(error, result){});
         await publicpoolProxy.methods.sendCredit(issuer_1, mintingFee, 0).send({from: issuer_1, gas: Gas}, function(error, result){});
         await Market_1.methods.mintToken(tokenId, user_1, [tokenPrice], false, 0).send({from: issuer_1, gas: Gas}, function(error, result){});
         let token_1_1 = await Market_1.methods.retrieveToken(tokenId).call();
@@ -309,6 +309,8 @@ contract("Testing NFT Markets",function(accounts){
     });
 
     it("Submit Offer CORRECT",async function(){
+        let start = Math.floor(Date.now()/1000);
+
         await GenerateMarkets(false);
         let tokenId = 0;
         let tokenPrice = 10;
@@ -316,12 +318,12 @@ contract("Testing NFT Markets",function(accounts){
         await Market_1.methods.mintToken(tokenId, user_1, [tokenPrice], false, 0).send({from: issuer_1, gas: Gas}, function(error, result){});
         await Market_1.methods.mintToken(tokenId + 1, user_1, [tokenPrice], false, 0).send({from: issuer_1, gas: Gas}, function(error, result){});
 
-        let start = Math.floor(Date.now()/1000);
-
         await mockdai.methods.approve(paymentsProxyAddress, 2 * tokenPrice).send({from: user_2, gas: Gas}, function(error, result){});
         await publicpoolProxy.methods.sendCredit(user_2, tokenPrice, 0).send({from: user_2, gas: Gas}, function(error, result){});
         await Market_1.methods.submitOffer(tokenId, user_2, tokenPrice, false, 0).send({from: user_2, gas: Gas}, function(error, result){});
         await Market_1.methods.submitOffer(tokenId + 1, user_3, tokenPrice, true, 0).send({from: user_2, gas: Gas}, function(error, result){});
+
+        await sleep(1000);
 
         let offer_1 = await Market_1.methods.retrieveOffer(tokenId).call();
         let offer_2 = await Market_1.methods.retrieveOffer(tokenId + 1).call();
