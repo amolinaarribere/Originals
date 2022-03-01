@@ -201,7 +201,8 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
     }
 
     function retrieveAggregatedAmount(uint256 paymentTokenID) external override view returns(uint){
-        return _AggregatedDividendAmount[paymentTokenID];
+        if(paymentTokenID < _AggregatedDividendAmount.length) return _AggregatedDividendAmount[paymentTokenID];
+        else return 0;
     }
 
     function sumUpTotal(address addr, uint256 paymentTokenID) internal view returns (uint, uint)
