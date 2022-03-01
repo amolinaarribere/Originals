@@ -33,7 +33,7 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
     using ItemsLibrary for *;
 
     // EVENTS /////////////////////////////////////////
-    event _NewFees(uint[][] Prices);
+    event _NewSettings(uint[][] Fees, uint[] TransactionFees, uint[] OfferSettings);
     event _Pay(address indexed Payer, uint Amount, uint AggregatedAmount, uint256 tokenContractId);
     event _AssignDividend(address indexed Recipient, uint Amount, uint TotalSupply, uint256 tokenContractId);
     event _Withdraw(address indexed Recipient, uint Amount, uint256 tokenContractId);
@@ -73,16 +73,18 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
         uint256 numberOfTokens = UintLibrary.Bytes32ToUint(ProposedNewValues[count++]);
         uint256 FeesPerToken = UintLibrary.Bytes32ToUint(ProposedNewValues[count++]);
         uint256 numberOfTransferFees = UintLibrary.Bytes32ToUint(ProposedNewValues[count++]);
-        uint256[][] memory newFees;
-        uint256[] memory newTransferFees;
-        uint256[] memory newOfferSettings;
+        uint256[][] memory newFees = new uint256[][](numberOfTokens);
+        uint256[] memory newTransferFees = new uint256[](numberOfTransferFees);
+        uint256[] memory newOfferSettings = new uint256[](ProposedNewValues.length - (numberOfTokens * FeesPerToken) - count - numberOfTransferFees);
 
         require(ProposedNewValues.length >= count + (numberOfTokens * FeesPerToken) + numberOfTransferFees, "There are some missing fees and/or settings");
 
-        for (uint256 i=count; i < (numberOfTokens * FeesPerToken) + count; i++) {
-            uint256 paymentTokenID = (i - count) / FeesPerToken;
-            uint256 PriceId = (i - count) % FeesPerToken;
-            newFees[paymentTokenID][PriceId] = UintLibrary.Bytes32ToUint(ProposedNewValues[i]);
+        for (uint256 i=0; i < numberOfTokens; i++) {
+            uint256[] memory FeesForToken = new uint256[](FeesPerToken);
+            for(uint256 j=0; j < FeesPerToken; j++){
+                FeesForToken[j] = UintLibrary.Bytes32ToUint(ProposedNewValues[count + (i * FeesPerToken) + j]);
+            }
+            newFees[i] = FeesForToken;
         }
 
         for (uint256 j=(numberOfTokens * FeesPerToken) + count; j < (numberOfTokens * FeesPerToken) + count + numberOfTransferFees; j++) {
@@ -95,9 +97,8 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
 
         InternalupdateSettings(newFees, newTransferFees, newOfferSettings);
 
-        emit _NewFees(newFees);
+        emit _NewSettings(newFees, newTransferFees, newOfferSettings);
     }
-
     function InternalupdateSettings(uint256[][] memory Fees, uint256[] memory TransferFees, uint256[] memory OfferSettings) internal
     {
         for (uint i=0; i < Fees.length; i++) {
@@ -147,17 +148,18 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
 
     function InternalAssignDividends(address recipient, uint256 paymentTokenID) internal
     {
-        (uint totalOffBalance, uint DividendOffBalance) = sumUpTotalOffBalance(recipient, paymentTokenID);
-        _lastAssigned[paymentTokenID][recipient] = _AggregatedDividendAmount[paymentTokenID];
+        if(paymentTokenID < _AggregatedDividendAmount.length){
+            (uint totalOffBalance, uint DividendOffBalance) = sumUpTotalOffBalance(recipient, paymentTokenID);
+            _lastAssigned[paymentTokenID][recipient] = _AggregatedDividendAmount[paymentTokenID];
         
-        if(totalOffBalance > 0){   
-           ItemsLibrary.addBalance(_balances[paymentTokenID][recipient], totalOffBalance, DividendOffBalance);
-           emit _AssignDividend(recipient, totalOffBalance, DividendOffBalance, paymentTokenID);
-        }
+            if(totalOffBalance > 0){   
+            ItemsLibrary.addBalance(_balances[paymentTokenID][recipient], totalOffBalance, DividendOffBalance);
+            emit _AssignDividend(recipient, totalOffBalance, DividendOffBalance, paymentTokenID);
+            }
+        }  
     }
 
-    function withdraw(uint amount, uint256 paymentTokenID) external 
-    override
+    function withdraw(uint amount, uint256 paymentTokenID) external override
     {
         InternalWithdraw(amount, paymentTokenID);
     }
@@ -225,7 +227,8 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
     {
         uint total = 0;
 
-        if(_lastAssigned[paymentTokenID][addr] < _AggregatedDividendAmount[paymentTokenID])
+        if(paymentTokenID < _AggregatedDividendAmount.length && 
+            _lastAssigned[paymentTokenID][addr] < _AggregatedDividendAmount[paymentTokenID])
         {
             total = (_AggregatedDividendAmount[paymentTokenID] - _lastAssigned[paymentTokenID][addr]) * GetTokensBalance(addr);           
         }

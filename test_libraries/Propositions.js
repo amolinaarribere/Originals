@@ -79,23 +79,49 @@ async function checkPropositionSettings(contractAddress, propBytes, user_1){
     }
 }
 
-async function checkFees(contractAddress, FeesBytes, TransactionFeesBytes, SettingsBytes,  user_1){
+async function checkFees(contractAddress, FeeAndSettingsBytes,  user_1){
+    let numberOfTokens = aux.Bytes32ToInt(FeeAndSettingsBytes[0]);
+    let FeesPerToken = aux.Bytes32ToInt(FeeAndSettingsBytes[1]);
+    let numberOfTransferFees = aux.Bytes32ToInt(FeeAndSettingsBytes[2]);
+
+    let FeesBytes = []
+    let TransactionFeesBytes = []
+    let SettingsBytes = []
+
+    for(let f=3; f < (numberOfTokens * FeesPerToken) + 3; f++){
+        FeesBytes.push(FeeAndSettingsBytes[f]);
+    }
+
+    for(let f2=(numberOfTokens * FeesPerToken) + 3; f2 < (numberOfTokens * FeesPerToken) + 3 + numberOfTransferFees; f2++){
+        TransactionFeesBytes.push(FeeAndSettingsBytes[f2]);
+    }
+
+    for(let f3=(numberOfTokens * FeesPerToken) + 3 + numberOfTransferFees; f3 < FeeAndSettingsBytes.length; f3++){
+        SettingsBytes.push(FeeAndSettingsBytes[f3]);
+    }
+
     let response =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    let _Fees = response[0];
-    let _TransactionFees = response[1];
-    let _Settings = response[2];
-    expect(FeesBytes.length).to.equal(_Fees.length);
-    for(let i=0; i < _Fees.length; i++){
-        expect(FeesBytes[i].length).to.equal(_Fees[i].length);
-        for(let j=0; i < _Fees[i].length; j++){
-            expect(aux.Bytes32ToInt(FeesBytes[i][j])).to.equal(parseInt(_Fees[i][j]));
+    let _Fees = []
+    for(let f4=0; f4 < response[0].length; f4++){
+        for(let f5=0; f5 < response[0][f4].length; f5++){
+            _Fees.push(response[0][f4][f5]);
         }
     }
-    for(let i=0; i < _TransactionFees.length; i++){
-        expect(aux.Bytes32ToInt(TransactionFeesBytes[i])).to.equal(parseInt(_TransactionFees[i]));
+    let _TransactionFees = response[1];
+    let _Settings = response[2];
+
+    expect(FeesBytes.length).to.equal(_Fees.length);
+    expect(TransactionFeesBytes.length).to.equal(_TransactionFees.length);
+    expect(SettingsBytes.length).to.equal(_Settings.length);
+
+    for(let i=0; i < _Fees.length; i++){
+        expect(aux.Bytes32ToInt(FeesBytes[i])).to.equal(parseInt(_Fees[i]));
     }
-    for(let i=0; i < _Settings.length; i++){
-        expect(aux.Bytes32ToInt(SettingsBytes[i])).to.equal(parseInt(_Settings[i]));
+    for(let j=0; j < _TransactionFees.length; j++){
+        expect(aux.Bytes32ToInt(TransactionFeesBytes[j])).to.equal(parseInt(_TransactionFees[j]));
+    }
+    for(let k=0; k < _Settings.length; k++){
+        expect(aux.Bytes32ToInt(SettingsBytes[k])).to.equal(parseInt(_Settings[k]));
     }
 
 }
@@ -164,13 +190,29 @@ async function Config_Treasury_Wrong(contractAddress, originalsTokenProxy, token
 };
 
 async function Config_Treasury_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
-    let _price =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
+    let response =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
+    let FeesBytes = response[0];
+    let TransactionFeesBytes = response[1];
+    let SettingsBytes = response[2];
+
     let InitValue = [];
-    for(let i=0; i < _price.length; i++){
-        InitValue.push(aux.IntToBytes32(_price[i]));
+    InitValue.push(aux.IntToBytes32(FeesBytes.length));
+    InitValue.push(aux.IntToBytes32(FeesBytes[0].length));
+    InitValue.push(aux.IntToBytes32(TransactionFeesBytes.length));
+
+    for(let i=0; i < FeesBytes.length; i++){
+        for(let j=0; j < FeesBytes[i].length; j++){
+            InitValue.push(aux.IntToBytes32(FeesBytes[i][j]));
+        }
     }
+    for(let p=0; p < TransactionFeesBytes.length; p++){
+        InitValue.push(aux.IntToBytes32(TransactionFeesBytes[p]));
+    }
+    for(let k=0; k < SettingsBytes.length; k++){
+        InitValue.push(aux.IntToBytes32(SettingsBytes[k]));
+    }
+
     await Config_CommonProposition_Correct(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkFees, true, true);
-   
 };
 
 async function Config_ContractsManager_Wrong(contractAddress, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
