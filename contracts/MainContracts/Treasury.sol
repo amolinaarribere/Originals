@@ -52,7 +52,14 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
     mapping(uint256 => mapping(address => ItemsLibrary._BalanceStruct)) private _balances;
 
     // MODIFIERS /////////////////////////////////////////
-    
+    modifier FeesStructOK(uint256[][] memory Fees){
+        require(Fees.length > 0, "No payment token at all for the fees");
+        uint256 FeesPerToken = Fees[0].length;
+        for(uint256 i=1; i < Fees.length; i++){
+            require(FeesPerToken == Fees[1].length, "Diffrent amount of fees for different tokens");
+        }
+        _;
+    }
     // CONSTRUCTOR /////////////////////////////////////////
     function Treasury_init(uint256[][] memory Fees, uint256[] memory TransferFees, uint256[] memory OfferSettings, address managerContractAddress, address chairPerson) public initializer 
     {
@@ -100,6 +107,7 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
         emit _NewSettings(newFees, newTransferFees, newOfferSettings);
     }
     function InternalupdateSettings(uint256[][] memory Fees, uint256[] memory TransferFees, uint256[] memory OfferSettings) internal
+        FeesStructOK(Fees)
     {
         for (uint i=0; i < Fees.length; i++) {
             if(i < _Fees.length){
@@ -107,18 +115,34 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
                     if(p < _Fees[i].length)_Fees[i][p] = Fees[i][p];
                     else _Fees[i].push(Fees[i][p]);
                 }
+                for(uint p2=Fees[i].length; p2 < _Fees[i].length; p2++){
+                    _Fees[i].pop();
+                }
             }
             else {
                 _Fees.push(Fees[i]);
             }
         }
+        for (uint i2=Fees.length; i2 < _Fees.length; i2++) {
+           _Fees.pop();
+        }
+
+
         for (uint j=0; j < TransferFees.length; j++) {
             if(j < _TransferFees.length)_TransferFees[j] = TransferFees[j];
             else _TransferFees.push(TransferFees[j]);
         }
+        for (uint j2=TransferFees.length; j2 < _TransferFees.length; j2++) {
+            _TransferFees.pop();
+        }
+
+
         for (uint k=0; k < OfferSettings.length; k++) {
             if(k < _OfferSettings.length)_OfferSettings[k] = OfferSettings[k];
             else _OfferSettings.push(OfferSettings[k]);
+        }
+        for (uint k2=OfferSettings.length; k2 < _OfferSettings.length; k2++) {
+            _OfferSettings.pop();
         }
     }
 
