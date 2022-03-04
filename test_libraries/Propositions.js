@@ -81,7 +81,7 @@ async function checkPropositionSettings(contractAddress, propBytes, user_1){
 
 async function checkFees(contractAddress, FeeAndSettingsBytes,  user_1){
     let numberOfTokens = aux.Bytes32ToInt(FeeAndSettingsBytes[0]);
-    let FeesPerToken = aux.Bytes32ToInt(FeeAndSettingsBytes[1]);
+    let FeesPerToken = aux.Bytes32ToInt(FeeAndSettingsBytes[1]) + 1;
     let numberOfTransferFees = aux.Bytes32ToInt(FeeAndSettingsBytes[2]);
 
     let FeesBytes = []
@@ -103,6 +103,7 @@ async function checkFees(contractAddress, FeeAndSettingsBytes,  user_1){
     let response =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
     let _Fees = []
     for(let f4=0; f4 < response[0].length; f4++){
+        _Fees.push(f4);
         for(let f5=0; f5 < response[0][f4].length; f5++){
             _Fees.push(response[0][f4][f5]);
         }
@@ -202,6 +203,7 @@ async function Config_Treasury_Correct(contractAddress, originalsTokenProxy, tok
     InitValue.push(aux.IntToBytes32(TransactionFeesBytes.length));
 
     for(let i=0; i < FeesBytes.length; i++){
+        InitValue.push(aux.IntToBytes32(i));
         for(let j=0; j < FeesBytes[i].length; j++){
             InitValue.push(aux.IntToBytes32(FeesBytes[i][j]));
         }

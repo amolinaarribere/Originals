@@ -52,11 +52,23 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
     mapping(uint256 => mapping(address => ItemsLibrary._BalanceStruct)) private _balances;
 
     // MODIFIERS /////////////////////////////////////////
-    modifier FeesStructOK(uint256[][] memory Fees){
-        require(Fees.length > 0, "No payment token at all for the fees");
-        uint256 FeesPerToken = Fees[0].length;
-        for(uint256 i=1; i < Fees.length; i++){
-            require(FeesPerToken == Fees[1].length, "Diffrent amount of fees for different tokens");
+    modifier FeesOK(uint256[][] memory Fees){
+        if(_Fees.length > 0){
+            for(uint256 i=0; i < Fees.length; i++){
+                require(_Fees[0].length + 1 == Fees[i].length, "Number of Fees does not match");
+            }
+        }
+        _;
+    }
+    modifier TransferFeesOK(uint256[] memory TransferFees){
+        if(_TransferFees.length > 0){
+            require(_TransferFees.length == TransferFees.length, "Number of Transfer Fees does not match");
+        }
+        _;
+    }
+    modifier OfferSettingsOK(uint256[] memory OfferSettings){
+        if(_OfferSettings.length > 0){
+            require(_OfferSettings.length == OfferSettings.length, "Number of Offer Settings does not match");
         }
         _;
     }
@@ -64,7 +76,21 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
     function Treasury_init(uint256[][] memory Fees, uint256[] memory TransferFees, uint256[] memory OfferSettings, address managerContractAddress, address chairPerson) public initializer 
     {
         super.StdPropositionBaseContract_init(chairPerson, managerContractAddress);
-        InternalupdateSettings(Fees, TransferFees, OfferSettings);
+
+        uint256[][] memory initFees = new uint256[][](Fees.length);
+        if(Fees.length > 0){
+            uint256[] memory FeesForToken = new uint256[](Fees[0].length + 1);
+
+            for(uint i=0; i < initFees.length; i++){
+                FeesForToken[0] = i;
+                for(uint j=0; j < Fees[i].length; j++){
+                    FeesForToken[j + 1] = Fees[i][j];
+                }
+                initFees[i] = FeesForToken;
+            }
+        }
+
+        InternalupdateSettings(initFees, TransferFees, OfferSettings);
     }
 
     // GOVERNANCE /////////////////////////////////////////
@@ -79,70 +105,67 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
         bytes32[] memory ProposedNewValues = PropositionsToBytes32();
         uint256 numberOfTokens = UintLibrary.Bytes32ToUint(ProposedNewValues[count++]);
         uint256 FeesPerToken = UintLibrary.Bytes32ToUint(ProposedNewValues[count++]);
+        uint256 ItemsPerToken = FeesPerToken + 1;
         uint256 numberOfTransferFees = UintLibrary.Bytes32ToUint(ProposedNewValues[count++]);
         uint256[][] memory newFees = new uint256[][](numberOfTokens);
         uint256[] memory newTransferFees = new uint256[](numberOfTransferFees);
-        uint256[] memory newOfferSettings = new uint256[](ProposedNewValues.length - (numberOfTokens * FeesPerToken) - count - numberOfTransferFees);
+        uint256[] memory newOfferSettings = new uint256[](ProposedNewValues.length - (numberOfTokens * ItemsPerToken) - count - numberOfTransferFees);
 
-        require(ProposedNewValues.length >= count + (numberOfTokens * FeesPerToken) + numberOfTransferFees, "There are some missing fees and/or settings");
+        require(ProposedNewValues.length >= count + (numberOfTokens * ItemsPerToken) + numberOfTransferFees, "There are some missing fees and/or settings");
+        require(numberOfTransferFees == _TransferFees.length, "Number of Transfer fees does not match");
+        require(newOfferSettings.length == _OfferSettings.length, "Number of Offer settings does not match");
 
         for (uint256 i=0; i < numberOfTokens; i++) {
-            uint256[] memory FeesForToken = new uint256[](FeesPerToken);
-            for(uint256 j=0; j < FeesPerToken; j++){
-                FeesForToken[j] = UintLibrary.Bytes32ToUint(ProposedNewValues[count + (i * FeesPerToken) + j]);
+            uint256[] memory newFeesForToken = new uint256[](ItemsPerToken);
+            for(uint256 j=0; j < ItemsPerToken; j++){
+                uint index = count + (i * ItemsPerToken) + j;
+                newFeesForToken[j] = UintLibrary.Bytes32ToUint(ProposedNewValues[index]);
             }
-            newFees[i] = FeesForToken;
+            newFees[i] = newFeesForToken;
         }
 
-        for (uint256 j=(numberOfTokens * FeesPerToken) + count; j < (numberOfTokens * FeesPerToken) + count + numberOfTransferFees; j++) {
-            newTransferFees[j - ((numberOfTokens * FeesPerToken) + count)] = UintLibrary.Bytes32ToUint(ProposedNewValues[j]);
+        for (uint256 j=(numberOfTokens * ItemsPerToken) + count; j < (numberOfTokens * ItemsPerToken) + count + numberOfTransferFees; j++) {
+            newTransferFees[j - ((numberOfTokens * ItemsPerToken) + count)] = UintLibrary.Bytes32ToUint(ProposedNewValues[j]);
         }
 
-        for (uint256 k=(numberOfTokens * FeesPerToken) + count + numberOfTransferFees; k < ProposedNewValues.length; k++) {
-            newOfferSettings[k - ((numberOfTokens * FeesPerToken) + count + numberOfTransferFees)] = UintLibrary.Bytes32ToUint(ProposedNewValues[k]);
+        for (uint256 k=(numberOfTokens * ItemsPerToken) + count + numberOfTransferFees; k < ProposedNewValues.length; k++) {
+            newOfferSettings[k - ((numberOfTokens * ItemsPerToken) + count + numberOfTransferFees)] = UintLibrary.Bytes32ToUint(ProposedNewValues[k]);
         }
 
         InternalupdateSettings(newFees, newTransferFees, newOfferSettings);
 
         emit _NewSettings(newFees, newTransferFees, newOfferSettings);
     }
+
     function InternalupdateSettings(uint256[][] memory Fees, uint256[] memory TransferFees, uint256[] memory OfferSettings) internal
-        FeesStructOK(Fees)
+        FeesOK(Fees)
+        TransferFeesOK(TransferFees)
+        OfferSettingsOK(OfferSettings)
     {
         for (uint i=0; i < Fees.length; i++) {
-            if(i < _Fees.length){
-                for(uint p=0; p < Fees[i].length; p++){
-                    if(p < _Fees[i].length)_Fees[i][p] = Fees[i][p];
-                    else _Fees[i].push(Fees[i][p]);
-                }
-                for(uint p2=Fees[i].length; p2 < _Fees[i].length; p2++){
-                    _Fees[i].pop();
+            uint256 paymentTokenID = Fees[i][0];
+            if(paymentTokenID < _Fees.length){
+                for(uint p=0; p < _Fees[paymentTokenID].length; p++){
+                    _Fees[paymentTokenID][p] = Fees[i][p + 1];
                 }
             }
             else {
-                _Fees.push(Fees[i]);
+                uint256[] memory FeesForNewPaymentID = new uint256[](Fees[i].length - 1);
+                for(uint p=0; p < FeesForNewPaymentID.length; p++){
+                    FeesForNewPaymentID[p] = Fees[i][p + 1];
+                }
+                _Fees.push(FeesForNewPaymentID);
             }
         }
-        for (uint i2=Fees.length; i2 < _Fees.length; i2++) {
-           _Fees.pop();
-        }
-
 
         for (uint j=0; j < TransferFees.length; j++) {
-            if(j < _TransferFees.length)_TransferFees[j] = TransferFees[j];
+            if(j < _TransferFees.length) _TransferFees[j] = TransferFees[j];
             else _TransferFees.push(TransferFees[j]);
         }
-        for (uint j2=TransferFees.length; j2 < _TransferFees.length; j2++) {
-            _TransferFees.pop();
-        }
-
 
         for (uint k=0; k < OfferSettings.length; k++) {
-            if(k < _OfferSettings.length)_OfferSettings[k] = OfferSettings[k];
+            if(k < _OfferSettings.length) _OfferSettings[k] = OfferSettings[k];
             else _OfferSettings.push(OfferSettings[k]);
-        }
-        for (uint k2=OfferSettings.length; k2 < _OfferSettings.length; k2++) {
-            _OfferSettings.pop();
         }
     }
 

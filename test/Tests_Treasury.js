@@ -56,6 +56,7 @@ contract("Testing Treasury",function(accounts){
     var PropositionValues = [aux.IntToBytes32(1),
         aux.IntToBytes32(4),
         aux.IntToBytes32(4),
+        aux.IntToBytes32(0),
         aux.IntToBytes32(10),
         aux.IntToBytes32(9),
         aux.IntToBytes32(8),
@@ -123,6 +124,7 @@ contract("Testing Treasury",function(accounts){
         expect("0").to.be.equal(UserBalance_1.toString());
         expect(NewIssuerFee.toString()).to.be.equal(AggregatedAmount.toString());
 
+
         await TreasuryProxy.methods.withdraw(first_withdraw, 0).send({from: chairPerson, gas: Gas}, function(error, result){});
         TreasuryBalance = new BigNumber(await mockdai.methods.balanceOf(TreasuryProxy._address).call());
         let UserBalance_2 = new BigNumber(await mockdai.methods.balanceOf(chairPerson).call());
@@ -139,6 +141,5 @@ contract("Testing Treasury",function(accounts){
         expect(NewIssuerFee.toString()).to.be.equal(UserBalance_3.toString());
         expect(NewIssuerFee.toString()).to.be.equal(AggregatedAmount.toString());
     });
-
 
 });
