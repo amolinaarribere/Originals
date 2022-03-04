@@ -35,6 +35,11 @@ library Library{
         bool active;
     }
 
+    struct NewPaymentTokenStruct{
+        address TokenContractAddress;
+        uint256 index;
+    }
+
     // FUNCTIONALITY /////////////////////////////////////////
     function validFees(uint256 fee, uint256 decimals) public pure{
       require(fee <= 100 * 10**decimals, "fees cannot be larger than 100 percent");

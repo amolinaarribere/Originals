@@ -20,7 +20,7 @@ contract Payments is IPayments, StdPropositionBaseContract{
     using Library for *;
 
     // EVENTS /////////////////////////////////////////
-    event _NewAddresses(address[] TokenAddresses);
+    event _NewAddresses(uint[] index, address[] TokenAddresses);
 
     // DATA /////////////////////////////////////////
     Library.PaymentTokenStruct[] _Tokens;
@@ -28,23 +28,7 @@ contract Payments is IPayments, StdPropositionBaseContract{
     // MODIFIERS /////////////////////////////////////////
     modifier areAddressesOK(bytes[] memory NewValues)
     {
-        require(NewValues.length > 0, "At least one token address must be provided");
-
-        if(NewValues.length > _Tokens.length){
-            for(uint256 i=_Tokens.length; i < NewValues.length; i++){
-                require(address(0) != AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[i])[0]), "New Token addresses cannot be empty");
-            }
-        }
-        else{
-            bool AtLeastOneActiveToken = false;
-            for(uint256 i=0; i < NewValues.length; i++){
-                if(address(0) != AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[i])[0])) {
-                    AtLeastOneActiveToken = true;
-                    break;
-                }
-            }
-            require(AtLeastOneActiveToken, "EC21-");
-        }
+        require(NewValues.length % 2 == 0, "For each address and index must be provided");
         _;
     }
 
@@ -78,7 +62,15 @@ contract Payments is IPayments, StdPropositionBaseContract{
     function Payments_init(address managerContractAddress, address chairPerson, address[] memory tokenAddresses) public initializer 
     {
         super.StdPropositionBaseContract_init(chairPerson, managerContractAddress);
-        InternalupdateSettings(tokenAddresses);
+
+        Library.NewPaymentTokenStruct[] memory initTokenAddresses = new Library.NewPaymentTokenStruct[](tokenAddresses.length);
+
+        for(uint i=0; i < tokenAddresses.length; i++){
+            initTokenAddresses[i].index = i;
+            initTokenAddresses[i].TokenContractAddress = tokenAddresses[i];
+        }
+
+        InternalupdateSettings(initTokenAddresses);
     }
 
     // GOVERNANCE /////////////////////////////////////////
@@ -89,30 +81,40 @@ contract Payments is IPayments, StdPropositionBaseContract{
     function UpdateAll() internal override
     {
         bytes32[] memory ProposedNewValues = PropositionsToBytes32();
-        address[] memory NewAddresses = new address[](ProposedNewValues.length);
-        for(uint256 i=0; i < NewAddresses.length; i++){
-            NewAddresses[i] = AddressLibrary.Bytes32ToAddress(ProposedNewValues[i]);
+        Library.NewPaymentTokenStruct[] memory newTokenAddresses = new Library.NewPaymentTokenStruct[](ProposedNewValues.length / 2);
+        address[] memory NewAddresses = new address[](ProposedNewValues.length / 2);
+        uint256[] memory Indexes = new uint256[](ProposedNewValues.length / 2);
+
+        for(uint256 i=0; i < newTokenAddresses.length; i++){
+            Indexes[i] = UintLibrary.Bytes32ToUint(ProposedNewValues[2 * i]);
+            NewAddresses[i] = AddressLibrary.Bytes32ToAddress(ProposedNewValues[(2 * i) + 1]);
+            newTokenAddresses[i].index = Indexes[i];
+            newTokenAddresses[i].TokenContractAddress = NewAddresses[i];
         }
 
-        InternalupdateSettings(NewAddresses);
-        emit _NewAddresses(NewAddresses);
+        InternalupdateSettings(newTokenAddresses);
+        emit _NewAddresses(Indexes, NewAddresses);
     }
 
-    function InternalupdateSettings(address[] memory tokenAddresses) internal
+    function InternalupdateSettings(Library.NewPaymentTokenStruct[] memory tokenAddresses) internal
     {
-        for(uint256 i=0; i < _Tokens.length; i++){
-            if(i < tokenAddresses.length && address(0) != tokenAddresses[i]) {
-                _Tokens[i].TokenContract = IERC20(tokenAddresses[i]);
-                if(!_Tokens[i].active)_Tokens[i].active = true;
+        for(uint256 i=0; i < tokenAddresses.length; i++){
+            if(tokenAddresses[i].index < _Tokens.length){
+                if(address(0) != tokenAddresses[i].TokenContractAddress){
+                    _Tokens[tokenAddresses[i].index].TokenContract =  IERC20(tokenAddresses[i].TokenContractAddress);
+                    if(!_Tokens[tokenAddresses[i].index].active)_Tokens[tokenAddresses[i].index].active =  true;
+                } 
+                else {
+                    if(_Tokens[tokenAddresses[i].index].active)_Tokens[i].active = false;
+                }
             }
             else{
-                if(_Tokens[i].active)_Tokens[i].active = false;
+                if(address(0) != tokenAddresses[i].TokenContractAddress){
+                    Library.PaymentTokenStruct memory newToken = Library.PaymentTokenStruct(IERC20(tokenAddresses[i].TokenContractAddress), true);
+                    _Tokens.push(newToken);
+                }
+                
             }
-        }
-
-        for(uint256 k=_Tokens.length; k < tokenAddresses.length; k++){
-            Library.PaymentTokenStruct memory newToken = Library.PaymentTokenStruct(IERC20(tokenAddresses[k]), true);
-            _Tokens.push(newToken);
         }
     }
 

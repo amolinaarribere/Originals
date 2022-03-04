@@ -18,5 +18,13 @@ function returnIssuerObject(owner, name, symbol, feeAmount, feeDecimals, payment
         };  
 }
 
+function returnNewPaymentsObject(index, address){
+    return {
+        "TokenContractAddress": address,
+        "index": index
+    };  
+}
+
 exports.returnUpgradeObject = returnUpgradeObject;
 exports.returnIssuerObject = returnIssuerObject;
+exports.returnNewPaymentsObject = returnNewPaymentsObject;

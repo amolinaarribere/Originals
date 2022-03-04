@@ -30,7 +30,10 @@ contract("Testing Payments",function(accounts){
     const address_1 = "0x0000000000000000000000000000000000000001";
     const address_2 = "0x0000000000000000000000000000000000000002";
     const zeroBytes = "0x0000000000000000000000000000000000000000000000000000000000000000"
-    var PropositionValues = [aux.AddressToBytes32(address_1), aux.AddressToBytes32(address_2)];
+    var PropositionValues = [aux.IntToBytes32(0), 
+        aux.AddressToBytes32(address_1), 
+        aux.IntToBytes32(1),
+        aux.AddressToBytes32(address_2)];
 
     const NotCertifiedContract = new RegExp("It is not from one of the certified contracts");
 
