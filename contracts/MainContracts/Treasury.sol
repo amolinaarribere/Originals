@@ -115,21 +115,22 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
         require(numberOfTransferFees == _TransferFees.length, "Number of Transfer fees does not match");
         require(newOfferSettings.length == _OfferSettings.length, "Number of Offer settings does not match");
 
+        uint index = count;
+
         for (uint256 i=0; i < numberOfTokens; i++) {
             uint256[] memory newFeesForToken = new uint256[](ItemsPerToken);
             for(uint256 j=0; j < ItemsPerToken; j++){
-                uint index = count + (i * ItemsPerToken) + j;
-                newFeesForToken[j] = UintLibrary.Bytes32ToUint(ProposedNewValues[index]);
+                newFeesForToken[j] = UintLibrary.Bytes32ToUint(ProposedNewValues[index++]);
             }
             newFees[i] = newFeesForToken;
         }
 
-        for (uint256 j=(numberOfTokens * ItemsPerToken) + count; j < (numberOfTokens * ItemsPerToken) + count + numberOfTransferFees; j++) {
-            newTransferFees[j - ((numberOfTokens * ItemsPerToken) + count)] = UintLibrary.Bytes32ToUint(ProposedNewValues[j]);
+        for (uint256 j=0; j < numberOfTransferFees; j++) {
+            newTransferFees[j] = UintLibrary.Bytes32ToUint(ProposedNewValues[index++]);
         }
 
-        for (uint256 k=(numberOfTokens * ItemsPerToken) + count + numberOfTransferFees; k < ProposedNewValues.length; k++) {
-            newOfferSettings[k - ((numberOfTokens * ItemsPerToken) + count + numberOfTransferFees)] = UintLibrary.Bytes32ToUint(ProposedNewValues[k]);
+        for (uint256 k=0; k < newOfferSettings.length; k++) {
+            newOfferSettings[k] = UintLibrary.Bytes32ToUint(ProposedNewValues[index++]);
         }
 
         InternalupdateSettings(newFees, newTransferFees, newOfferSettings);
