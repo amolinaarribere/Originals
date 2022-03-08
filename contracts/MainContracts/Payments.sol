@@ -105,7 +105,7 @@ contract Payments is IPayments, StdPropositionBaseContract{
                     if(!_Tokens[tokenAddresses[i].index].active)_Tokens[tokenAddresses[i].index].active =  true;
                 } 
                 else {
-                    if(_Tokens[tokenAddresses[i].index].active)_Tokens[i].active = false;
+                    if(_Tokens[tokenAddresses[i].index].active)_Tokens[tokenAddresses[i].index].active = false;
                 }
             }
             else{
