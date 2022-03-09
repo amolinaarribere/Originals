@@ -109,6 +109,18 @@ import "../Interfaces/IPayments.sol";
     require((total * CommonDividend) == calculatedTotal, "the total amount is not equal to the calculated one");
   }
 
+  modifier isPaymentTokenOK(uint256 paymentTokenID){
+    isPaymentTokenOKFunc(paymentTokenID);
+    _;
+  }
+
+   function isPaymentTokenOKFunc(uint256 paymentTokenID) internal view{
+    IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
+    Library.PaymentTokenStruct[] memory  paymentTokens = payments.retrieveSettings();
+    require(paymentTokenID < paymentTokens.length, "This payment token is not valid");
+    require(true == paymentTokens[paymentTokenID].active, "This payment token is not enabled");
+  }
+
   // CONSTRUCTOR /////////////////////////////////////////
   function PublicPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
       super.MultiSigContract_init(owners, minOwners); 
@@ -138,6 +150,7 @@ import "../Interfaces/IPayments.sol";
 
   function requestIssuer(ItemsLibrary._issuerStruct memory requestedIssuer, bool FromCredit, uint256 paymentTokenID) external override
     validIssuerRequest(requestedIssuer)
+    isPaymentTokenOK(paymentTokenID)
   {
 
     (uint256[][] memory Fees, , ) = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
@@ -266,6 +279,7 @@ import "../Interfaces/IPayments.sol";
   // Credit Functionality
 
   function sendCredit(address addr, uint256 amount, uint256 paymentTokenID) external override
+      isPaymentTokenOK(paymentTokenID)
   {
     bytes32[] memory dataArray = new bytes32[](3);
     dataArray[0] = UintLibrary.UintToBytes32(uint256(Library.PublicPoolPaymentTypes.SendCredit));
@@ -297,6 +311,7 @@ import "../Interfaces/IPayments.sol";
   function reuseCredit(uint256 NFTMarketId, uint256 tokenID, address addr, uint256 amount, uint256 paymentTokenID) external override
     isNFTMarket(NFTMarketId, msg.sender)
     isTokenUnassignedCreditEmpty(NFTMarketId, tokenID)
+    isPaymentTokenOK(paymentTokenID)
   {
     internalWithdraw(address(0), amount, addr, false, bytes(""), paymentTokenID, false);
     internalTransferUnassignedCredit(NFTMarketId, tokenID, amount, paymentTokenID);
@@ -305,6 +320,7 @@ import "../Interfaces/IPayments.sol";
 
   function spendCredit(uint256 NFTMarketId, address from, uint256 amount, address to, uint256 paymentTokenID) external override
     isNFTMarket(NFTMarketId, msg.sender)
+    isPaymentTokenOK(paymentTokenID)
   {
     internalSpendCredit(NFTMarketId, from, amount, to, paymentTokenID);
   }
