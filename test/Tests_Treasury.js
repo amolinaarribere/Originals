@@ -75,7 +75,7 @@ contract("Testing Treasury",function(accounts){
         TreasuryProxy = new web3.eth.Contract(TreasuryAbi, contracts[1][1]);
         originalsTokenProxy = new web3.eth.Contract(OriginalsTokenAbi, contracts[1][2]);
         paymentsProxyAddress = contracts[1][5];
-        mockdai = new web3.eth.Contract(MockDaiAbi, contracts[2][7]);
+        mockdai = new web3.eth.Contract(MockDaiAbi, contracts[2][8]);
     });
 
 

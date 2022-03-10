@@ -13,17 +13,18 @@ Before every token transfer we contact the token gouvernance Base contracts so t
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "../Interfaces/IPool.sol";
+import "../Interfaces/IMarketsCredits.sol";
 import "../Interfaces/ITreasury.sol";
 import "../Base/MultiSigContract.sol";
 import "../Libraries/ItemsLibrary.sol";
 import "../Libraries/UintLibrary.sol";
 import "../Libraries/Library.sol";
 import "../Libraries/AddressLibrary.sol";
+import "../Base/ManagedBaseContract.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
-import "../Base/CreditorBaseContract.sol";
 import "../Interfaces/IPayments.sol";
 
- contract PublicPool is  IPool, Initializable, MultiSigContract, CreditorBaseContract {
+ contract PublicPool is  IPool, Initializable, ManagedBaseContract, MultiSigContract {
   using ItemsLibrary for *;
   using UintLibrary for *;
   using Library for *;
@@ -57,10 +58,6 @@ import "../Interfaces/IPayments.sol";
   mapping(uint256 => _pendingIssuerStruct) private _pendingIssuers;
   uint256[] private _listOfPendingIssuers;
 
-  mapping(uint256 => mapping(address => ItemsLibrary._BalanceStruct)) private _creditOfAccount;
-  mapping(uint256 => mapping(uint256 => _unassignedCreditStruct)) private _unassignedCreditForMarket;
-
-
 
   // MODIFIERS /////////////////////////////////////////
   modifier IssuerPending(uint256 id){
@@ -76,90 +73,26 @@ import "../Interfaces/IPayments.sol";
      _;
   }
 
-  modifier isNFTMarket(uint256 MarketId, address MarketAddress){
-      isNFTMarketFunc(MarketId, MarketAddress);
-      _;
-  }
-
-  function isNFTMarketFunc(uint256 MarketId, address MarketAddress) internal view{
-    require(MarketAddress == _issuers[MarketId], "The Market Id and Address do not correspond");
-  }
-
-  modifier isTokenUnassignedCreditEmpty(uint256 NFTMarketId, uint256 tokenID){
-    isTokenUnassignedCreditEmptyFunc(NFTMarketId, tokenID);
-    _;
-  }
-
-  function isTokenUnassignedCreditEmptyFunc(uint256 NFTMarketId, uint256 tokenID) internal view{
-    require(0 == _unassignedCreditForMarket[NFTMarketId][tokenID]._credit, "Unassigned credit for this token is not empty");
-  }
-
-  modifier checkTotal(uint256 total, uint256[] memory amounts, uint256[] memory factors){
-    checkTotalFunc(total, amounts, factors);
-    _;
-  }
-
-  function checkTotalFunc(uint256 total, uint256[] memory amounts, uint256[] memory factors) internal pure{
-    require(amounts.length == factors.length, "Provided arrays do not have the same length");
-    uint256 CommonDividend = UintLibrary.ProductOfFactors(factors);
-    uint256 calculatedTotal = 0;
-    for(uint256 i=0; i < factors.length; i++){
-        calculatedTotal += amounts[i] * CommonDividend / factors[i];
-    }
-    require((total * CommonDividend) == calculatedTotal, "the total amount is not equal to the calculated one");
-  }
-
-  modifier isPaymentTokenOK(uint256 paymentTokenID){
-    isPaymentTokenOKFunc(paymentTokenID);
-    _;
-  }
-
-   function isPaymentTokenOKFunc(uint256 paymentTokenID) internal view{
-    IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
-    Library.PaymentTokenStruct[] memory  paymentTokens = payments.retrieveSettings();
-    require(paymentTokenID < paymentTokens.length, "This payment token is not valid");
-    require(true == paymentTokens[paymentTokenID].active, "This payment token is not enabled");
-  }
-
   // CONSTRUCTOR /////////////////////////////////////////
-  function PublicPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
+  function PublicPool_init(address[] memory owners, uint256 minOwners, address managerContractAddress) public initializer {
       super.MultiSigContract_init(owners, minOwners); 
-      super.CreditorBaseContract_init(managerContractAddress); 
+      super.ManagedBaseContract_init(managerContractAddress); 
   }
 
   // FUNCTIONALITY /////////////////////////////////////////
-  function onCreditReceived(address sender, uint256 amount, uint256 paymentTokenID, bytes memory data) internal override
-  {
-    bytes32[] memory receivedData = Library.BytestoBytes32(data);
-    Library.PublicPoolPaymentTypes paymentType = Library.PublicPoolPaymentTypes(uint256(receivedData[0]));
-
-    if(Library.PublicPoolPaymentTypes.SendCredit == paymentType){
-      address account = AddressLibrary.Bytes32ToAddress(receivedData[1]);
-      ItemsLibrary.addBalance(_creditOfAccount[paymentTokenID][account], amount, 1);
-      emit _CreditReceived(account, amount, sender, paymentTokenID);
-    }
-
-    else{
-      uint256 NFTMarketId = UintLibrary.Bytes32ToUint(receivedData[1]);
-      uint256 tokenID = UintLibrary.Bytes32ToUint(receivedData[2]);
-      internalTransferUnassignedCredit(NFTMarketId, tokenID, amount, paymentTokenID);
-      emit _CreditUnAssignedReceived(NFTMarketId, tokenID, amount, paymentTokenID);
-    }
-     
-  }
-
   function requestIssuer(ItemsLibrary._issuerStruct memory requestedIssuer, bool FromCredit, uint256 paymentTokenID) external override
     validIssuerRequest(requestedIssuer)
-    isPaymentTokenOK(paymentTokenID)
   {
-
     (uint256[][] memory Fees, , ) = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
+    require(paymentTokenID < Fees.length, "No system prices for this payment ID");
+
     uint256 NewIssuerFee = Fees[paymentTokenID][uint256(Library.Fees.NewIssuerFee)];
     uint256 AdminNewIssuerFee = Fees[paymentTokenID][uint256(Library.Fees.AdminNewIssuerFee)];
 
     if(FromCredit){
-      internalSpendCredit(0, msg.sender, NewIssuerFee,  _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], paymentTokenID);
-      internalSpendCredit(0, msg.sender, AdminNewIssuerFee,  _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], paymentTokenID);
+      IMarketsCredits marketsCredits = IMarketsCredits(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.MarketsCredits)]);
+      marketsCredits.spendCredit(0, msg.sender, NewIssuerFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], paymentTokenID);
+      marketsCredits.spendCredit(0, msg.sender, AdminNewIssuerFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], paymentTokenID);
     }
     else{
       IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
@@ -275,108 +208,6 @@ import "../Interfaces/IPayments.sol";
   {
     return _pendingIssuers[id];
   }
-
-  // Credit Functionality
-
-  function sendCredit(address addr, uint256 amount, uint256 paymentTokenID) external override
-      isPaymentTokenOK(paymentTokenID)
-  {
-    bytes32[] memory dataArray = new bytes32[](3);
-    dataArray[0] = UintLibrary.UintToBytes32(uint256(Library.PublicPoolPaymentTypes.SendCredit));
-    dataArray[1] = AddressLibrary.AddressToBytes32(addr);
-    bytes memory data = Library.Bytes32ArrayToBytes(dataArray);
-
-    IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
-    payments.TransferFrom(msg.sender, address(this), amount, 0, data, paymentTokenID);
-  }
-
-  function addCredit(uint256 NFTMarketId, uint256 tokenID, address[] calldata addrs, uint256[] calldata amounts, uint256[] calldata factors) external override
-    isNFTMarket(NFTMarketId, msg.sender)
-    checkTotal(_unassignedCreditForMarket[NFTMarketId][tokenID]._credit, amounts, factors)
-  {
-    require(addrs.length == factors.length, "Provided arrays do not have the same length");
-    addCreditinternal(NFTMarketId, tokenID, addrs, amounts, factors);
-    delete(_unassignedCreditForMarket[NFTMarketId][tokenID]);
-  }
-
-  function addCreditinternal(uint256 NFTMarketId, uint256 tokenID, address[] calldata addrs, uint256[] calldata amounts, uint256[] calldata factors) internal 
-  {
-    uint256 paymentTokenID = _unassignedCreditForMarket[NFTMarketId][tokenID]._paymentTokenID;
-    for(uint i=0; i < addrs.length; i++){
-      ItemsLibrary.addBalance(_creditOfAccount[paymentTokenID][addrs[i]], amounts[i], factors[i]);
-      emit _CreditAssigned(NFTMarketId, tokenID, addrs[i], amounts[i], factors[i], paymentTokenID);
-    }
-  }
-
-  function reuseCredit(uint256 NFTMarketId, uint256 tokenID, address addr, uint256 amount, uint256 paymentTokenID) external override
-    isNFTMarket(NFTMarketId, msg.sender)
-    isTokenUnassignedCreditEmpty(NFTMarketId, tokenID)
-    isPaymentTokenOK(paymentTokenID)
-  {
-    internalWithdraw(address(0), amount, addr, false, bytes(""), paymentTokenID, false);
-    internalTransferUnassignedCredit(NFTMarketId, tokenID, amount, paymentTokenID);
-    emit _CreditReused(NFTMarketId, tokenID, addr, amount, paymentTokenID);
-  }
-
-  function spendCredit(uint256 NFTMarketId, address from, uint256 amount, address to, uint256 paymentTokenID) external override
-    isNFTMarket(NFTMarketId, msg.sender)
-    isPaymentTokenOK(paymentTokenID)
-  {
-    internalSpendCredit(NFTMarketId, from, amount, to, paymentTokenID);
-  }
-
-  function internalSpendCredit(uint256 NFTMarketId, address from, uint256 amount, address to, uint256 paymentTokenID) internal 
-  {
-    internalWithdraw(to, amount, from, true, bytes(""), paymentTokenID, true);
-    emit _CreditSpent(NFTMarketId, from, amount, to, paymentTokenID);
-  }
-
-  function withdraw(uint amount, uint256 paymentTokenID) external override
-  {
-    internalWithdraw(msg.sender, amount, msg.sender, false, bytes(""), paymentTokenID, true);
-    emit _CreditWithdrawn(msg.sender, amount, paymentTokenID);
-  }
-  
-  function withdrawAll(uint256 paymentTokenID) external override
-  {
-    uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[paymentTokenID][msg.sender]);
-    internalWithdraw(msg.sender, amount, msg.sender, false, bytes(""), paymentTokenID, true);
-    emit _CreditWithdrawn(msg.sender, amount, paymentTokenID);
-  }
-  
-  function withdrawAllFor(uint256 NFTMarketId, address addr, uint256 paymentTokenID, bytes memory data) external override
-    isNFTMarket(NFTMarketId, msg.sender)
-  {
-    uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[paymentTokenID][addr]);
-    internalWithdraw(addr, amount, addr, true, data, paymentTokenID, true);
-    emit _CreditWithdrawnFor(addr, amount, msg.sender, paymentTokenID);
-  }
-
-  function internalTransferUnassignedCredit(uint256 NFTMarketId, uint256 tokenID, uint256 amount, uint256 paymentTokenID) internal
-  {
-      _unassignedCreditForMarket[NFTMarketId][tokenID]._credit = amount;
-      _unassignedCreditForMarket[NFTMarketId][tokenID]._paymentTokenID = paymentTokenID;
-  }
-
-  function internalWithdraw(address to, uint amount, address sender, bool sendData, bytes memory data, uint256 paymentTokenID, bool transfer) internal
-  {
-    ItemsLibrary.InternalWithdraw(
-      _creditOfAccount[paymentTokenID][sender], 
-      amount, 
-      to, 
-      transfer, 
-      address(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings()[paymentTokenID].TokenContract),
-      sendData,
-      data,
-      paymentTokenID
-    );
-  }
-
-  function retrieveCredit(address addr, uint256 paymentTokenID) external override view returns (uint256)
-  {
-    return ItemsLibrary.checkFullBalance(_creditOfAccount[paymentTokenID][addr]);
-  }
-
 
 
  }

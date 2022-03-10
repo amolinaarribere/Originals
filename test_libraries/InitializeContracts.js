@@ -6,6 +6,7 @@ const NFTMarket = artifacts.require("NFTMarket");
 const OriginalsToken = artifacts.require("OriginalsToken");
 const PropositionSettings = artifacts.require("PropositionSettings");
 const Payments = artifacts.require("Payments");
+const MarketsCredits = artifacts.require("MarketsCredits");
 const TransparentUpgradeableProxy = artifacts.require("@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol");
 
 const ManagerAbi = Manager.abi;
@@ -29,12 +30,15 @@ const AdminTransferFeeAmount = constants.AdminTransferFeeAmount;
 const AdminTransferFeeDecimals = constants.AdminTransferFeeDecimals;
 const OffersLifeTime = constants.OffersLifeTime;
 // Mock -------------
-const MockName = constants.MockName;
-const MockSymbol = constants.MockSymbol;
-const MockSupply = constants.MockSupply;
+const MockName1 = constants.MockName1;
+const MockSymbol1 = constants.MockSymbol1;
+const MockSupply1 = constants.MockSupply1;
+const MockName2 = constants.MockName2;
+const MockSymbol2 = constants.MockSymbol2;
+const MockSupply2 = constants.MockSupply2;
 // Mock -------------
 const Fees = [NewIssuerFee.toString(), AdminNewIssuerFee.toString(), MintingFee.toString(), AdminMintingFee.toString()];
-const AllFees = [Fees];
+const AllFees = [Fees, Fees];
 const TransferFees = [TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals];
 const OfferSettings = [OffersLifeTime]
 
@@ -231,6 +235,19 @@ const PaymentsProxyInitializerMethod = {
   "stateMutability": "nonpayable",
   "type": "function"
 };
+const MarketsCreditsProxyInitializerMethod = {
+  "inputs": [
+    {
+      "internalType": "address",
+      "name": "managerContractAddress",
+      "type": "address"
+    }
+  ],
+  "name": "MarketsCredits_init",
+  "outputs": [],
+  "stateMutability": "nonpayable",
+  "type": "function"
+};
 
 
 async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1){
@@ -248,10 +265,13 @@ async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1)
   await TransparentUpgradeableProxyInstance.methods.changeAdmin(ProxyAdmin).send({from: chairPerson, gas: Gas});;
 
   let implementations = await deployImplementations(user_1);
-  let ProxyData = returnProxyInitData(PublicOwners, minOwners, ManagerProxyAddress, chairPerson, [implementations[7]]);
 
-  await ManagerProxy.methods.InitializeContracts(obj.returnUpgradeObject(implementations[0], implementations[1], implementations[2], implementations[3], implementations[4], implementations[5], implementations[6],
-    ProxyData[0], ProxyData[1], ProxyData[2], ProxyData[3], ProxyData[4], ProxyData[5]),
+  let ProxyData = returnProxyInitData(PublicOwners, minOwners, ManagerProxyAddress, chairPerson, [implementations[9], implementations[10]]);
+
+  await ManagerProxy.methods.InitializeContracts(obj.returnUpgradeObject(
+    [implementations[0], implementations[1], implementations[2], implementations[3], implementations[4], implementations[6], implementations[7]],
+    [implementations[5]],
+    ProxyData),
     ManagerProxy._address).send({from: chairPerson, gas: Gas});
 
   let proxies = await retrieveProxies(ManagerProxy, user_1);
@@ -268,11 +288,13 @@ async function deployImplementations(user_1){
     let adminPiggyBank = await AdminPiggyBank.new({from: user_1});
     let nFTMarket = await NFTMarket.new({from: user_1});
     let payments = await Payments.new({from: user_1});
+    let marketsCredits = await MarketsCredits.new({from: user_1});
     // Mock ---------------
-    let mockDai = await MockDai.new(MockName, MockSymbol, MockSupply, user_1, {from: user_1});
+    let mockDai1 = await MockDai.new(MockName1, MockSymbol1, MockSupply1, user_1, {from: user_1});
+    let mockDai2 = await MockDai.new(MockName2, MockSymbol2, MockSupply2, user_1, {from: user_1});
     // Mock ---------------
 
-    return [publicPool.address, treasury.address, originalsToken.address, propositionSettings.address, adminPiggyBank.address, nFTMarket.address, payments.address, mockDai.address, manager.address];
+    return [publicPool.address, treasury.address, originalsToken.address, propositionSettings.address, adminPiggyBank.address, nFTMarket.address, payments.address, marketsCredits.address, manager.address, mockDai1.address, mockDai2.address];
 }
 
 async function retrieveProxies(manager, user_1){
@@ -290,8 +312,10 @@ async function retrieveProxies(manager, user_1){
   let adminPiggyBank = TransparentProxies[i];
   i++;
   let payments = TransparentProxies[i];
+  i++;
+  let marketsCredits = TransparentProxies[i];
 
-  return [publicPoolProxy, treasuryProxy, originalsTokenProxy, propositionSettingsProxy, adminPiggyBank, payments];
+  return [publicPoolProxy, treasuryProxy, originalsTokenProxy, propositionSettingsProxy, adminPiggyBank, payments, marketsCredits];
 }
 
 function getProxyData(method, parameters){
@@ -305,8 +329,9 @@ function returnProxyInitData(PublicOwners, minOwners, manager, chairPerson, toke
   let PropositionSettingsProxyData = getProxyData(PropositionSettingsProxyInitializerMethod, [manager, chairPerson, PropositionLifeTime, PropositionThreshold, minToPropose]);
   let AdminPiggyBankProxyData = getProxyData(AdminPiggyBankProxyInitializerMethod, [PublicOwners, minOwners, manager]);
   let PaymentsProxyData = getProxyData(PaymentsProxyInitializerMethod, [manager, chairPerson, tokenAddresses]);
+  let MarketsCreditsProxyData = getProxyData(MarketsCreditsProxyInitializerMethod, [manager]);
 
-  return [PublicPoolProxyData, TreasuryProxyData, OriginalsProxyData, PropositionSettingsProxyData, AdminPiggyBankProxyData, PaymentsProxyData];
+  return [PublicPoolProxyData, TreasuryProxyData, OriginalsProxyData, PropositionSettingsProxyData, AdminPiggyBankProxyData, PaymentsProxyData, MarketsCreditsProxyData];
 }
 
 

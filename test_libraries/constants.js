@@ -16,9 +16,12 @@ const minToPropose = 50;
 const Gas = 6721975;
 const GasPrice = 10;
 // Mock -----------
-const MockName = "Mock DAI";
-const MockSymbol = "MDA";
-const MockSupply = new BigNumber("100000000000000000000000000");
+const MockName1 = "Mock USD";
+const MockSymbol1 = "USD";
+const MockSupply1 = new BigNumber("100000000000000000000000000");
+const MockName2 = "Mock EUR";
+const MockSymbol2 = "EUR";
+const MockSupply2 = new BigNumber("100000000000000000000000000");
 // Mock -----------
 
 
@@ -38,8 +41,11 @@ exports.minToPropose = minToPropose;
 exports.Gas = Gas;
 exports.GasPrice = GasPrice;
 // Mock -----------
-exports.MockName = MockName;
-exports.MockSymbol = MockSymbol;
-exports.MockSupply = MockSupply;
+exports.MockName1 = MockName1;
+exports.MockSymbol1 = MockSymbol1;
+exports.MockSupply1 = MockSupply1;
+exports.MockName2 = MockName2;
+exports.MockSymbol2 = MockSymbol2;
+exports.MockSupply2 = MockSupply2;
 // Mock -----------
 

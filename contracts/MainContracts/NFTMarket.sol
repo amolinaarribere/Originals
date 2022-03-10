@@ -18,7 +18,7 @@ import "../Libraries/Library.sol";
 import "../Libraries/UintLibrary.sol";
 import "../Libraries/ItemsLibrary.sol";
 import "../Interfaces/ITreasury.sol";
-import "../Interfaces/IPool.sol";
+import "../Interfaces/IMarketsCredits.sol";
 import "../Interfaces/INFTMarket.sol";
 import "../Interfaces/IPayments.sol";
 
@@ -153,8 +153,9 @@ import "../Interfaces/IPayments.sol";
         AdminMintingFee = Fees[paymentTokenID][uint256(Library.Fees.AdminMintingFee)];
 
         if(FromCredit){
-          IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], paymentTokenID);
-          IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).spendCredit(_issuerID, msg.sender, AdminMintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], paymentTokenID);
+          IMarketsCredits marketsCredits = IMarketsCredits(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.MarketsCredits)]);
+          marketsCredits.spendCredit(_issuerID, msg.sender, MintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], paymentTokenID);
+          marketsCredits.spendCredit(_issuerID, msg.sender, AdminMintingFee, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], paymentTokenID);
         } 
         else{
           IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
@@ -219,11 +220,17 @@ import "../Interfaces/IPayments.sol";
 
     removeOffer(tokenId);
 
-    IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).withdrawAllFor(_issuerID,
+    transferToSystemContracts(tokenId);
+  }
+
+  function transferToSystemContracts(uint256 tokenId) internal {
+    IMarketsCredits marketsCredits = IMarketsCredits(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.MarketsCredits)]);
+
+    marketsCredits.withdrawAllFor(_issuerID,
       _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)],
       _tokenOffer[tokenId]._paymentTokenID,
       bytes(""));
-    IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).withdrawAllFor(_issuerID,
+    marketsCredits.withdrawAllFor(_issuerID,
       _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)],
       _tokenOffer[tokenId]._paymentTokenID,
       bytes(""));
@@ -275,17 +282,17 @@ import "../Interfaces/IPayments.sol";
     if(address(0) != _tokenOffer[offer._tokenId]._sender) assignToRejectedSender(offer._tokenId);
 
     if(offer._FromCredit)
-      IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).reuseCredit(_issuerID, offer._tokenId,  msg.sender, offer._offer, offer._paymentTokenID);
+      IMarketsCredits(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.MarketsCredits)]).reuseCredit(_issuerID, offer._tokenId,  msg.sender, offer._offer, offer._paymentTokenID);
     
     else{
       bytes32[] memory dataArray = new bytes32[](3);
-      dataArray[0] = UintLibrary.UintToBytes32(uint256(Library.PublicPoolPaymentTypes.TransferUnassignedCredit));
+      dataArray[0] = UintLibrary.UintToBytes32(uint256(Library.MarketsCreditsPaymentTypes.TransferUnassignedCredit));
       dataArray[1] = UintLibrary.UintToBytes32(_issuerID);
       dataArray[2] = UintLibrary.UintToBytes32(offer._tokenId);
       bytes memory data = Library.Bytes32ArrayToBytes(dataArray);
 
       IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
-      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)], offer._offer, _issuerID, data, offer._paymentTokenID);
+      payments.TransferFrom(msg.sender, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.MarketsCredits)], offer._offer, _issuerID, data, offer._paymentTokenID);
     }
 
     _tokenOffer[offer._tokenId]._offer = offer._offer;
@@ -314,7 +321,7 @@ import "../Interfaces/IPayments.sol";
     addrs[0] = _tokenOffer[tokenId]._sender;
     amounts[0] = _tokenOffer[tokenId]._offer;
     factors[0] = 1;
-    IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).addCredit(_issuerID, tokenId, addrs, amounts, factors);
+    IMarketsCredits(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.MarketsCredits)]).assignCredit(_issuerID, tokenId, addrs, amounts, factors);
   }
 
   function AllocatePercents(uint256 tokenId, address[4] memory destinations, uint256[4] memory percentages, uint256 offer, uint256 commonDecimals) internal
@@ -338,11 +345,13 @@ import "../Interfaces/IPayments.sol";
       factors[pos++] = denominator;
     }
 
-    IPool(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]).addCredit(_issuerID, 
+    IMarketsCredits(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.MarketsCredits)]).assignCredit(
+      _issuerID, 
       tokenId, 
       addrs, 
       amounts, 
-      factors);
+      factors
+    );
   }
 
   function CalculatePercents(uint256 amount, uint256 percentage, uint256 decimals) internal pure returns(uint256, uint256, uint256)

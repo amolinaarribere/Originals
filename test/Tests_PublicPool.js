@@ -26,7 +26,8 @@ contract("Testing Public Pool",function(accounts){
     var manager;
     var publicpoolProxy;
     var treasuryProxy;
-    var mockdai;
+    var mockdai1;
+    var mockdai2;
     var paymentsProxyAddress;
     var piggybankAddress;
 
@@ -70,11 +71,12 @@ contract("Testing Public Pool",function(accounts){
         treasuryProxy = new web3.eth.Contract(TreasuryAbi, contracts[1][1]);
         piggybankAddress = contracts[1][4];
         paymentsProxyAddress = contracts[1][5];
-        mockdai = new web3.eth.Contract(MockDaiAbi, contracts[2][7]);
+        mockdai1 = new web3.eth.Contract(MockDaiAbi, contracts[2][8]);
+        mockdai2 = new web3.eth.Contract(MockDaiAbi, contracts[2][9]);
     });
 
     // ****** TESTING Adding Owners ***************************************************************** //
-
+/*
     it("Add Owner WRONG",async function(){
         await multisigcontract.AddOwnerWrong(publicpoolProxy, PublicOwners, extra_owner, user_1);
     });
@@ -128,7 +130,7 @@ contract("Testing Public Pool",function(accounts){
         }
         // act
         try{
-            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(address_0, issuer_1_name, issuer_1_symbol, 10, 0, 0), false, 0).send({from: user_1, gas: Gas}, function(error, result){});
+            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(address_0, issuer_1_name, issuer_1_symbol, 10, 0, 0), false, 1).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -146,7 +148,7 @@ contract("Testing Public Pool",function(accounts){
         }
         // act
         try{
-            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, "", 10, 0, 0), false, 0).send({from: user_1, gas: Gas}, function(error, result){});
+            await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, "", 10, 0, 0), false, 1).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -156,7 +158,7 @@ contract("Testing Public Pool",function(accounts){
         // act
         try{
             let amount = NewIssuerAmount.minus(1)
-            await mockdai.methods.approve(paymentsProxyAddress, amount).send({from: user_1, gas: Gas}, function(error, result){});
+            await mockdai1.methods.approve(paymentsProxyAddress, amount).send({from: user_1, gas: Gas}, function(error, result){});
             await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, 10, 0, 0), false, 0).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
@@ -175,7 +177,7 @@ contract("Testing Public Pool",function(accounts){
         }
         // act
         try{
-            await mockdai.methods.approve(paymentsProxyAddress, NewIssuerAmount.multipliedBy(2)).send({from: user_1, gas: Gas}, function(error, result){});
+            await mockdai1.methods.approve(paymentsProxyAddress, NewIssuerAmount.multipliedBy(2)).send({from: user_1, gas: Gas}, function(error, result){});
             await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, 10, 0, 0), false, 0).send({from: user_1, gas: Gas}, function(error, result){});
             await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_2, issuer_1_name, "test", 10, 0, 0), false, 0).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
@@ -185,12 +187,14 @@ contract("Testing Public Pool",function(accounts){
             expect(error.message).to.match(IssuerIDTaken);
         }
     });
-
+*/
     it("Add Issuer CORRECT",async function(){
-        await mockdai.methods.approve(paymentsProxyAddress, NewIssuerAmount.multipliedBy(3)).send({from: user_1, gas: Gas}, function(error, result){});
-        var AggregatedAmount = new BigNumber(await treasuryProxy.methods.retrieveAggregatedAmount(0).call());
-        var TreasuryBalance = new BigNumber(await mockdai.methods.balanceOf(treasuryProxy._address).call());
-        var PiggyBankBalance = new BigNumber(await mockdai.methods.balanceOf(piggybankAddress).call());
+        await mockdai1.methods.approve(paymentsProxyAddress, NewIssuerAmount.multipliedBy(2)).send({from: user_1, gas: Gas}, function(error, result){});
+        await mockdai2.methods.approve(paymentsProxyAddress, NewIssuerAmount).send({from: user_1, gas: Gas}, function(error, result){});
+
+        /*var AggregatedAmount = new BigNumber(await treasuryProxy.methods.retrieveAggregatedAmount(0).call());
+        var TreasuryBalance = new BigNumber(await mockdai1.methods.balanceOf(treasuryProxy._address).call());
+        var PiggyBankBalance = new BigNumber(await mockdai1.methods.balanceOf(piggybankAddress).call());
         expect(TreasuryBalance.toString()).to.equal("0");
         expect(PiggyBankBalance.toString()).to.equal("0");
         expect(AggregatedAmount.toString()).to.equal("0");
@@ -201,8 +205,8 @@ contract("Testing Public Pool",function(accounts){
         let pendingIssuers = await publicpoolProxy.methods.retrievePendingIssuers().call();
         let pendingIssuer = await publicpoolProxy.methods.retrievePendingIssuer(issuerId).call();
         AggregatedAmount = new BigNumber(await treasuryProxy.methods.retrieveAggregatedAmount(0).call());
-        TreasuryBalance = new BigNumber(await mockdai.methods.balanceOf(treasuryProxy._address).call());
-        PiggyBankBalance = new BigNumber(await mockdai.methods.balanceOf(piggybankAddress).call());
+        TreasuryBalance = new BigNumber(await mockdai1.methods.balanceOf(treasuryProxy._address).call());
+        PiggyBankBalance = new BigNumber(await mockdai1.methods.balanceOf(piggybankAddress).call());
         expect(TreasuryBalance.toString()).to.equal(NewIssuerFee.toString());
         expect(PiggyBankBalance.toString()).to.equal(AdminNewIssuerFee.toString());
         expect(AggregatedAmount.toString()).to.equal(NewIssuerFee.toString());
@@ -217,20 +221,20 @@ contract("Testing Public Pool",function(accounts){
         await publicpoolProxy.methods.rejectIssuer(issuerId).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
         await publicpoolProxy.methods.rejectIssuer(issuerId).send({from: PublicOwners[1], gas: Gas}, function(error, result){});
         pendingIssuers = await publicpoolProxy.methods.retrievePendingIssuers().call();
-        expect(pendingIssuers.length).to.equal(0);
+        expect(pendingIssuers.length).to.equal(0);*/
 
-        await publicpoolProxy.methods.sendCredit(user_1, NewIssuerAmount, 0).send({from: user_1, gas: Gas}, function(error, result){});
-        response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), true, 0).send({from: user_1, gas: Gas}, function(error, result){});
-        issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
+        await publicpoolProxy.methods.sendCredit(user_1, NewIssuerAmount, 1).send({from: user_1, gas: Gas}, function(error, result){});
+        response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), true, 1).send({from: user_1, gas: Gas}, function(error, result){});
+        /*issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
 
         pendingIssuers = await publicpoolProxy.methods.retrievePendingIssuers().call();
         pendingIssuer = await publicpoolProxy.methods.retrievePendingIssuer(issuerId).call();
-        AggregatedAmount = new BigNumber(await treasuryProxy.methods.retrieveAggregatedAmount(0).call());
-        TreasuryBalance = new BigNumber(await mockdai.methods.balanceOf(treasuryProxy._address).call());
-        PiggyBankBalance = new BigNumber(await mockdai.methods.balanceOf(piggybankAddress).call());
-        expect(TreasuryBalance.toString()).to.equal(NewIssuerFee.multipliedBy(2).toString());
-        expect(PiggyBankBalance.toString()).to.equal(AdminNewIssuerFee.multipliedBy(2).toString());
-        expect(AggregatedAmount.toString()).to.equal(NewIssuerFee.multipliedBy(2).toString());
+        AggregatedAmount = new BigNumber(await treasuryProxy.methods.retrieveAggregatedAmount(1).call());
+        TreasuryBalance = new BigNumber(await mockdai2.methods.balanceOf(treasuryProxy._address).call());
+        PiggyBankBalance = new BigNumber(await mockdai2.methods.balanceOf(piggybankAddress).call());
+        expect(TreasuryBalance.toString()).to.equal(NewIssuerFee.toString());
+        expect(PiggyBankBalance.toString()).to.equal(AdminNewIssuerFee.toString());
+        expect(AggregatedAmount.toString()).to.equal(NewIssuerFee.toString());
         expect(pendingIssuers.length).to.equal(1);
         expect(pendingIssuer._issuer._owner).to.equal(issuer_1);
         expect(pendingIssuer._issuer._name).to.equal(issuer_1_name);
@@ -248,9 +252,9 @@ contract("Testing Public Pool",function(accounts){
         let Issuers = await publicpoolProxy.methods.retrieveIssuers().call();
         expect(Issuers.length).to.equal(1);
         let IssuersAddress = await publicpoolProxy.methods.retrieveNFTMarketForIssuer(issuerId).call();
-        expect(IssuersAddress).to.equal(NFTMarketAddress);
+        expect(IssuersAddress).to.equal(NFTMarketAddress);*/
 
-        try{
+       /* try{
             await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_2, issuer_1_name, "whatever", 10, 0, 0), false, 0).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
@@ -258,17 +262,17 @@ contract("Testing Public Pool",function(accounts){
         catch(error){
             expect(error.message).to.match(IssuerIDTaken);
             AggregatedAmount = new BigNumber(await treasuryProxy.methods.retrieveAggregatedAmount(0).call());
-            TreasuryBalance = new BigNumber(await mockdai.methods.balanceOf(treasuryProxy._address).call());
-            PiggyBankBalance = new BigNumber(await mockdai.methods.balanceOf(piggybankAddress).call());
-            expect(TreasuryBalance.toString()).to.equal(NewIssuerFee.multipliedBy(2).toString());
-            expect(PiggyBankBalance.toString()).to.equal(AdminNewIssuerFee.multipliedBy(2).toString());
-            expect(AggregatedAmount.toString()).to.equal(NewIssuerFee.multipliedBy(2).toString());
-        }
+            TreasuryBalance = new BigNumber(await mockdai1.methods.balanceOf(treasuryProxy._address).call());
+            PiggyBankBalance = new BigNumber(await mockdai1.methods.balanceOf(piggybankAddress).call());
+            expect(TreasuryBalance.toString()).to.equal(NewIssuerFee.toString());
+            expect(PiggyBankBalance.toString()).to.equal(AdminNewIssuerFee.toString());
+            expect(AggregatedAmount.toString()).to.equal(NewIssuerFee.toString());
+        }*/
     });
-
+/*
     // ****** TESTING Voting On Issuers ***************************************************************** //
     it("Voting Issuer WRONG",async function(){
-        await mockdai.methods.approve(paymentsProxyAddress, NewIssuerAmount).send({from: user_1, gas: Gas}, function(error, result){});
+        await mockdai1.methods.approve(paymentsProxyAddress, NewIssuerAmount).send({from: user_1, gas: Gas}, function(error, result){});
         let response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), false, 0).send({from: user_1, gas: Gas}, function(error, result){});;
         let issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
         try{
@@ -326,7 +330,7 @@ contract("Testing Public Pool",function(accounts){
 
     // ****** TESTING Spending Credit ***************************************************************** //
     it("Spend, Add, WithdrawForAll and Reuse Credit WRONG",async function(){
-        await mockdai.methods.approve(paymentsProxyAddress, NewIssuerAmount).send({from: user_1, gas: Gas}, function(error, result){});
+        await mockdai1.methods.approve(paymentsProxyAddress, NewIssuerAmount).send({from: user_1, gas: Gas}, function(error, result){});
         let response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), false, 0).send({from: user_1, gas: Gas}, function(error, result){});;
         let issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
         try{
@@ -378,11 +382,11 @@ contract("Testing Public Pool",function(accounts){
 
     it("Withdraw Credit CORRECT",async function(){
         let amount = 10;
-        let initialBalance = new BigNumber(await mockdai.methods.balanceOf(accounts[0]).call());
+        let initialBalance = new BigNumber(await mockdai1.methods.balanceOf(accounts[0]).call());
 
-        await mockdai.methods.approve(paymentsProxyAddress, amount).send({from: user_1, gas: Gas}, function(error, result){});
-        await mockdai.methods.transfer(accounts[1], amount).send({from: user_1, gas: Gas}, function(error, result){});
-        await mockdai.methods.approve(paymentsProxyAddress, amount).send({from: accounts[1], gas: Gas}, function(error, result){});
+        await mockdai1.methods.approve(paymentsProxyAddress, amount).send({from: user_1, gas: Gas}, function(error, result){});
+        await mockdai1.methods.transfer(accounts[1], amount).send({from: user_1, gas: Gas}, function(error, result){});
+        await mockdai1.methods.approve(paymentsProxyAddress, amount).send({from: accounts[1], gas: Gas}, function(error, result){});
 
         await publicpoolProxy.methods.sendCredit(accounts[0], amount, 0).send({from: user_1, gas: Gas}, function(error, result){});
         await publicpoolProxy.methods.sendCredit(accounts[0], amount, 0).send({from: accounts[1], gas: Gas}, function(error, result){});
@@ -393,15 +397,15 @@ contract("Testing Public Pool",function(accounts){
         let withdraw_1 = amount - 1;
         await publicpoolProxy.methods.withdraw(withdraw_1, 0).send({from: accounts[0], gas: Gas}, function(error, result){});
         credit = await publicpoolProxy.methods.retrieveCredit(accounts[0], 0).call();
-        let Balance_1 = new BigNumber(await mockdai.methods.balanceOf(accounts[0]).call());
+        let Balance_1 = new BigNumber(await mockdai1.methods.balanceOf(accounts[0]).call());
         expect(Balance_1.toString()).to.equal(withdraw_1.toString());
         expect(parseInt(credit)).to.equal((2 * amount) - withdraw_1);
 
         await publicpoolProxy.methods.withdrawAll(0).send({from: accounts[0], gas: Gas}, function(error, result){});
         credit = await publicpoolProxy.methods.retrieveCredit(accounts[0], 0).call();
-        let Balance_2 = new BigNumber(await mockdai.methods.balanceOf(accounts[0]).call());
+        let Balance_2 = new BigNumber(await mockdai1.methods.balanceOf(accounts[0]).call());
         expect(Balance_2.toString()).to.equal((2 * amount).toString());
         expect(parseInt(credit)).to.equal(0);
     });
-
+*/
 });

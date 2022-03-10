@@ -46,6 +46,7 @@ async function returnContractManagerSettings(contractAddress, user_1){
     let _propositionSettings = TransparentImpl[i++];
     let _adminPiggyBank = TransparentImpl[i++];
     let _payments = TransparentImpl[i++];
+    let _marketscredits = TransparentImpl[i++];
 
 
     let _nftMarket = BeaconsImpl[j++];
@@ -59,12 +60,14 @@ async function returnContractManagerSettings(contractAddress, user_1){
         _propositionSettings,
         _adminPiggyBank,
         _payments,
+        _marketscredits,
         _nftMarket,
         emptyBytes,
         emptyBytes, 
         emptyBytes, 
         emptyBytes, 
         emptyBytes, 
+        emptyBytes,
         emptyBytes,
         emptyBytes]
 }
@@ -130,6 +133,7 @@ async function checkFees(contractAddress, FeeAndSettingsBytes,  user_1){
 async function checkContracts(contractAddress, ContractsBytes, user_1){
     let _Contracts = await returnContractManagerSettings(contractAddress, user_1);
     let i = 2;
+    expect(aux.Bytes32ToAddress(ContractsBytes[i])).to.equal(_Contracts[i++]);
     expect(aux.Bytes32ToAddress(ContractsBytes[i])).to.equal(_Contracts[i++]);
     expect(aux.Bytes32ToAddress(ContractsBytes[i])).to.equal(_Contracts[i++]);
     expect(aux.Bytes32ToAddress(ContractsBytes[i])).to.equal(_Contracts[i++]);
@@ -235,6 +239,8 @@ async function Config_ContractsManager_Correct(contractAddress, originalsTokenPr
         aux.AddressToBytes32(result[i++]),
         aux.AddressToBytes32(result[i++]),
         aux.AddressToBytes32(result[i++]),
+        aux.AddressToBytes32(result[i++]),
+        result[i++],
         result[i++],
         result[i++],
         result[i++],

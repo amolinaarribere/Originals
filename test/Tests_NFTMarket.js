@@ -85,7 +85,7 @@ contract("Testing NFT Markets",function(accounts){
         publicpoolProxy = new web3.eth.Contract(PublicPoolAbi, contracts[1][0]);
         piggybankAddress = contracts[1][4];
         paymentsProxyAddress = contracts[1][5];
-        mockdai = new web3.eth.Contract(MockDaiAbi, contracts[2][7]);
+        mockdai = new web3.eth.Contract(MockDaiAbi, contracts[2][8]);
         await mockdai.methods.transfer(issuer_1, MockSupply.dividedToIntegerBy(10)).send({from: user_1, gas: Gas}, function(error, result){});
         await mockdai.methods.transfer(issuer_2, MockSupply.dividedToIntegerBy(10)).send({from: user_1, gas: Gas}, function(error, result){});
         await mockdai.methods.transfer(user_2, MockSupply.dividedToIntegerBy(10)).send({from: user_1, gas: Gas}, function(error, result){});

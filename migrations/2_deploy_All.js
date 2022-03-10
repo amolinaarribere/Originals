@@ -9,6 +9,7 @@ let OriginalsToken = artifacts.require("./MainContracts/OriginalsToken");
 let PropositionSettings = artifacts.require("./MainContracts/PropositionSettings");
 let AdminPiggyBank = artifacts.require("./MainContracts/AdminPiggyBank");
 let Payments = artifacts.require("./MainContracts/Payments");
+let MarketsCredits = artifacts.require("./MainContracts/MarketsCredits");
 let TransparentUpgradeableProxy = artifacts.require("@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol")
 
 //Mock
@@ -420,22 +421,56 @@ module.exports = async function(deployer, network, accounts){
  var PaymentsProxyInitializerParameters = [ManagerProxyAddress, accounts[0], [TokenContractAddress]]
  var PaymentsProxyData = web3.eth.abi.encodeFunctionCall(PaymentsProxyInitializerMethod, PaymentsProxyInitializerParameters);
  
+ // Markets Credits -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ await deployer.link(Library, MarketsCredits);
+ console.log("Library linked to MarketsCredits");
 
- await ManagerProxyInstance.methods.InitializeContracts(
-  obj.returnUpgradeObject(PublicPoolInstance.address,
-      TreasuryInstance.address,
-      OriginalsTokenInstance.address, 
-      PropositionSettingsInstance.address,
-      AdminPiggyBankInstance.address,
-      NFTMarketInstance.address, 
-      PaymentsInstance.address,
-      PublicPoolProxyData, 
-      TreasuryProxyData, 
-      OriginalsProxyData, 
-      PropositionSettingsProxyData, 
-      AdminPiggyBankProxyData,
-      PaymentsProxyData),
-      ManagerProxyAddress).send({from: accounts[0], gas: Gas});
+ await deployer.link(UintLibrary, MarketsCredits);
+ console.log("Uint Library linked to MarketsCredits");
+
+ await deployer.link(AddressLibrary, MarketsCredits);
+ console.log("AddressLibrary linked to MarketsCredits");
+
+ await deployer.link(ItemsLibrary, MarketsCredits);
+ console.log("Items Library linked to MarketsCredits");
+
+ await deployer.deploy(MarketsCredits);
+ MarketsCreditsInstance = await MarketsCredits.deployed();
+ console.log("MarketsCredits deployed : " + MarketsCreditsInstance.address);
+
+ var MarketsCreditsProxyInitializerMethod = {
+   "inputs": [
+     {
+       "internalType": "address",
+       "name": "managerContractAddress",
+       "type": "address"
+     }
+   ],
+   "name": "MarketsCredits_init",
+   "outputs": [],
+   "stateMutability": "nonpayable",
+   "type": "function"
+ };
+ var MarketsCreditsProxyInitializerParameters = [ManagerProxyAddress];
+ var MarketsCreditsProxyData = web3.eth.abi.encodeFunctionCall(MarketsCreditsProxyInitializerMethod, MarketsCreditsProxyInitializerParameters);
+
+  await ManagerProxyInstance.methods.InitializeContracts(
+    obj.returnUpgradeObject([PublicPoolInstance.address,
+            TreasuryInstance.address,
+            OriginalsTokenInstance.address, 
+            PropositionSettingsInstance.address,
+            AdminPiggyBankInstance.address,
+            PaymentsInstance.address,
+            MarketsCreditsInstance.address],
+            [NFTMarketInstance.address],
+            [PublicPoolProxyData, 
+            TreasuryProxyData, 
+            OriginalsProxyData, 
+            PropositionSettingsProxyData, 
+            AdminPiggyBankProxyData,
+            PaymentsProxyData,
+            MarketsCreditsProxyData]),
+            ManagerProxyAddress).send({from: accounts[0], gas: Gas});
 
   console.log("Manager initialized");
 
@@ -480,6 +515,8 @@ module.exports = async function(deployer, network, accounts){
   console.log("Payments Proxy Address : " + TransparentProxies[i]);
   console.log("Payments Address : " + TransparentImpl[i++]);
 
+  console.log("Markets Credits Proxy Address : " + TransparentProxies[i]);
+  console.log("Markets Credits Address : " + TransparentImpl[i++]);
 
   let j=0;
   console.log("NFT Market Beacon Address : " + Beacons[j]);

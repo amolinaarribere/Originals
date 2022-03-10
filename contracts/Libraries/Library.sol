@@ -17,9 +17,9 @@ library Library{
     enum Fees{NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee}
     enum TransferFees{TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals}
     enum OffersSettings{OffersLifeTime}
-    enum TransparentProxies{Manager, PublicPool, Treasury, Originals, PropSettings, AdminPiggyBank, Payments}
+    enum TransparentProxies{Manager, PublicPool, Treasury, Originals, PropSettings, AdminPiggyBank, Payments, MarketsCredits}
     enum Beacons{NFT}
-    enum PublicPoolPaymentTypes{SendCredit, TransferUnassignedCredit}
+    enum MarketsCreditsPaymentTypes{SendCredit, TransferUnassignedCredit}
 
 
     // Structures

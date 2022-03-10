@@ -45,8 +45,7 @@ contract("Testing Admin Piggy Bank",function(accounts){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         manager = contracts[0];
         adminPiggyBankProxy = new web3.eth.Contract(AdminPiggyBankAbi, contracts[1][4]);
-        mockdai = new web3.eth.Contract(MockDaiAbi, contracts[2][7]);
-
+        mockdai = new web3.eth.Contract(MockDaiAbi, contracts[2][8]);
     });
 
     // ****** TESTING Adding Owners ***************************************************************** //

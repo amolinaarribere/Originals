@@ -38,6 +38,7 @@ contract Payments is IPayments, StdPropositionBaseContract{
             addr == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)] || 
             addr == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)] || 
             addr == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)] || 
+            addr == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.MarketsCredits)] || 
             isNFTMarket(addr, id) 
         , "It is not from one of the certified contracts");
         _;
