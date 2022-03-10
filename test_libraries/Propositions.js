@@ -84,22 +84,23 @@ async function checkPropositionSettings(contractAddress, propBytes, user_1){
 
 async function checkFees(contractAddress, FeeAndSettingsBytes,  user_1){
     let numberOfTokens = aux.Bytes32ToInt(FeeAndSettingsBytes[0]);
-    let FeesPerToken = aux.Bytes32ToInt(FeeAndSettingsBytes[1]) + 1;
+    let FeesPerToken = aux.Bytes32ToInt(FeeAndSettingsBytes[1]);
+    let ItemsPerToken = FeesPerToken + 1;
     let numberOfTransferFees = aux.Bytes32ToInt(FeeAndSettingsBytes[2]);
 
     let FeesBytes = []
     let TransactionFeesBytes = []
     let SettingsBytes = []
 
-    for(let f=3; f < (numberOfTokens * FeesPerToken) + 3; f++){
+    for(let f=3; f < (numberOfTokens * ItemsPerToken) + 3; f++){
         FeesBytes.push(FeeAndSettingsBytes[f]);
     }
 
-    for(let f2=(numberOfTokens * FeesPerToken) + 3; f2 < (numberOfTokens * FeesPerToken) + 3 + numberOfTransferFees; f2++){
+    for(let f2=(numberOfTokens * ItemsPerToken) + 3; f2 < (numberOfTokens * ItemsPerToken) + 3 + numberOfTransferFees; f2++){
         TransactionFeesBytes.push(FeeAndSettingsBytes[f2]);
     }
 
-    for(let f3=(numberOfTokens * FeesPerToken) + 3 + numberOfTransferFees; f3 < FeeAndSettingsBytes.length; f3++){
+    for(let f3=(numberOfTokens * ItemsPerToken) + 3 + numberOfTransferFees; f3 < FeeAndSettingsBytes.length; f3++){
         SettingsBytes.push(FeeAndSettingsBytes[f3]);
     }
 

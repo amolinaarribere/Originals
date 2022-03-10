@@ -20,10 +20,14 @@ const MockDai = artifacts.require("MockDai"); // Mock
 const constants = require("../test_libraries/constants.js");
 const obj = require("../test_libraries/objects.js");
 
-const NewIssuerFee = constants.NewIssuerFee;
-const AdminNewIssuerFee = constants.AdminNewIssuerFee;
-const MintingFee = constants.MintingFee;
-const AdminMintingFee = constants.AdminMintingFee;
+const NewIssuerFee1 = constants.NewIssuerFee1;
+const AdminNewIssuerFee1 = constants.AdminNewIssuerFee1;
+const MintingFee1 = constants.MintingFee1;
+const AdminMintingFee1 = constants.AdminMintingFee1;
+const NewIssuerFee2 = constants.NewIssuerFee2;
+const AdminNewIssuerFee2 = constants.AdminNewIssuerFee2;
+const MintingFee2 = constants.MintingFee2;
+const AdminMintingFee2 = constants.AdminMintingFee2;
 const TransferFeeAmount = constants.TransferFeeAmount;
 const TransferFeeDecimals = constants.TransferFeeDecimals;
 const AdminTransferFeeAmount = constants.AdminTransferFeeAmount;
@@ -37,8 +41,9 @@ const MockName2 = constants.MockName2;
 const MockSymbol2 = constants.MockSymbol2;
 const MockSupply2 = constants.MockSupply2;
 // Mock -------------
-const Fees = [NewIssuerFee.toString(), AdminNewIssuerFee.toString(), MintingFee.toString(), AdminMintingFee.toString()];
-const AllFees = [Fees, Fees];
+const Fees1 = [NewIssuerFee1.toString(), AdminNewIssuerFee1.toString(), MintingFee1.toString(), AdminMintingFee1.toString()];
+const Fees2 = [NewIssuerFee2.toString(), AdminNewIssuerFee2.toString(), MintingFee2.toString(), AdminMintingFee2.toString()];
+const AllFees = [Fees1, Fees2];
 const TransferFees = [TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals];
 const OfferSettings = [OffersLifeTime]
 

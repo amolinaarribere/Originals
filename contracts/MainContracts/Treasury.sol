@@ -78,10 +78,10 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
         super.StdPropositionBaseContract_init(chairPerson, managerContractAddress);
 
         uint256[][] memory initFees = new uint256[][](Fees.length);
-        if(Fees.length > 0){
-            uint256[] memory FeesForToken = new uint256[](Fees[0].length + 1);
 
+        if(Fees.length > 0){
             for(uint i=0; i < initFees.length; i++){
+                uint256[] memory FeesForToken = new uint256[](Fees[i].length + 1);
                 FeesForToken[0] = i;
                 for(uint j=0; j < Fees[i].length; j++){
                     FeesForToken[j + 1] = Fees[i][j];

@@ -16,8 +16,8 @@ abstract contract CreditorBaseContract is ICreditor, ManagedBaseContract{
     // MODIFIERS /////////////////////////////////////////
     modifier isFromCertifiedContract(address addr){
         require(
-            addr == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)] || 
-            addr == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]
+            addr == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)] || 
+            addr == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.MarketsCredits)]
         , "It is not from one of the certified contracts");
         _;
     }
