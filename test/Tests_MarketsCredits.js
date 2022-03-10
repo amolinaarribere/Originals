@@ -14,8 +14,10 @@ const MockDai = artifacts.require("MockDai");
 const MockDaiAbi = MockDai.abi;
 
 const Gas = constants.Gas;
-const NewIssuerFee = constants.NewIssuerFee;
-const AdminNewIssuerFee = constants.AdminNewIssuerFee;
+const NewIssuerFee1 = constants.NewIssuerFee1;
+const AdminNewIssuerFee1 = constants.AdminNewIssuerFee1;
+const NewIssuerFee2 = constants.NewIssuerFee2;
+const AdminNewIssuerFee2 = constants.AdminNewIssuerFee2;
 
 
 
@@ -47,7 +49,7 @@ contract("Testing Markets Credits",function(accounts){
     const issuer_1_paymentplans = 0;
     const issuer_2 = accounts[6];
 
-    var NewIssuerAmount = NewIssuerFee.plus(AdminNewIssuerFee);
+    var NewIssuerAmount1 = NewIssuerFee1.plus(AdminNewIssuerFee1);
 
     const NotEnoughCredit = new RegExp("EC20-");
     const MarketNotOK = new RegExp("The Market Id and Address do not correspond");
@@ -71,7 +73,7 @@ contract("Testing Markets Credits",function(accounts){
 
     // ****** TESTING Spending Credit ***************************************************************** //
     it("Spend, Add, WithdrawForAll and Reuse Credit WRONG",async function(){
-        await mockdai1.methods.approve(paymentsProxyAddress, NewIssuerAmount).send({from: user_1, gas: Gas}, function(error, result){});
+        await mockdai1.methods.approve(paymentsProxyAddress, NewIssuerAmount1).send({from: user_1, gas: Gas}, function(error, result){});
         let response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), false, 0).send({from: user_1, gas: Gas}, function(error, result){});;
         let issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
         try{
