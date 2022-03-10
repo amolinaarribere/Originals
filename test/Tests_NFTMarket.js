@@ -31,6 +31,7 @@ const MockSupply1 = constants.MockSupply1;
 const MockSupply2 = constants.MockSupply2;
 
 const mintingFee1 = MintingFee1.plus(AdminMintingFee1)
+const mintingFee2 = MintingFee2.plus(AdminMintingFee2)
 
 
 
@@ -106,7 +107,7 @@ contract("Testing NFT Markets",function(accounts){
     });
 
     async function GenerateMarkets(secondMarket){
-        await mockdai1.methods.approve(paymentsProxyAddress, NewIssuerAmount.multipliedBy(2)).send({from: user_1, gas: Gas}, function(error, result){});
+        await mockdai1.methods.approve(paymentsProxyAddress, NewIssuerAmount1.multipliedBy(2)).send({from: user_1, gas: Gas}, function(error, result){});
         let response_1 = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), false, 0).send({from: user_1, gas: Gas}, function(error, result){});
         let issuerId_1 = new BigNumber(response_1.events._NewIssuerRequest.returnValues.id);
         await publicpoolProxy.methods.validateIssuer(issuerId_1).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
