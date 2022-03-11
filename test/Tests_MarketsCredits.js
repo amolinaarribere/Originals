@@ -8,10 +8,14 @@ const PublicPool = artifacts.require("PublicPool");
 const PublicPoolAbi = PublicPool.abi;
 const Treasury = artifacts.require("Treasury");
 const TreasuryAbi = Treasury.abi;
+const Payments = artifacts.require("Payments");
+const PaymentsAbi = Payments.abi;
 const MarketsCredits = artifacts.require("MarketsCredits");
 const MarketsCreditsAbi = MarketsCredits.abi;
 const MockDai = artifacts.require("MockDai");
 const MockDaiAbi = MockDai.abi;
+const NFTMarket = artifacts.require("NFTMarket");
+const NFTMarketAbi = NFTMarket.abi;
 
 const Gas = constants.Gas;
 const NewIssuerFee1 = constants.NewIssuerFee1;
@@ -30,6 +34,7 @@ contract("Testing Markets Credits",function(accounts){
     var publicpoolProxy;
     var treasuryProxy;
     var marketsCreditsProxy;
+    var paymentsProxy;
     var mockdai1;
     var mockdai2;
     var paymentsProxyAddress;
@@ -46,21 +51,27 @@ contract("Testing Markets Credits",function(accounts){
     const issuer_1_symbol = "I1";
     const issuer_1_fee = 10;
     const issuer_1_decimals = 0;
-    const issuer_1_paymentplans = 0;
+    const issuer_1_paymentplans = 1;
     const issuer_2 = accounts[6];
 
     var NewIssuerAmount1 = NewIssuerFee1.plus(AdminNewIssuerFee1);
+    var NewIssuerAmount2 = NewIssuerFee2.plus(AdminNewIssuerFee2);
+
 
     const NotEnoughCredit = new RegExp("EC20-");
     const MarketNotOK = new RegExp("The Market Id and Address do not correspond");
-
-
+    const WrongPaymentTokenId = new RegExp("this token Id does not have a corresponding Token address");
+    const WrongTotalAmount = new RegExp("the total amount is not equal to the calculated one");
+    const WrongArrays = new RegExp("Provided arrays do not have the same length");
+    const OfferInProgress = new RegExp("Unassigned credit for this token is not empty");
+    const InvalidPaymentToken = new RegExp("This payment token is not valid");
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         manager = contracts[0];
         publicpoolProxy = new web3.eth.Contract(PublicPoolAbi, contracts[1][0]);
         treasuryProxy = new web3.eth.Contract(TreasuryAbi, contracts[1][1]);
+        paymentsProxy = new web3.eth.Contract(PaymentsAbi, contracts[1][5]);
         marketsCreditsProxy = new web3.eth.Contract(MarketsCreditsAbi, contracts[1][6]);
         piggybankAddress = contracts[1][4];
         paymentsProxyAddress = contracts[1][5];
@@ -72,61 +83,169 @@ contract("Testing Markets Credits",function(accounts){
 
 
     // ****** TESTING Spending Credit ***************************************************************** //
-    it("Spend, Add, WithdrawForAll and Reuse Credit WRONG",async function(){
-        await mockdai1.methods.approve(paymentsProxyAddress, NewIssuerAmount1).send({from: user_1, gas: Gas}, function(error, result){});
-        let response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name, issuer_1_symbol, issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), false, 0).send({from: user_1, gas: Gas}, function(error, result){});;
-        let issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
-        try{
-            await marketsCreditsProxy.methods.spendCredit(issuerId, user_1, 0, user_1, 0).send({from: user_1, gas: Gas}, function(error, result){});
-            expect.fail();
+    it("Spend, Assign, Send and Reuse Credit WRONG",async function(){
+        let mockdai = mockdai1;
+        let NewIssuerAmount = NewIssuerAmount1;
+        let Market;
+
+        for(let i=0; i < 2; i++){
+            if(i == 1){
+                mockdai = mockdai2;
+                NewIssuerAmount = NewIssuerAmount2;
+            }
+            tokenID = 0;
+
+            await mockdai.methods.approve(paymentsProxyAddress, NewIssuerAmount + 1000).send({from: user_1, gas: Gas}, function(error, result){});
+            let response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name + i.toString(), issuer_1_symbol  + i.toString(), issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), false, i).send({from: user_1, gas: Gas}, function(error, result){});;
+            let issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
+            try{
+                await marketsCreditsProxy.methods.spendCredit(issuerId, user_1, 0, user_1, i).send({from: user_1, gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(MarketNotOK);
+            }
+            try{
+                await marketsCreditsProxy.methods.assignCredit(issuerId, 0, [], [], []).send({from: user_1, gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(MarketNotOK);
+            }
+           
+            try{
+                await marketsCreditsProxy.methods.reuseCredit(issuerId, 0, user_1, 0, i).send({from: user_1, gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(MarketNotOK);
+            }
+            try{
+                await marketsCreditsProxy.methods.sendCredit(accounts[0], 10, (i + 100)).send({from: user_1, gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(WrongPaymentTokenId);
+            }
+            try{
+                await marketsCreditsProxy.methods.assignCredit(issuerId, 0, [user_1], [1], [1]).send({from: user_1, gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(WrongTotalAmount);
+            }
+            try{
+                await marketsCreditsProxy.methods.assignCredit(issuerId, 0, [user_1], [1, 1], [1]).send({from: user_1, gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(WrongArrays);
+            }
+            try{
+                await marketsCreditsProxy.methods.assignCredit(issuerId, 0, [user_1], [1], [1, 2]).send({from: user_1, gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(WrongArrays);
+            }
+            try{
+                await publicpoolProxy.methods.validateIssuer(issuerId).send({from: PublicOwners[1], gas: Gas}, function(error, result){});
+                await publicpoolProxy.methods.validateIssuer(issuerId).send({from: PublicOwners[2], gas: Gas}, function(error, result){});
+                let marketAddress = await publicpoolProxy.methods.retrieveNFTMarketForIssuer(issuerId).call();
+                Market = new web3.eth.Contract(NFTMarketAbi, marketAddress);
+                await Market.methods.mintToken(tokenID, user_1, obj.returnArrayTokenPriceObject([0, 1], [1, 1], [true, true]), false, i).send({from: issuer_1, gas: Gas}, function(error, result){});
+                await marketsCreditsProxy.methods.reuseCredit(issuerId, tokenID, user_1, 1, (i + 100)).send({from: user_1, gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(InvalidPaymentToken);
+            }
+            try{
+                await Market.methods.submitOffer(obj.returnSubmitOfferObject(tokenID, user_1, 1, false, i)).send({from: user_1, gas: Gas}, function(error, result){});
+                await marketsCreditsProxy.methods.reuseCredit(issuerId, tokenID, user_1, 1, i).send({from: user_1, gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(OfferInProgress);
+            }
+            try{
+                await marketsCreditsProxy.methods.spendCredit(issuerId, user_1, 0, user_1, (i + 100)).send({from: user_1, gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(InvalidPaymentToken);
+            }
+
         }
-        // assert
-        catch(error){
-            expect(error.message).to.match(MarketNotOK);
-        }
-        try{
-            await marketsCreditsProxy.methods.assignCredit(issuerId, 0, [], [], []).send({from: user_1, gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(MarketNotOK);
-        }
-        try{
-            await marketsCreditsProxy.methods.withdrawAllFor(issuerId, user_1, 0, "0x").send({from: user_1, gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(MarketNotOK);
-        }
-        try{
-            await marketsCreditsProxy.methods.reuseCredit(issuerId, 0, user_1, 0, 0).send({from: user_1, gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(MarketNotOK);
-        }
+        
     });
 
     // ****** TESTING Credit ***************************************************************** //
     it("Withdraw Credit WRONG",async function(){
-        try{
-            await marketsCreditsProxy.methods.withdraw(1, 0).send({from: accounts[0], gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NotEnoughCredit);
-        }
-        try{
-            await marketsCreditsProxy.methods.withdraw(1, 1).send({from: accounts[0], gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NotEnoughCredit);
+        let mockdai = mockdai1;
+        let NewIssuerAmount = NewIssuerAmount1;
+
+        for(let i=0; i < 2; i++){
+
+            if(i == 1){
+                mockdai = mockdai2;
+                NewIssuerAmount = NewIssuerAmount2;
+            }
+
+            await mockdai.methods.approve(paymentsProxyAddress, NewIssuerAmount).send({from: user_1, gas: Gas}, function(error, result){});
+            let response = await publicpoolProxy.methods.requestIssuer(obj.returnIssuerObject(issuer_1, issuer_1_name + i.toString(), issuer_1_symbol + i.toString(), issuer_1_fee, issuer_1_decimals, issuer_1_paymentplans), false, i).send({from: user_1, gas: Gas}, function(error, result){});;
+            let issuerId = new BigNumber(response.events._NewIssuerRequest.returnValues.id);
+
+            try{
+                await marketsCreditsProxy.methods.withdraw(1, i).send({from: accounts[0], gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(NotEnoughCredit);
+            }
+            try{
+                await marketsCreditsProxy.methods.withdraw(1, i + 100).send({from: accounts[0], gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(InvalidPaymentToken);
+            }
+            try{
+                await marketsCreditsProxy.methods.withdrawAll(i + 100).send({from: accounts[0], gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(InvalidPaymentToken);
+            }
+            try{
+                await marketsCreditsProxy.methods.withdrawAllFor(issuerId, user_1, i, "0x").send({from: user_1, gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(MarketNotOK);
+            }
+            try{
+                await marketsCreditsProxy.methods.withdrawAllFor(issuerId, user_1, i + 100, "0x").send({from: user_1, gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(InvalidPaymentToken);
+            }
         }
 
     });

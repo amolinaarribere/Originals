@@ -112,15 +112,18 @@ contract("Testing Treasury",function(accounts){
     // ****** TESTING Withdraws ***************************************************************** //
 
     it("Withdraw WRONG",async function(){
-        // act
-        try{
-            await TreasuryProxy.methods.withdraw(1, 0).send({from: user_1,  gas: Gas}, function(error, result){});
-            expect.fail();
+        for(let i=0; i < 2; i++){
+            // act
+            try{
+                await TreasuryProxy.methods.withdraw(1, i).send({from: user_1,  gas: Gas}, function(error, result){});
+                expect.fail();
+            }
+            // assert
+            catch(error){
+                expect(error.message).to.match(NotEnoughBalance);
+            }
         }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NotEnoughBalance);
-        }
+        
     });
 
     it("Withdraw CORRECT",async function(){

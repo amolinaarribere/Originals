@@ -121,8 +121,8 @@ contract Payments is IPayments, StdPropositionBaseContract{
 
     // FUNCTIONALITY /////////////////////////////////////////
     function TransferFrom(address sender, address recipient, uint256 amount, uint256 MarketId, bytes memory data, uint256 tokenId) external override
-        isFromCertifiedContract(msg.sender, MarketId)
         isTokenIdOK(tokenId)
+        isFromCertifiedContract(msg.sender, MarketId)
     {
         require(_Tokens[tokenId].TokenContract.allowance(sender, address(this)) >= amount, "Contract does not have enough approved funds");
         bool success = _Tokens[tokenId].TokenContract.transferFrom(sender, recipient, amount);

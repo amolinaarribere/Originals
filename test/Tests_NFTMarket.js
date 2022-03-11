@@ -85,6 +85,7 @@ contract("Testing NFT Markets",function(accounts){
     const OnlyOwnerOrApproved = new RegExp("Only owner or approved can change token price");
     const OfferPriceNotOK = new RegExp("The offer is below the minimum price");
     const OnlySender = new RegExp("Only the original sender can withdraw the bid");
+    const TokenAlreadyMinted = new RegExp("token already minted")
 
     const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 
@@ -222,6 +223,17 @@ contract("Testing NFT Markets",function(accounts){
         catch(error){
             expect(error.message).to.match(NotEnoughFees);
         }
+        try{
+            await mockdai1.methods.approve(paymentsProxyAddress, mintingFee1.multipliedBy(2)).send({from: issuer_1, gas: Gas}, function(error, result){});
+            await Market_1.methods.mintToken(0, user_1, obj.returnArrayTokenPriceObject([0, 1],[10, 11], [true, true]), false, 0).send({from: issuer_1, gas: Gas}, function(error, result){});
+            await Market_1.methods.mintToken(0, user_1, obj.returnArrayTokenPriceObject([0, 1],[12, 13], [true, true]), false, 0).send({from: issuer_1, gas: Gas}, function(error, result){});
+            expect.fail();
+            
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(TokenAlreadyMinted);
+        }
     });
 
     it("Minting CORRECT",async function(){
@@ -232,12 +244,12 @@ contract("Testing NFT Markets",function(accounts){
         let mintingFee = mintingFee1;
 
         for(let i=0; i < 2; i++){
-            if(i == 0) {
+            if(i == 1) {
                 mockdai = mockdai2;
                 mintingFee = mintingFee2;
             }
 
-            await mockdai.methods.approve(paymentsProxyAddress, mintingFee.multipliedBy(2)).send({from: issuer_1, gas: Gas}, function(error, result){});
+            await mockdai.methods.approve(paymentsProxyAddress, mintingFee.multipliedBy(3)).send({from: issuer_1, gas: Gas}, function(error, result){});
 
             let tokenId = i * 10;
 
@@ -287,7 +299,7 @@ contract("Testing NFT Markets",function(accounts){
         await mockdai1.methods.approve(paymentsProxyAddress, mintingFee1).send({from: issuer_1, gas: Gas}, function(error, result){});
         await Market_1.methods.mintToken(tokenId, user_1, obj.returnArrayTokenPriceObject([0, 1],[tokenPrice, tokenPrice], [true, true]), false, 0).send({from: issuer_1, gas: Gas}, function(error, result){});
         try{
-            await Market_1.methods.setTokenPrice(tokenId, obj.returnArrayTokenPriceObject([0, 1],[2 * tokenPrice, 2 * tokenPrice], [true, true])).send({from: issuer_1, gas: Gas}, function(error, result){});
+            await Market_1.methods.setTokenPrice(tokenId, obj.returnArrayTokenPriceObject([0, 1, 2, 3],[2 * tokenPrice, 2 * tokenPrice, 1, 2], [true, true, false, false])).send({from: issuer_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert

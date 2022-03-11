@@ -38,11 +38,7 @@ import "../Interfaces/IPayments.sol";
   event _CreditWithdrawnFor(address indexed withdrawer, uint256 amount, address indexed sender, uint256 paymentTokenID);
 
 
-  // DATA /////////////////////////////////////////
-  struct _unassignedCreditStruct{
-    uint256 _credit;
-    uint256 _paymentTokenID;
-  }
+ 
 
   mapping(uint256 => mapping(address => ItemsLibrary._BalanceStruct)) private _creditOfAccount;
   mapping(uint256 => mapping(uint256 => _unassignedCreditStruct)) private _unassignedCreditForMarket;
@@ -67,7 +63,7 @@ import "../Interfaces/IPayments.sol";
   }
 
   modifier isTokenUnassignedCreditEmpty(uint256 NFTMarketId, uint256 tokenID){
-    require(0 == _unassignedCreditForMarket[NFTMarketId][tokenID]._credit, "Unassigned credit for this token is not empty");
+    require(false == _unassignedCreditForMarket[NFTMarketId][tokenID]._inProgress, "Unassigned credit for this token is not empty");
     _;
   }
 
@@ -137,8 +133,8 @@ import "../Interfaces/IPayments.sol";
   }
 
   function assignCredit(uint256 NFTMarketId, uint256 tokenID, address[] calldata addrs, uint256[] calldata amounts, uint256[] calldata factors) external override
-    isNFTMarket(NFTMarketId, msg.sender)
     checkTotal(_unassignedCreditForMarket[NFTMarketId][tokenID]._credit, amounts, factors)
+    isNFTMarket(NFTMarketId, msg.sender)
   {
     require(addrs.length == factors.length, "Provided arrays do not have the same length");
     assignCreditInternal(NFTMarketId, tokenID, addrs, amounts, factors);
@@ -155,9 +151,9 @@ import "../Interfaces/IPayments.sol";
   }
 
   function reuseCredit(uint256 NFTMarketId, uint256 tokenID, address addr, uint256 amount, uint256 paymentTokenID) external override
-    isNFTMarket(NFTMarketId, msg.sender)
     isTokenUnassignedCreditEmpty(NFTMarketId, tokenID)
     isPaymentTokenOK(paymentTokenID, true)
+    isNFTMarket(NFTMarketId, msg.sender)
   {
     internalWithdraw(address(0), amount, addr, false, bytes(""), paymentTokenID, false);
     internalTransferUnassignedCredit(NFTMarketId, tokenID, amount, paymentTokenID);
@@ -165,8 +161,8 @@ import "../Interfaces/IPayments.sol";
   }
 
   function spendCredit(uint256 NFTMarketId, address from, uint256 amount, address to, uint256 paymentTokenID) external override
-    isNFTMarketorPublicPool(NFTMarketId, msg.sender)
     isPaymentTokenOK(paymentTokenID, true)
+    isNFTMarketorPublicPool(NFTMarketId, msg.sender)
   {
     internalWithdraw(to, amount, from, true, bytes(""), paymentTokenID, true);
     emit _CreditSpent(NFTMarketId, from, amount, to, paymentTokenID);
@@ -188,8 +184,8 @@ import "../Interfaces/IPayments.sol";
   }
   
   function withdrawAllFor(uint256 NFTMarketId, address addr, uint256 paymentTokenID, bytes memory data) external override
-    isNFTMarket(NFTMarketId, msg.sender)
     isPaymentTokenOK(paymentTokenID, false)
+    isNFTMarket(NFTMarketId, msg.sender)
   {
     uint amount = ItemsLibrary.checkFullBalance(_creditOfAccount[paymentTokenID][addr]);
     internalWithdraw(addr, amount, addr, true, data, paymentTokenID, true);
@@ -200,6 +196,7 @@ import "../Interfaces/IPayments.sol";
   {
       _unassignedCreditForMarket[NFTMarketId][tokenID]._credit = amount;
       _unassignedCreditForMarket[NFTMarketId][tokenID]._paymentTokenID = paymentTokenID;
+      _unassignedCreditForMarket[NFTMarketId][tokenID]._inProgress = true;
   }
 
   function internalWithdraw(address to, uint amount, address sender, bool sendData, bytes memory data, uint256 paymentTokenID, bool transfer) internal
@@ -221,6 +218,9 @@ import "../Interfaces/IPayments.sol";
     return ItemsLibrary.checkFullBalance(_creditOfAccount[paymentTokenID][addr]);
   }
 
+  function retrieveUnAssignedCredit(uint256 NFTMarketId, uint256 tokenID) external override view returns (_unassignedCreditStruct memory){
+    return(_unassignedCreditForMarket[NFTMarketId][tokenID]);
+  }
 
 
  }
