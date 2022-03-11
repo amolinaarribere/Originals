@@ -30,16 +30,11 @@ contract AdminPiggyBank is Initializable, MultiSigContract, CreditorBaseContract
         _;
     }
 
-    modifier isAmountOK(uint256 amount)
+    modifier isAmountOK(uint256 amount, uint256 paymentTokenID)
     {
-        require(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).BalanceOf(address(this), 0) >= amount, "We cannot transfer more than the current balance");
-        _;
-    }
-
-    modifier isTokenOK(uint256 paymentTokenID)
-    {
-        require(paymentTokenID < IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).retrieveSettings().length,
-         "This token Id does not exist yet in the system");
+        IPayments payments = IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]);
+        require(paymentTokenID < payments.retrieveSettings().length, "This token Id does not exist yet in the system");
+        require(IPayments(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Payments)]).BalanceOf(address(this), paymentTokenID) >= amount, "We cannot transfer more than the current balance");
         _;
     }
 
@@ -70,8 +65,7 @@ contract AdminPiggyBank is Initializable, MultiSigContract, CreditorBaseContract
 
     function transfer(address receiver, uint256 amount, uint256 paymentTokenID) external override
         isReceiverOK(receiver)
-        isAmountOK(amount)
-        isTokenOK(paymentTokenID)
+        isAmountOK(amount, paymentTokenID)
         transferInProgress(false)
     {
         _transferInProgress._to = receiver;
