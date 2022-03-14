@@ -242,7 +242,8 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
 
     function retrieveFullBalance(address addr, uint256 paymentTokenID) external override view returns(uint)
     {
-        return ItemsLibrary.checkFullBalance(_balances[paymentTokenID][addr]);
+        (uint total, uint dividend) = sumUpTotal(addr, paymentTokenID);
+        return total / dividend;
     }
 
     function retrieveSettings() external override view returns(uint256[][] memory, uint256[] memory, uint256[] memory)
