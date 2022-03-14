@@ -214,7 +214,7 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
 
     function withdrawAll(uint256 paymentTokenID) external override
     {
-        uint All = ItemsLibrary.checkFullBalance(_balances[paymentTokenID][msg.sender]);
+        uint All = retrieveFullBalanceInternal(msg.sender, paymentTokenID);
         InternalWithdraw(All, paymentTokenID);
     }
 
@@ -241,6 +241,11 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
     }
 
     function retrieveFullBalance(address addr, uint256 paymentTokenID) external override view returns(uint)
+    {
+        return retrieveFullBalanceInternal(addr, paymentTokenID);
+    }
+
+    function retrieveFullBalanceInternal(address addr, uint256 paymentTokenID) internal view returns(uint)
     {
         (uint total, uint dividend) = sumUpTotal(addr, paymentTokenID);
         return total / dividend;
