@@ -210,29 +210,32 @@ import "../Interfaces/IPayments.sol";
 
     uint256 percentageForTokenOwner = 10**(commonDecimals + 2) - TotalFees;
 
-    _safeTransfer(ownerOf(tokenId), _tokenOffer[tokenId]._bidder, tokenId, "");
-
     AllocatePercents(tokenId,
       [_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)], _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)], _owner, ownerOf(tokenId)],
       [TransferFeeAmount, AdminTransferFeeAmount, OwnerTransferFeeAmount, percentageForTokenOwner],
       _tokenOffer[tokenId]._offer,
       commonDecimals);
 
+    _safeTransfer(ownerOf(tokenId), _tokenOffer[tokenId]._bidder, tokenId, "");
+
+    uint256 paymentTokenID = _tokenOffer[tokenId]._paymentTokenID;
+
     removeOffer(tokenId);
 
-    transferToSystemContracts(tokenId);
+    transferToSystemContracts(paymentTokenID);
+
   }
 
-  function transferToSystemContracts(uint256 tokenId) internal {
+  function transferToSystemContracts(uint256 paymentTokenID) internal {
     IMarketsCredits marketsCredits = IMarketsCredits(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.MarketsCredits)]);
 
     marketsCredits.withdrawAllFor(_issuerID,
       _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)],
-      _tokenOffer[tokenId]._paymentTokenID,
+      paymentTokenID,
       bytes(""));
     marketsCredits.withdrawAllFor(_issuerID,
       _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.AdminPiggyBank)],
-      _tokenOffer[tokenId]._paymentTokenID,
+      paymentTokenID,
       bytes(""));
   }
 

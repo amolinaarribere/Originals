@@ -145,8 +145,10 @@ import "../Interfaces/IPayments.sol";
   {
     uint256 paymentTokenID = _unassignedCreditForMarket[NFTMarketId][tokenID]._paymentTokenID;
     for(uint i=0; i < addrs.length; i++){
-      ItemsLibrary.addBalance(_creditOfAccount[paymentTokenID][addrs[i]], amounts[i], factors[i]);
-      emit _CreditAssigned(NFTMarketId, tokenID, addrs[i], amounts[i], factors[i], paymentTokenID);
+      if(amounts[i] > 0){
+        ItemsLibrary.addBalance(_creditOfAccount[paymentTokenID][addrs[i]], amounts[i], factors[i]);
+        emit _CreditAssigned(NFTMarketId, tokenID, addrs[i], amounts[i], factors[i], paymentTokenID);
+      }
     }
   }
 
