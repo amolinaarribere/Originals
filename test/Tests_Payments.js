@@ -28,10 +28,15 @@ contract("Testing Payments",function(accounts){
     const user_1 = accounts[4];
     const tokenOwner = [accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
     const address_1 = "0x0000000000000000000000000000000000000001";
+    const address_2 = "0x0000000000000000000000000000000000000002";
     const zeroBytes = "0x0000000000000000000000000000000000000000000000000000000000000000"
-    var PropositionValues = [aux.AddressToBytes32(address_1)];
+    var PropositionValues = [aux.IntToBytes32(0), 
+        aux.AddressToBytes32(address_1), 
+        aux.IntToBytes32(1),
+        aux.AddressToBytes32(address_2)];
 
     const NotCertifiedContract = new RegExp("It is not from one of the certified contracts");
+    const WrongPaymentID = new RegExp("this token Id does not have a corresponding Token address");
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
@@ -63,12 +68,20 @@ contract("Testing Payments",function(accounts){
      it("TransferFrom WRONG",async function(){
         // act
         try{
-            await paymentsProxy.methods.TransferFrom(address_1, address_1, 1, 0, zeroBytes).send({from: user_1,  gas: Gas}, function(error, result){});
+            await paymentsProxy.methods.TransferFrom(address_1, address_1, 1, 0, zeroBytes, 0).send({from: user_1,  gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
         catch(error){
             expect(error.message).to.match(NotCertifiedContract);
+        }
+        try{
+            await paymentsProxy.methods.TransferFrom(address_1, address_1, 1, 0, zeroBytes, 3).send({from: user_1,  gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(WrongPaymentID);
         }
     });
 

@@ -29,7 +29,7 @@ library ItemsLibrary{
     }
 
     // TREASURY & NFTMarket///////////////////////////
-    function InternalWithdraw(_BalanceStruct storage balance, uint amount, address to, bool transfer, address TokenContractAddress, bool sendData, bytes memory data) public 
+    function InternalWithdraw(_BalanceStruct storage balance, uint amount, address to, bool transfer, address TokenContractAddress, bool sendData, bytes memory data, uint256 tokenId) public 
     {
         require(checkFullBalance(balance) >= amount, "EC20-");
 
@@ -44,11 +44,11 @@ library ItemsLibrary{
         addBalance(balance, remainder, commonDividend);
 
         if(transfer){
-            TransferTo(amount, to, TokenContractAddress, sendData, data);
+            TransferTo(amount, to, TokenContractAddress, sendData, data, tokenId);
         }
     }
 
-    function TransferTo(uint amount, address to, address TokenContractAddress, bool sendData, bytes memory data) public
+    function TransferTo(uint amount, address to, address TokenContractAddress, bool sendData, bytes memory data, uint256 tokenId) public
     {
         IERC20 TokenContract = IERC20(TokenContractAddress);
         require(TokenContract.balanceOf(address(this)) >= amount, "Contract does not have enough funds");
@@ -56,7 +56,7 @@ library ItemsLibrary{
         bool success = TokenContract.transfer(to, amount);
         require(true == success, "Transfer did not work");
 
-        if(sendData) ICreditor(to).CreditReceived(address(this), amount, data);
+        if(sendData) ICreditor(to).CreditReceived(address(this), amount, tokenId, data);
     }
 
     function addBalance(_BalanceStruct storage balance, uint amount, uint factor) public

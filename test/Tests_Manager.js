@@ -17,6 +17,8 @@ const NFTMarket = artifacts.require("NFTMarket");
 const NFTMarketAbi = NFTMarket.abi;
 const Payments = artifacts.require("Payments");
 const PaymentsAbi = Payments.abi;
+const MarketsCredits = artifacts.require("MarketsCredits");
+const MarketsCreditsAbi = MarketsCredits.abi;
 
 const init = require("../test_libraries/InitializeContracts.js");
 const constants = require("../test_libraries/constants.js");
@@ -36,7 +38,7 @@ contract("Testing Manager",function(accounts){
     var propositionSettingsProxy;
     var adminPiggyBankProxy;
     var paymentsProxy;
-
+    var marketsCreditsProxy;
 
     var manager;
     var originalsToken;
@@ -45,6 +47,7 @@ contract("Testing Manager",function(accounts){
     var propositionSettings;
     var adminPiggyBank;
     var payments;
+    var marketsCredits;
     var marketNFT;
 
     // used addresses
@@ -62,11 +65,12 @@ contract("Testing Manager",function(accounts){
     const address_6 = "0x0000000000000000000000000000000000000006";
     const address_7 = "0x0000000000000000000000000000000000000007";
     const address_8 = "0x0000000000000000000000000000000000000008";
+    const address_9 = "0x0000000000000000000000000000000000000009";
     const emptyBytes = "0x";
     const emptyString = "0x";
     const zeroBytes = "0x0000000000000000000000000000000000000000000000000000000000000000";
-    const PropositionValues = [zeroBytes, zeroBytes, address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8,
-        emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes];
+    const PropositionValues = [zeroBytes, zeroBytes, address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8, address_9,
+        emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes];
 
 
     beforeEach(async function(){
@@ -78,6 +82,7 @@ contract("Testing Manager",function(accounts){
         propositionSettingsProxy = new web3.eth.Contract(PropositionSettingsAbi, contracts[1][3]);
         adminPiggyBankProxy = new web3.eth.Contract(AdminPiggyBankAbi, contracts[1][4]);
         paymentsProxy = new web3.eth.Contract(PaymentsAbi, contracts[1][5]);
+        marketsCreditsProxy = new web3.eth.Contract(MarketsCreditsAbi, contracts[1][6]);
 
         publicPool = contracts[2][0];
         treasury = contracts[2][1];
@@ -86,10 +91,11 @@ contract("Testing Manager",function(accounts){
         adminPiggyBank = contracts[2][4];
         marketNFT = contracts[2][5];
         payments = contracts[2][6];
+        marketsCredits = contracts[2][7];
         manager = contracts[4];
     });
 
-    async function checkProxyAddresses( _ma, _ppa, _ta, _oa, _ps, _apb, _pp){
+    async function checkProxyAddresses( _ma, _ppa, _ta, _oa, _ps, _apb, _pp, _mc){
         let TransparentProxies = await managerProxy.methods.retrieveTransparentProxies().call({from: user_1});
 
         let i = 0;
@@ -100,7 +106,8 @@ contract("Testing Manager",function(accounts){
         let _propositionSettingsAddressProxy = TransparentProxies[i++];
         let _adminpiggyBankAddressProxy = TransparentProxies[i++];
         let _paymentsAddressProxy = TransparentProxies[i++];
-        
+        let _marketscreditsAddressProxy = TransparentProxies[i++];
+
         expect(_ma).to.equal(_ManagerAddressProxy);
         expect(_ppa).to.equal(_publicPoolAddressProxy);
         expect(_ta).to.equal(_treasuryAddressProxy);
@@ -108,9 +115,10 @@ contract("Testing Manager",function(accounts){
         expect(_ps).to.equal(_propositionSettingsAddressProxy);
         expect(_apb).to.equal(_adminpiggyBankAddressProxy);
         expect(_pp).to.equal(_paymentsAddressProxy);
+        expect(_mc).to.equal(_marketscreditsAddressProxy);
     }
 
-    async function checkImplAddresses( _ma, _ppa, _ta, _oa, _ps, _apb, _nft, _py){
+    async function checkImplAddresses( _ma, _ppa, _ta, _oa, _ps, _apb, _nft, _py, _mc){
         let TransparentImpl = await managerProxy.methods.retrieveTransparentProxiesImpl().call({from: user_1});
         let BeaconsImpl = await managerProxy.methods.retrieveBeaconsImpl().call({from: user_1});
     
@@ -123,10 +131,10 @@ contract("Testing Manager",function(accounts){
         let _propositionSettingsAddress = TransparentImpl[i++];
         let _adminPiggyBankAddress = TransparentImpl[i++];
         let _paymentsAddress = TransparentImpl[i++];
+        let _marketsCreditsAddress = TransparentImpl[i++];
 
         let _nftAddress = BeaconsImpl[j++];
 
-        
         expect(_ma).to.equal(_managerAddress);
         expect(_ppa).to.equal(_publicPoolAddress);
         expect(_ta).to.equal(_treasuryAddress);
@@ -135,14 +143,15 @@ contract("Testing Manager",function(accounts){
         expect(_apb).to.equal(_adminPiggyBankAddress);
         expect(_nft).to.equal(_nftAddress);
         expect(_py).to.equal(_paymentsAddress);
+        expect(_mc).to.equal(_marketsCreditsAddress);
     }
 
     // ****** TESTING Retrieves ***************************************************************** //
 
     it("Retrieve Configuration",async function(){
         // assert
-        await checkProxyAddresses(managerProxy._address, publicPoolProxy._address, treasuryProxy._address, originalsTokenProxy._address, propositionSettingsProxy._address, adminPiggyBankProxy._address, paymentsProxy._address);
-        await checkImplAddresses(manager, publicPool, treasury, originalsToken, propositionSettings, adminPiggyBank, marketNFT, payments);
+        await checkProxyAddresses(managerProxy._address, publicPoolProxy._address, treasuryProxy._address, originalsTokenProxy._address, propositionSettingsProxy._address, adminPiggyBankProxy._address, paymentsProxy._address, marketsCreditsProxy._address);
+        await checkImplAddresses(manager, publicPool, treasury, originalsToken, propositionSettings, adminPiggyBank, marketNFT, payments, marketsCredits);
     });
 
     it("Retrieve Proposals Details",async function(){
@@ -164,7 +173,7 @@ contract("Testing Manager",function(accounts){
         var Newadminpiggybank = contracts[i++];
         var Newmarketnft = contracts[i++];
         var Newpayments = contracts[i++];
-        i++;
+        var Newmarketscredits = contracts[i++];
         var NewManager = contracts[i++];
 
         var NewValues = [zeroBytes,
@@ -176,8 +185,9 @@ contract("Testing Manager",function(accounts){
             aux.AddressToBytes32(NewpropositionSettings), 
             aux.AddressToBytes32(Newadminpiggybank),
             aux.AddressToBytes32(Newpayments),
+            aux.AddressToBytes32(Newmarketscredits),
             aux.AddressToBytes32(Newmarketnft),
-            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes];
+            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes];
         
         await proposition.Config_ContractsManager_Correct(managerProxy, originalsTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
     });
@@ -185,20 +195,20 @@ contract("Testing Manager",function(accounts){
     it("Vote/Propose/Cancel Contracts Configuration CORRECT Empty",async function(){
         // act
         var address0 = aux.AddressToBytes32(address_0);
-        var PropositionValues_2 = [zeroBytes, zeroBytes, address0, address0, address0, address0, address0, address0, address0, address0,
-            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes];
+        var PropositionValues_2 = [zeroBytes, zeroBytes, address0, address0, address0, address0, address0, address0, address0, address0, address0,
+            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes];
 
         await proposition.SplitTokenSupply(originalsTokenProxy, tokenOwner, chairPerson);
 
         // Update contracts validated (address(0)) nothing done
         await managerProxy.methods.sendProposition(PropositionValues_2).send({from: chairPerson, gas: Gas});
-        await checkImplAddresses(manager, publicPool, treasury, originalsToken, propositionSettings, adminPiggyBank, marketNFT, payments);
+        await checkImplAddresses(manager, publicPool, treasury, originalsToken, propositionSettings, adminPiggyBank, marketNFT, payments, marketsCredits);
         await managerProxy.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas});
-        await checkImplAddresses(manager, publicPool, treasury, originalsToken, propositionSettings, adminPiggyBank, marketNFT, payments);
+        await checkImplAddresses(manager, publicPool, treasury, originalsToken, propositionSettings, adminPiggyBank, marketNFT, payments, marketsCredits);
         await managerProxy.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas});
-        await checkImplAddresses(manager, publicPool, treasury, originalsToken, propositionSettings, adminPiggyBank, marketNFT, payments);
+        await checkImplAddresses(manager, publicPool, treasury, originalsToken, propositionSettings, adminPiggyBank, marketNFT, payments, marketsCredits);
         await managerProxy.methods.voteProposition(true).send({from: tokenOwner[2], gas: Gas});
-        await checkImplAddresses(manager, publicPool, treasury, originalsToken, propositionSettings, adminPiggyBank, marketNFT, payments);
+        await checkImplAddresses(manager, publicPool, treasury, originalsToken, propositionSettings, adminPiggyBank, marketNFT, payments, marketsCredits);
 
     });
 

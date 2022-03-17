@@ -6,15 +6,20 @@ pragma solidity 0.8.7;
 Common functionality for all contracts and libraries
 */
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+
 library Library{
 
     // DATA /////////////////////////////////////////
     // enum
     enum PaymentPlans{Minting, TransferFee}
-    enum Prices{NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee, TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals, OffersLifeTime}
-    enum TransparentProxies{Manager, PublicPool, Treasury, Originals, PropSettings, AdminPiggyBank, Payments}
+    enum Fees{NewIssuerFee, AdminNewIssuerFee, MintingFee, AdminMintingFee}
+    enum TransferFees{TransferFeeAmount, TransferFeeDecimals, AdminTransferFeeAmount, AdminTransferFeeDecimals}
+    enum OffersSettings{OffersLifeTime}
+    enum TransparentProxies{Manager, PublicPool, Treasury, Originals, PropSettings, AdminPiggyBank, Payments, MarketsCredits}
     enum Beacons{NFT}
-    enum PublicPoolPaymentTypes{SendCredit, TransferUnassignedCredit}
+    enum MarketsCreditsPaymentTypes{SendCredit, TransferUnassignedCredit}
 
 
     // Structures
@@ -23,6 +28,16 @@ library Library{
         address[] TransparentAddresses;
         address[] BeaconAddresses;
         bytes[] TransparentData;
+    }
+
+    struct PaymentTokenStruct{
+        IERC20 TokenContract;
+        bool active;
+    }
+
+    struct NewPaymentTokenStruct{
+        address TokenContractAddress;
+        uint256 index;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
