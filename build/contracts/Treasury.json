@@ -51507,10 +51507,307 @@
       },
       "address": "0xcCe2Bf6C71036B0F3C473041aD0A8D8509BBB208",
       "transactionHash": "0xe1c67d6d0e4d612bdfcce8e2df3a3a87b284c15d96aa38eaf230d9311e211a66"
+    },
+    "80001": {
+      "events": {
+        "0x472501d19bf75639b2e316cd36f8568b0c3ab943b82a87de3c086c98c1929df9": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Deadline",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Threshold",
+              "type": "uint256"
+            }
+          ],
+          "name": "_AddedProposition",
+          "type": "event"
+        },
+        "0xd594bb9b33d8e7d250dcc95a70d74fbd1e03e16d3e7660f60b12149bd7fd2a12": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Recipient",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "TotalSupply",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "tokenContractId",
+              "type": "uint256"
+            }
+          ],
+          "name": "_AssignDividend",
+          "type": "event"
+        },
+        "0x1fe8aec10c0a50fa765076161e08c1f961ced69594ff45cf7d559f593afe1479": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            }
+          ],
+          "name": "_CancelledProposition",
+          "type": "event"
+        },
+        "0x09b3b89daeb2f093dfbba34628427631adc467324bf0a40cfe8a7ab63cd2befb": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256[][]",
+              "name": "Fees",
+              "type": "uint256[][]"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256[]",
+              "name": "TransactionFees",
+              "type": "uint256[]"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256[]",
+              "name": "OfferSettings",
+              "type": "uint256[]"
+            }
+          ],
+          "name": "_NewSettings",
+          "type": "event"
+        },
+        "0xa0e5c002871629acffe2f6c9e7932d18ed4493526043875a27b3011d79813706": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Payer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "AggregatedAmount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "tokenContractId",
+              "type": "uint256"
+            }
+          ],
+          "name": "_Pay",
+          "type": "event"
+        },
+        "0x23ca0034cf5aad32571b4a492e9598ea8a490e1643a60970e3cdc6933b55e49f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesFor",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesAgainst",
+              "type": "uint256"
+            }
+          ],
+          "name": "_PropositionApproved",
+          "type": "event"
+        },
+        "0xa58eb6daa3c62c3f883973c4035e5bd3e81aa627c8379de068a7de42df122be2": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesFor",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesAgainst",
+              "type": "uint256"
+            }
+          ],
+          "name": "_PropositionRejected",
+          "type": "event"
+        },
+        "0x50f654d58981575c05e369cb129aeacb01e1b036af429380242cfc5d1a4b743f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Voter",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "Vote",
+              "type": "bool"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "AmountTokens",
+              "type": "uint256"
+            }
+          ],
+          "name": "_PropositionVote",
+          "type": "event"
+        },
+        "0x65fbd5e5dd32bea4aeca85bd0be0abf0e489d655dee888a7510d43b06dda2dba": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "From",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "To",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "_UsedTokensTransfered",
+          "type": "event"
+        },
+        "0xe3a578db023c93c17a32f818b53100ba3479950e72d911afbee045639067f87f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Recipient",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "tokenContractId",
+              "type": "uint256"
+            }
+          ],
+          "name": "_Withdraw",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Library": "0xF9F8358bF211Da7Ce6cCc5B8CA87094Ad41F8342",
+        "UintLibrary": "0x282cD7EEf00E67785713C1b07bcB9df6B6425c97",
+        "ItemsLibrary": "0xA345c9BE3783f219ABa6C07652E4577A5e333976"
+      },
+      "address": "0x53fd265d095406334C6C06a6Dc69Df2b6C8343E1",
+      "transactionHash": "0x2775029e252f725c5af42441865c74de002ebf34a3ea089320d22896e82fa567"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2022-03-17T09:33:56.197Z",
+  "updatedAt": "2022-03-18T10:15:42.597Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

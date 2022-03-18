@@ -36521,10 +36521,245 @@
       },
       "address": "0x5a1B92119480B3640aAAE67D2bCDE6C3C29942c7",
       "transactionHash": "0x9c7168a4c0a626aabd57ecc370c53ecbc5c019d67846c6cbf2471625436d8426"
+    },
+    "80001": {
+      "events": {
+        "0x472501d19bf75639b2e316cd36f8568b0c3ab943b82a87de3c086c98c1929df9": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Deadline",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Threshold",
+              "type": "uint256"
+            }
+          ],
+          "name": "_AddedProposition",
+          "type": "event"
+        },
+        "0x1fe8aec10c0a50fa765076161e08c1f961ced69594ff45cf7d559f593afe1479": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            }
+          ],
+          "name": "_CancelledProposition",
+          "type": "event"
+        },
+        "0x28fbcc6e7781af00516c046711977989e1ca1bf627baa89f112b193653efb1a8": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "NewContractAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "ProxyId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "ProxyType",
+              "type": "string"
+            }
+          ],
+          "name": "_ContractUpgrade",
+          "type": "event"
+        },
+        "0x20baf84965293c5077f4dd07839fa02177fcc842a69a52206581f24fb4e092ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "NewContractAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "ProxyId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "ProxyType",
+              "type": "string"
+            }
+          ],
+          "name": "_NewProxy",
+          "type": "event"
+        },
+        "0x23ca0034cf5aad32571b4a492e9598ea8a490e1643a60970e3cdc6933b55e49f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesFor",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesAgainst",
+              "type": "uint256"
+            }
+          ],
+          "name": "_PropositionApproved",
+          "type": "event"
+        },
+        "0xa58eb6daa3c62c3f883973c4035e5bd3e81aa627c8379de068a7de42df122be2": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesFor",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesAgainst",
+              "type": "uint256"
+            }
+          ],
+          "name": "_PropositionRejected",
+          "type": "event"
+        },
+        "0x50f654d58981575c05e369cb129aeacb01e1b036af429380242cfc5d1a4b743f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Voter",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "Vote",
+              "type": "bool"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "AmountTokens",
+              "type": "uint256"
+            }
+          ],
+          "name": "_PropositionVote",
+          "type": "event"
+        },
+        "0x65fbd5e5dd32bea4aeca85bd0be0abf0e489d655dee888a7510d43b06dda2dba": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "From",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "To",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "_UsedTokensTransfered",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Library": "0xF9F8358bF211Da7Ce6cCc5B8CA87094Ad41F8342",
+        "AddressLibrary": "0x7CCD046d358c54f402F1F063c675c6B65Cb1555e",
+        "UintLibrary": "0x282cD7EEf00E67785713C1b07bcB9df6B6425c97"
+      },
+      "address": "0x4434A0d69D507cEeb15c7D41636211173fDc840E",
+      "transactionHash": "0x3be6a7a18c94e8de31c7b11ef91b94b4b272d162bfac6758db32db0bd175c863"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2022-03-17T09:33:56.172Z",
+  "updatedAt": "2022-03-18T10:15:42.578Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

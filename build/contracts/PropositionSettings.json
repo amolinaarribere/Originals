@@ -17719,10 +17719,219 @@
       },
       "address": "0x4c16E55D52FD9a3D8125FEe4Ba47F7d3F24281cF",
       "transactionHash": "0xce4c632a5448720c668abe9ea445506ac75c7d7f6bad9a0ad191915267c90de8"
+    },
+    "80001": {
+      "events": {
+        "0x472501d19bf75639b2e316cd36f8568b0c3ab943b82a87de3c086c98c1929df9": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Deadline",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Threshold",
+              "type": "uint256"
+            }
+          ],
+          "name": "_AddedProposition",
+          "type": "event"
+        },
+        "0x1fe8aec10c0a50fa765076161e08c1f961ced69594ff45cf7d559f593afe1479": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            }
+          ],
+          "name": "_CancelledProposition",
+          "type": "event"
+        },
+        "0x5f142d19236803d18232d4e49383b84c9ce931aa90200b80fb6b2c22ef1c0b1d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "LifeTime",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Threshold",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "minToPropose",
+              "type": "uint256"
+            }
+          ],
+          "name": "_NewSettings",
+          "type": "event"
+        },
+        "0x23ca0034cf5aad32571b4a492e9598ea8a490e1643a60970e3cdc6933b55e49f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesFor",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesAgainst",
+              "type": "uint256"
+            }
+          ],
+          "name": "_PropositionApproved",
+          "type": "event"
+        },
+        "0xa58eb6daa3c62c3f883973c4035e5bd3e81aa627c8379de068a7de42df122be2": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesFor",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesAgainst",
+              "type": "uint256"
+            }
+          ],
+          "name": "_PropositionRejected",
+          "type": "event"
+        },
+        "0x50f654d58981575c05e369cb129aeacb01e1b036af429380242cfc5d1a4b743f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Voter",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "Vote",
+              "type": "bool"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "AmountTokens",
+              "type": "uint256"
+            }
+          ],
+          "name": "_PropositionVote",
+          "type": "event"
+        },
+        "0x65fbd5e5dd32bea4aeca85bd0be0abf0e489d655dee888a7510d43b06dda2dba": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "From",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "To",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "_UsedTokensTransfered",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Library": "0xF9F8358bF211Da7Ce6cCc5B8CA87094Ad41F8342",
+        "UintLibrary": "0x282cD7EEf00E67785713C1b07bcB9df6B6425c97"
+      },
+      "address": "0x76EaF0943770B1F914A712cb28d96Af88Afa90bF",
+      "transactionHash": "0xd1d1ce99e7edeff63bc7820225e3b0bf2e2f236880e9fb8e3be8c8cd08e54981"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2022-03-17T09:33:56.286Z",
+  "updatedAt": "2022-03-18T10:15:42.681Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
