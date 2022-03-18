@@ -34334,10 +34334,214 @@
       },
       "address": "0xaA2EC714d03CD50BD19Be8Cf47a639F6007D8aFe",
       "transactionHash": "0x9e1ba42ec21fc56d0e6c2c86dbb74e213dc5efb554d9b720d55c3b352ac3af8f"
+    },
+    "80001": {
+      "events": {
+        "0x472501d19bf75639b2e316cd36f8568b0c3ab943b82a87de3c086c98c1929df9": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Deadline",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Threshold",
+              "type": "uint256"
+            }
+          ],
+          "name": "_AddedProposition",
+          "type": "event"
+        },
+        "0x1fe8aec10c0a50fa765076161e08c1f961ced69594ff45cf7d559f593afe1479": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            }
+          ],
+          "name": "_CancelledProposition",
+          "type": "event"
+        },
+        "0xb204baf16d8d2698eeb2ef168ab72e0b57eb8b9fd83b12921c007d15bea8acc1": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256[]",
+              "name": "index",
+              "type": "uint256[]"
+            },
+            {
+              "indexed": false,
+              "internalType": "address[]",
+              "name": "TokenAddresses",
+              "type": "address[]"
+            }
+          ],
+          "name": "_NewAddresses",
+          "type": "event"
+        },
+        "0x23ca0034cf5aad32571b4a492e9598ea8a490e1643a60970e3cdc6933b55e49f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesFor",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesAgainst",
+              "type": "uint256"
+            }
+          ],
+          "name": "_PropositionApproved",
+          "type": "event"
+        },
+        "0xa58eb6daa3c62c3f883973c4035e5bd3e81aa627c8379de068a7de42df122be2": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Proposer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesFor",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "VotesAgainst",
+              "type": "uint256"
+            }
+          ],
+          "name": "_PropositionRejected",
+          "type": "event"
+        },
+        "0x50f654d58981575c05e369cb129aeacb01e1b036af429380242cfc5d1a4b743f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Voter",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "Vote",
+              "type": "bool"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "AmountTokens",
+              "type": "uint256"
+            }
+          ],
+          "name": "_PropositionVote",
+          "type": "event"
+        },
+        "0x65fbd5e5dd32bea4aeca85bd0be0abf0e489d655dee888a7510d43b06dda2dba": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "Id",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "From",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "To",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "Amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "_UsedTokensTransfered",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Library": "0xF9F8358bF211Da7Ce6cCc5B8CA87094Ad41F8342",
+        "UintLibrary": "0x282cD7EEf00E67785713C1b07bcB9df6B6425c97",
+        "AddressLibrary": "0x7CCD046d358c54f402F1F063c675c6B65Cb1555e"
+      },
+      "address": "0x4b22aA675372391b84D86c64C1D554B6Ebf54ef2",
+      "transactionHash": "0x46439cbd30534210318c05443b12a0eae6da8918bf940a95e41a75e50efc32ba"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2022-03-17T09:33:56.311Z",
+  "updatedAt": "2022-03-18T10:15:42.705Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
