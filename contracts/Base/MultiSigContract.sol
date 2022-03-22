@@ -107,6 +107,7 @@ abstract contract MultiSigContract is IMultiSigContract, Initializable{
     {
         _minOwners = minOwners;
         for (uint i=0; i < owners.length; i++) {
+            require(false ==  _Owners._owner[owners[i]]._activated, "EC29-");
             _Owners._owner[owners[i]]._activated = true;
             _Owners._activatedOwners.push(owners[i]);
         } 
