@@ -12,17 +12,6 @@ let Payments = artifacts.require("./MainContracts/Payments");
 let MarketsCredits = artifacts.require("./MainContracts/MarketsCredits");
 let TransparentUpgradeableProxy = artifacts.require("@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol")
 
-//Mock
-let MockDai = artifacts.require("./Mock/MockDai");
-const MockName = "Mock Dai";
-const MockSymbol = "MDA";
-const MockSupply = new BigNumber("1000000000000000000000000000");
-
-const ManagerAbi = Manager.abi;
-const TransparentUpgradeableProxyAbi = TransparentUpgradeableProxy.abi;
-
-const obj = require("../test_libraries/objects.js");
-
 let Library = artifacts.require("./Libraries/Library");
 let UintLibrary = artifacts.require("./Libraries/UintLibrary");
 let AddressLibrary = artifacts.require("./Libraries/AddressLibrary");
@@ -32,30 +21,6 @@ const Gas = 6721975;
 
 
 module.exports = async function(deployer, network, accounts){  
-
-  // Libraries -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.deploy(Library);
-  LibraryInstance = await Library.deployed();
-  console.log("Library deployed");
-
-  await deployer.deploy(UintLibrary);
-  UintLibraryInstance = await UintLibrary.deployed();
-  console.log("UintLibrary deployed");
-
-  await deployer.deploy(AddressLibrary);
-  AddressLibraryInstance = await AddressLibrary.deployed();
-  console.log("AddressLibrary deployed");
-
-  await deployer.link(Library, ItemsLibrary);
-  console.log("Library linked to Items Library");
-
-  await deployer.link(UintLibrary, ItemsLibrary);
-  console.log("Uint Library linked to Items Library");
-
-  await deployer.deploy(ItemsLibrary);
-  ItemsLibraryInstance = await ItemsLibrary.deployed();
-  console.log("ItemsLibrary deployed");
-
 
   // Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, Manager);
@@ -70,23 +35,6 @@ module.exports = async function(deployer, network, accounts){
   await deployer.deploy(Manager);
   ManagerInstance = await Manager.deployed();
   console.log("Manager deployed : " + ManagerInstance.address);
-
-  /*
-  // Deploy Certificate Proxy and attach it to the impl ("accounts[0]" is the admin) : ManagerProxyAddress
-  // initialize Certificate Main contract (so that ProxyAdmin gets created), 
-  await deployer.deploy(TransparentUpgradeableProxy, ManagerInstance.address, accounts[0], ManagerProxyData);
-  TransparentUpgradeableProxyIns = await TransparentUpgradeableProxy.deployed();
-  var ManagerProxyAddress = TransparentUpgradeableProxyIns.address;
-  console.log("Manager Proxy deployed : " + ManagerProxyAddress);
-
-  // Initialize Contract Manager
-  var TransparentUpgradeableProxyInstance = new web3.eth.Contract(TransparentUpgradeableProxyAbi, ManagerProxyAddress);
-  var ManagerProxyInstance = new web3.eth.Contract(ManagerAbi, ManagerProxyAddress);
-
-  // retrieve the ProxyAdmin from Certificate
-  let ProxyAdmin = await ManagerProxyInstance.methods.retrieveProxyAdmin().call({from: accounts[1]});
-  // assign the Certificate Proxy (deployed in step 1) admin rights from "user1" to the retrieved ProxyAdmin (step 3)
-  await TransparentUpgradeableProxyInstance.methods.changeAdmin(ProxyAdmin).send({from: accounts[0], gas: Gas});;*/
 
   // AdminPiggyBank -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, AdminPiggyBank);
@@ -205,13 +153,6 @@ module.exports = async function(deployer, network, accounts){
  
 
   console.log("Deployment Summary ----------------------------------------------- ");
-
-  console.log("Libraries ******* ");
-
-  console.log("Library Address : " + LibraryInstance.address);
-  console.log("UintLibrary Address : " + UintLibraryInstance.address);
-  console.log("AddressLibrary Address : " + AddressLibraryInstance.address);
-  console.log("ItemsLibrary Address : " + ItemsLibraryInstance.address);
 
   console.log("Contracts ******* ");
 
