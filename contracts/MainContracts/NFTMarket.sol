@@ -149,6 +149,8 @@ import "../Interfaces/IPayments.sol";
       if(_paymentPlan == Library.PaymentPlans.Minting)
       {
         (uint[][] memory Fees, , ) = ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).retrieveSettings();
+        require(paymentTokenID < Fees.length, "No system prices for this payment ID");
+
         MintingFee = Fees[paymentTokenID][uint256(Library.Fees.MintingFee)];
         AdminMintingFee = Fees[paymentTokenID][uint256(Library.Fees.AdminMintingFee)];
 

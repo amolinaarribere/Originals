@@ -174,8 +174,13 @@ contract Treasury is ITreasury, StdPropositionBaseContract, CreditorBaseContract
     function onCreditReceived(address sender, uint256 amount, uint256 paymentTokenID, bytes memory data) internal override
     {
         if(paymentTokenID < _AggregatedDividendAmount.length) _AggregatedDividendAmount[paymentTokenID] += amount;
-        else _AggregatedDividendAmount.push(amount);
-
+        else {
+            for(uint i = _AggregatedDividendAmount.length; i < paymentTokenID; i++){
+                _AggregatedDividendAmount.push(0);
+            }
+            _AggregatedDividendAmount.push(amount);
+        }
+        
         emit _Pay(sender, amount, _AggregatedDividendAmount[paymentTokenID], paymentTokenID);
     }
 
