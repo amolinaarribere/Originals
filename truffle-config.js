@@ -18,7 +18,7 @@
  *
  */
  const HDWalletProvider = require('@truffle/hdwallet-provider');
- const { projectId, mnemonic } = require('./secrets.json');
+ const { InfuraProjectId, mnemonic, AlchemyProjectAPIKey } = require('./secrets.json');
 
 //
 // const fs = require('fs');
@@ -54,7 +54,7 @@ module.exports = {
      },
      // ETHEREUM /////////////////////////////////////////////////////////////////////////////////////
     kovan: {
-      provider: () => new HDWalletProvider(mnemonic, `https://kovan.infura.io/v3/${projectId}`),
+      provider: () => new HDWalletProvider(mnemonic, `https://kovan.infura.io/v3/${InfuraProjectId}`),
       network_id: 42,       // Ropsten's id
       gas: 6721975,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -62,7 +62,7 @@ module.exports = {
       skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
     },
     ropsten: {
-      provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/${projectId}`),
+      provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/${InfuraProjectId}`),
       network_id: 3,       // Ropsten's id
       gas: 6721975,        // Ropsten has a lower block limit than mainnet
       //gasPrice: 242231467852,
@@ -72,7 +72,7 @@ module.exports = {
       skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
     },
     rinkeby: {
-      provider: () => new HDWalletProvider(mnemonic, `https://rinkeby.infura.io/v3/${projectId}`),
+      provider: () => new HDWalletProvider(mnemonic, `https://rinkeby.infura.io/v3/${InfuraProjectId}`),
       network_id: 4,       // Custom network
       gas: 6721975,           // Gas sent with each transaction (default: ~6700000)
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -81,7 +81,10 @@ module.exports = {
     },
      // POLYGON /////////////////////////////////////////////////////////////////////////////////////
     mumbai: {
-      provider: () => new HDWalletProvider(mnemonic, `https://matic-mumbai.chainstacklabs.com`),
+      //provider: () => new HDWalletProvider(mnemonic, `https://matic-mumbai.chainstacklabs.com`),
+      provider: () => new HDWalletProvider(mnemonic, `https://rpc-mumbai.matic.today/`),
+      //provider: () => new HDWalletProvider(mnemonic, `https://rpc-mumbai.maticvigil.com`),
+      //provider: () => new HDWalletProvider(mnemonic, `https://polygon-mumbai.g.alchemy.com/v2/${AlchemyProjectAPIKey}`),
       network_id: 80001,       // Custom network
       confirmations: 2,
       timeoutBlocks: 200,
